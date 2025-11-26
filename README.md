@@ -24,6 +24,8 @@ The fictional application gives you room to be creative while still modeling rea
 
 This creates a fun but meaningful environment for demonstrating domain modeling and system design.
 
+📄 [Functional Specification](docs/cat_app/functional_spec.md)
+
 ---
 
 ## 2. Architecture: Hexagonal + DDD (HexDDD)
@@ -41,6 +43,8 @@ Additionally, the project includes:
 
 This portion of the project showcases architectural thinking at a senior/staff level.
 
+📄 [DDD & Hex Component Reference](docs/framework/hexdd_architecture.md) · [Bounded Contexts Overview](docs/cat_app/all_bounded_contexts.md) · [Cat & Content BC Architecture](docs/cat_app/cat_content_architecture.md)
+
 ---
 
 ## 3. Reference Implementation: Catalog BC in Rails
@@ -52,6 +56,8 @@ A Rails application provides a concrete example of using the HexDDD framework in
 
 This serves as a living demonstration of how to structure a Rails app following DDD and hexagonal patterns.
 
+📄 [Full Implementation Spec](docs/cat_app/cat_content_implementation.md)
+
 ---
 
 ## 4. Portfolio Goal
@@ -62,4 +68,96 @@ This entire effort forms a single, polished portfolio narrative:
 - **Software craftsmanship** through the HexDDD Ruby library and Rails reference implementation
 
 **In short: the goal of the HexDDD cat e-commerce project is to build a playful but serious end-to-end showcase of your design, architecture, and coding skills, suitable for recruiters, hiring managers, and engineering leaders.**
+
+---
+
+## 5. Monorepo Structure
+
+```
+hexddd/
+├── apps/
+│   ├── web/                          # Next.js frontend
+│   │   ├── app/
+│   │   ├── components/
+│   │   ├── package.json
+│   │   └── ...
+│   │
+│   └── api/                          # Rails backend (mounts engines)
+│       ├── app/
+│       ├── config/
+│       ├── Gemfile
+│       └── ...
+│
+├── engines/
+│   └── catalog/                      # Catalog bounded context engine
+│       ├── app/
+│       │   ├── domain/
+│       │   ├── application/
+│       │   └── infrastructure/
+│       ├── lib/
+│       ├── catalog.gemspec
+│       └── ...
+│
+├── gems/
+│   └── hexddd/                       # HexDDD framework gem
+│       ├── lib/
+│       │   └── hexddd/
+│       ├── hexddd.gemspec
+│       └── ...
+│
+└── docs/
+    ├── cat_app/
+    └── framework/
+```
+
+### Directory Overview
+
+| Directory | Purpose |
+|-----------|---------|
+| `apps/web` | Next.js application serving the cat e-commerce UI |
+| `apps/api` | Rails application that mounts bounded context engines and exposes the API |
+| `engines/catalog` | Rails engine implementing the Catalog bounded context using HexDDD patterns |
+| `gems/hexddd` | Pure-Ruby gem providing DDD + Hexagonal Architecture building blocks |
+| `docs/` | Architecture documentation, specs, and bounded context definitions |
+
+### Engine Mounting
+
+Each bounded context lives in its own Rails engine under `engines/`. The main Rails app (`apps/api`) mounts these engines:
+
+```ruby
+# apps/api/config/routes.rb
+Rails.application.routes.draw do
+  mount Catalog::Engine, at: "/catalog"
+  # Future: mount Commerce::Engine, at: "/commerce"
+  # Future: mount Auth::Engine, at: "/auth"
+end
+```
+
+### Dependency Flow
+
+```
+┌─────────────┐
+│   apps/web  │  (Next.js)
+└──────┬──────┘
+       │ HTTP/JSON
+       ▼
+┌─────────────┐
+│   apps/api  │  (Rails)
+└──────┬──────┘
+       │ mounts
+       ▼
+┌─────────────────────────────────────┐
+│            engines/*                │
+│  ┌─────────┐  ┌─────────┐  ┌─────┐  │
+│  │ catalog │  │commerce │  │auth │  │
+│  └────┬────┘  └────┬────┘  └──┬──┘  │
+└───────┼────────────┼──────────┼─────┘
+        │            │          │
+        └────────────┼──────────┘
+                     │ depends on
+                     ▼
+              ┌─────────────┐
+              │ gems/hexddd │  (pure Ruby)
+              └─────────────┘
+```
 
