@@ -1,0 +1,86 @@
+.card {
+  background: linear-gradient(135deg, #fff3e4, #f0eaff);
+  border-radius: 18px;
+  border: 1px solid rgba(31, 27, 36, 0.08);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 18px 36px rgba(31, 27, 36, 0.08);
+}
+
+.badge {
+  align-self: center;
+  background: #fff;
+  color: #5b436d;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  border: 1px dashed rgba(31, 27, 36, 0.12);
+}
+
+.ascii {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 16px;
+  line-height: 1.4;
+  border: 1px solid rgba(31, 27, 36, 0.06);
+}
+
+.title {
+  font-size: 28px;
+  margin: 8px 0;
+}
+
+.description {
+  color: var(--muted-foreground);
+  line-height: 1.6;
+  max-width: 600px;
+  font-size: 16px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.primaryButton,
+.secondaryButton,
+.shareButton {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+}
+
+.primaryButton {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  box-shadow: 0 12px 24px rgba(255, 140, 66, 0.25);
+}
+
+.secondaryButton {
+  background: #fff;
+  color: var(--foreground);
+  border: 1px solid rgba(31, 27, 36, 0.1);
+}
+
+.shareButton {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+.primaryButton:hover,
+.secondaryButton:hover,
+.shareButton:hover {
+  transform: translateY(-1px);
+}

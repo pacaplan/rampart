@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import styles from './Hero.module.css';
 import Button from '../ui/Button';
 
@@ -13,9 +14,11 @@ export default function Hero() {
       </div>
       <div className={styles.heroCtas}>
         <Button variant="primary">Browse Pre‑Made Cats</Button>
-        <Button variant="secondary" disabled className={styles.heroCtaSecondaryDisabled}>
-          Build Your Own with CatBot
-        </Button>
+        <Link href="/catbot">
+          <Button variant="secondary">
+            Build Your Own with CatBot
+          </Button>
+        </Link>
       </div>
       <div className={styles.heroCtaNote}>
         Building custom cats requires an account. Guests can preview the CatBot flow from the CatBot tab.
