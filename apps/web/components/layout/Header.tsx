@@ -1,20 +1,46 @@
+'use client';
+
 import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import styles from './Header.module.css';
 import CartButton from '../cart/CartButton';
 
 export default function Header() {
+  const pathname = usePathname();
+  
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return pathname === '/';
+    }
+    return pathname?.startsWith(path);
+  };
+
   return (
     <header className={styles.header}>
-      <div className={styles.headerLeft}>
+      <Link href="/" className={styles.headerLeft}>
         <div className={styles.logoMark}>🐾</div>
         <div>Custom Cat Co.</div>
-      </div>
+      </Link>
       <nav className={styles.headerCenter}>
-        <div className={`${styles.navLink} ${styles.navLinkActive}`}>
+        <Link 
+          href="/" 
+          className={`${styles.navLink} ${isActive('/') ? styles.navLinkActive : ''}`}
+        >
           Cat‑alog
-        </div>
-        <div className={styles.navLink}>CatBot</div>
-        <div className={styles.navLink}>FAQ</div>
+        </Link>
+        <Link 
+          href="/catbot" 
+          className={`${styles.navLink} ${isActive('/catbot') ? styles.navLinkActive : ''}`}
+        >
+          CatBot
+        </Link>
+        <Link 
+          href="/faq" 
+          className={`${styles.navLink} ${isActive('/faq') ? styles.navLinkActive : ''}`}
+        >
+          FAQ
+        </Link>
       </nav>
       <div className={styles.headerRight}>
         <div className={styles.authLink}>Log in / Sign up</div>

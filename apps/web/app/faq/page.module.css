@@ -16,27 +16,27 @@
   gap: 24px;
 }
 
-.content {
+.faqLayout {
   display: flex;
   gap: 20px;
   align-items: flex-start;
 }
 
-.contentMain {
+.faqMain {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.contentHeaderRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.faqSectionLabel {
   font-size: 13px;
+  font-weight: 600;
 }
 
-.contentHeaderRow span:nth-child(1) {
-  font-weight: 600;
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 

@@ -88,6 +88,11 @@
   margin-top: 4px;
 }
 
+.miniCartButtonLink {
+  flex: 1;
+  text-decoration: none;
+}
+
 .viewCartBtn {
   flex: 1;
 }

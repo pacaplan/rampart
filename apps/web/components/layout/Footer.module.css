@@ -18,6 +18,7 @@
 .footerLink {
   color: var(--muted-foreground);
   cursor: pointer;
+  text-decoration: none;
 }
 
 .footerNote {

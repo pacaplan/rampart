@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import styles from './MiniCart.module.css';
 import Button from '../ui/Button';
@@ -59,12 +60,16 @@ export default function MiniCart({ onClose }: MiniCartProps) {
         <span>{subtotal.toFixed(2)} ¢</span>
       </div>
       <div className={styles.miniCartActions}>
-        <Button variant="secondary" className={styles.viewCartBtn}>
-          View cart
-        </Button>
-        <Button variant="primary">
-          Checkout
-        </Button>
+        <Link href="/cart" onClick={onClose} className={styles.miniCartButtonLink}>
+          <Button variant="secondary" className={styles.viewCartBtn}>
+            View cart
+          </Button>
+        </Link>
+        <Link href="/checkout" onClick={onClose} className={styles.miniCartButtonLink}>
+          <Button variant="primary">
+            Checkout
+          </Button>
+        </Link>
       </div>
       <div className={styles.badgeNote}>
         Quantities are always 1 — every cat is one‑of‑a‑kind.

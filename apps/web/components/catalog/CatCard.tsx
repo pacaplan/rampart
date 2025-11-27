@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import styles from './CatCard.module.css';
 import Button from '../ui/Button';
@@ -29,9 +30,11 @@ export default function CatCard({ name, description, imageUrl, price, tag }: Cat
         <div className={styles.catMeta}>1 of 1 • {tag}</div>
       </div>
       <div className={styles.catActions}>
-        <Button variant="primary" className={styles.catAddBtn}>
-          Add to cart
-        </Button>
+        <Link href="/cart" className={styles.catAddBtnLink}>
+          <Button variant="primary" className={styles.catAddBtn}>
+            Add to cart
+          </Button>
+        </Link>
         <div className={styles.catViewLink}>View details</div>
       </div>
     </article>

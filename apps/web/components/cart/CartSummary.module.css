@@ -1,0 +1,116 @@
+.cartSummary {
+  width: 320px;
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  color: var(--card-foreground);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summaryTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.summaryRowMuted {
+  color: var(--muted-foreground);
+}
+
+.summaryDivider {
+  margin: 4px 0;
+  height: 1px;
+  background: var(--border);
+}
+
+.summaryTotal {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.summaryNote {
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.summaryCta {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summaryButtonLink {
+  width: 100%;
+  text-decoration: none;
+}
+
+.summaryButton {
+  width: 100%;
+}
+
+.summarySecondaryActions {
+  margin-top: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.summaryLinkish {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-foreground);
+  background: var(--accent);
+  border-radius: var(--radius-md);
+  padding: 6px 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.summaryMiniText {
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+.promoField {
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.fieldLabel {
+  font-weight: 500;
+}
+
+.promoRow {
+  display: flex;
+  gap: 6px;
+}
+
+.promoInput {
+  flex: 1;
+  border-radius: var(--radius-md);
+  background: var(--input);
+  border: 1px solid var(--border);
+  padding: 7px 8px;
+  font-size: 13px;
+  color: var(--foreground);
+}
+
+.promoPlaceholder {
+  color: var(--muted-foreground);
+}
+

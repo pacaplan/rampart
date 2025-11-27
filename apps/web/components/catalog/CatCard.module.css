@@ -70,6 +70,11 @@
   cursor: pointer;
 }
 
+.catAddBtnLink {
+  flex: 1;
+  text-decoration: none;
+}
+
 .catAddBtn {
   flex: 1;
 }
