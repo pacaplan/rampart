@@ -111,7 +111,7 @@ Examples:
 - `DatabaseTransactionAdapter`
 
 ### 3.3 Primary Adapters (Inbound)
-- HTTP/REST controllers (e.g., `/cat-alog`, `/custom-cats`)
+- HTTP/REST controllers (e.g., `/catalog`, `/custom-cats`) — see [REST API docs](./cat_content_api.md)
 - GraphQL resolvers
 - Background job handlers
 
