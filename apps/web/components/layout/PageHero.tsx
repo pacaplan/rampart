@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from './PageHero.module.css';
 
 interface PageHeroProps {
   title: string;
@@ -10,18 +9,18 @@ interface PageHeroProps {
 
 export default function PageHero({ title, subtitle, meta, steps }: PageHeroProps) {
   return (
-    <section className={styles.hero}>
-      <div className={styles.heroTitleRow}>
-        <div className={styles.heroTitle}>{title}</div>
-        <div className={styles.heroSubtitle}>{subtitle}</div>
+    <section className="mt-1 p-[18px_20px] rounded-lg bg-secondary text-secondary-foreground flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
+        <div className="text-[26px] font-bold">{title}</div>
+        <div className="text-[13px] max-w-[640px]">{subtitle}</div>
       </div>
-      {meta && <div className={styles.heroMeta}>{meta}</div>}
+      {meta && <div className="text-[11px] text-muted-foreground">{meta}</div>}
       {steps && steps.length > 0 && (
-        <div className={styles.heroSteps}>
+        <div className="flex gap-2 text-[11px] mt-[2px] flex-wrap">
           {steps.map((step, index) => (
-            <div 
-              key={index} 
-              className={`${styles.stepPill} ${step.active ? styles.stepPillActive : ''}`}
+            <div
+              key={index}
+              className={`px-2 py-1 rounded-full ${step.active ? 'bg-primary text-primary-foreground' : 'bg-card text-card-foreground'}`}
             >
               {step.label}
             </div>

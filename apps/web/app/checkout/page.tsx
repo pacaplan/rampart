@@ -9,7 +9,6 @@ import PaymentSection from '@/components/checkout/PaymentSection';
 import CartSummary from '@/components/cart/CartSummary';
 import Button from '@/components/ui/Button';
 import { cats } from '@/data/cats';
-import styles from './page.module.css';
 
 export default function CheckoutPage() {
   // Use first 2 cats as static cart contents
@@ -17,33 +16,33 @@ export default function CheckoutPage() {
   const subtotal = cartCats.reduce((sum, cat) => sum + cat.price, 0);
 
   return (
-    <div className={styles.page}>
-      <div className={styles.pageInner}>
+    <div className="bg-background text-foreground min-h-screen flex flex-col">
+      <div className="max-w-[1120px] mx-auto p-[24px_32px_40px_32px] flex flex-col gap-6">
         <Header />
         <CheckoutHero />
-        <main className={styles.checkoutLayout}>
-          <section className={styles.checkoutMain}>
+        <main className="flex gap-5 items-start">
+          <section className="flex-1 flex flex-col gap-4">
             <ContactSection />
             <DeliverySection />
             <PaymentSection />
-            <div className={styles.checkoutFooterActions}>
-              <div className={styles.checkoutFooterLeft}>
+            <div className="flex justify-between items-center mt-1 gap-3">
+              <div className="text-[12px] text-muted-foreground flex gap-2 items-center">
                 <Link href="/cart">
                   <Button variant="ghost">← Back to cart</Button>
                 </Link>
-                <div className={styles.inlineNote}>
+                <div className="text-[11px] text-muted-foreground">
                   You can still remove or swap cats before "placing" your pretend order.
                 </div>
               </div>
-              <div className={styles.checkoutFooterRight}>
+              <div className="flex gap-2 items-center">
                 <Button variant="secondary">Save checkout state</Button>
                 <Button variant="primary">Review & place pretend order</Button>
               </div>
             </div>
           </section>
-          <CartSummary 
-            itemCount={cartCats.length} 
-            subtotal={subtotal} 
+          <CartSummary
+            itemCount={cartCats.length}
+            subtotal={subtotal}
             showCheckout={false}
             showUniverseFees={true}
             showPromo={true}
@@ -54,6 +53,5 @@ export default function CheckoutPage() {
     </div>
   );
 }
-
 
 

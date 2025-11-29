@@ -1,64 +1,63 @@
 import React from 'react';
-import styles from './DeliverySection.module.css';
 
 export default function DeliverySection() {
   return (
-    <div className={styles.sectionCard}>
-      <div className={styles.sectionHeader}>
+    <div className="rounded-lg bg-card text-card-foreground p-[14px_14px_12px_14px] flex flex-col gap-[10px]">
+      <div className="flex justify-between items-center gap-2">
         <div>
-          <div className={styles.sectionTitle}>Delivery universe</div>
-          <div className={styles.sectionSubtitle}>
+          <div className="text-[14px] font-semibold">Delivery universe</div>
+          <div className="text-[12px] text-muted-foreground">
             Standard fields, whimsical answers. Pick where your cats should exist.
           </div>
         </div>
       </div>
-      <div className={styles.fieldGroup}>
-        <div className={styles.fieldRow}>
-          <div className={styles.field}>
-            <div className={styles.fieldLabel}>Reality setting</div>
-            <div className={styles.fieldInput}>
-              <div className={styles.fieldPlaceholder}>
+      <div className="flex flex-col gap-2">
+        <div className="flex gap-2">
+          <div className="flex-1 flex flex-col gap-1 text-[12px]">
+            <div className="font-medium">Reality setting</div>
+            <div className="rounded-md bg-input border border-border p-[7px_8px] text-[13px] text-foreground flex items-center justify-between gap-2">
+              <div className="text-muted-foreground">
                 Earth‑adjacent demo universe
               </div>
-              <div className={styles.fieldDropdown}>▼</div>
+              <div className="text-[11px] text-muted-foreground">▼</div>
             </div>
           </div>
         </div>
-        <div className={styles.fieldRow}>
-          <div className={styles.field}>
-            <div className={styles.fieldLabel}>City</div>
-            <div className={styles.fieldInput}>
-              <div className={styles.fieldPlaceholder}>Starfall City</div>
+        <div className="flex gap-2">
+          <div className="flex-1 flex flex-col gap-1 text-[12px]">
+            <div className="font-medium">City</div>
+            <div className="rounded-md bg-input border border-border p-[7px_8px] text-[13px] text-foreground flex items-center justify-between gap-2">
+              <div className="text-muted-foreground">Starfall City</div>
             </div>
           </div>
-          <div className={styles.field}>
-            <div className={styles.fieldLabel}>Region</div>
-            <div className={styles.fieldInput}>
-              <div className={styles.fieldPlaceholder}>Nebula District</div>
+          <div className="flex-1 flex flex-col gap-1 text-[12px]">
+            <div className="font-medium">Region</div>
+            <div className="rounded-md bg-input border border-border p-[7px_8px] text-[13px] text-foreground flex items-center justify-between gap-2">
+              <div className="text-muted-foreground">Nebula District</div>
             </div>
           </div>
         </div>
-        <div className={styles.fieldRow}>
-          <div className={styles.field}>
-            <div className={styles.fieldLabel}>
+        <div className="flex gap-2">
+          <div className="flex-1 flex flex-col gap-1 text-[12px]">
+            <div className="font-medium">
               Preferred delivery mode
-              <span className={styles.fieldOptional}> (imaginary)</span>
+              <span className="text-[11px] text-muted-foreground"> (imaginary)</span>
             </div>
-            <div className={styles.fieldInput}>
-              <div className={styles.fieldPlaceholder}>
+            <div className="rounded-md bg-input border border-border p-[7px_8px] text-[13px] text-foreground flex items-center justify-between gap-2">
+              <div className="text-muted-foreground">
                 Quantum doorstep drop‑off
               </div>
             </div>
           </div>
         </div>
-        <div className={styles.fieldRow}>
-          <div className={styles.field}>
-            <div className={styles.fieldLabel}>
+        <div className="flex gap-2">
+          <div className="flex-1 flex flex-col gap-1 text-[12px]">
+            <div className="font-medium">
               Special instructions
-              <span className={styles.fieldOptional}> (optional)</span>
+              <span className="text-[11px] text-muted-foreground"> (optional)</span>
             </div>
-            <div className={styles.fieldInput}>
-              <div className={styles.fieldPlaceholder}>
+            <div className="rounded-md bg-input border border-border p-[7px_8px] text-[13px] text-foreground flex items-center justify-between gap-2">
+              <div className="text-muted-foreground">
                 e.g. "Don't ring the doorbell, the dog unionized"
               </div>
             </div>
@@ -68,6 +67,5 @@ export default function DeliverySection() {
     </div>
   );
 }
-
 
 

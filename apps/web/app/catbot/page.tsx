@@ -17,7 +17,6 @@ import {
   imageProgress,
 } from '@/data/catbotResponses';
 import { ChatMessage, CatPreviewState } from '@/components/catbot/types';
-import styles from './page.module.css';
 
 type Step = 'intro' | 'question1' | 'question2' | 'question3' | 'question4' | 'result' | 'chat';
 
@@ -312,10 +311,10 @@ export default function CatBotPage() {
   };
 
   return (
-    <div className={styles.page}>
-      <div className={styles.pageInner}>
+    <div className="bg-background text-foreground min-h-screen flex flex-col">
+      <div className="max-w-[1120px] mx-auto p-[24px_32px_40px_32px] flex flex-col gap-6">
         <Header />
-        <main className={styles.content}>
+        <main className="p-5 bg-card rounded-lg text-muted-foreground">
           {step === 'intro' && (
             <QuizIntro onStart={handleStartQuiz} onSkip={handleSkipToChat} />
           )}
