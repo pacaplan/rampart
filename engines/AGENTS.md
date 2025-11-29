@@ -75,3 +75,12 @@ engines/cat_content/
 3. Mount engine in `apps/api/config/routes.rb`
 4. Document context in `docs/cat_app/`
 
+## Health Check Endpoint
+
+Each engine should implement a health check endpoint for troubleshooting:
+
+**Location:** `app/controllers/context_name/health_controller.rb`
+
+**Route:** `GET /mount_path/health` (e.g., `/catalog/health` for cat_content)
+
+**Purpose:** Verify database connectivity to the engine's isolated schema

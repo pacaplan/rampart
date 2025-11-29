@@ -133,3 +133,18 @@ rails server
 - All domain/application code is pure Ruby
 - Infrastructure code can use Rails
 - Each engine is completely isolated from others
+
+## Health Check Endpoints
+
+The API provides health check endpoints for troubleshooting connectivity issues:
+
+### Main Health Endpoint
+
+**Route:** `GET /health`
+
+**Purpose:** Comprehensive health check that aggregates status from all components
+
+**Checks:**
+- API service status
+- Primary database connectivity
+- All mounted engine health statuses

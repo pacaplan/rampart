@@ -33,12 +33,38 @@ This application uses:
    bundle install
    ```
 
-3. **Start the Rails server:**
+3. **Configure environment variables:**
+   
+   Copy the example env file:
+   ```bash
+   cp .env.example .env.development
+   ```
+   
+   The `.env.development` file is automatically loaded by `dotenv-rails`:
+   ```bash
+   # .env.development
+   FRONTEND_URL=http://localhost:3000
+   ```
+
+4. **Start the Rails server:**
    ```bash
    rails server
    ```
    
    API will be available at http://localhost:8000
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `FRONTEND_URL` | CORS allowed origin(s) for the frontend | `http://localhost:3000` (dev only) |
+
+For multiple origins, use comma-separated values:
+```bash
+FRONTEND_URL=https://app.example.com,https://www.example.com
+```
+
+**Note:** In production, `FRONTEND_URL` must be set or the app will fail to start.
 
 > **Note**: Supabase handles all database schema creation via its migrations in `supabase/migrations/`.
 > Rails just connects to what Supabase created - no Rails migrations needed.
