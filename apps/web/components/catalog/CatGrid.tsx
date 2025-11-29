@@ -1,6 +1,5 @@
 import React from 'react';
 import CatCard, { CatCardProps } from './CatCard';
-import styles from './CatGrid.module.css';
 
 interface CatGridProps {
   cats: CatCardProps[];
@@ -8,17 +7,17 @@ interface CatGridProps {
 
 export default function CatGrid({ cats }: CatGridProps) {
   return (
-    <div className={styles.gridAndEmpty}>
-      <div className={styles.catGrid}>
+    <div className="flex flex-col gap-[10px]">
+      <div className="grid grid-cols-3 gap-3">
         {cats.map((cat, index) => (
           <CatCard key={index} {...cat} />
         ))}
       </div>
-      <div className={styles.emptyState}>
-        <span>
+      <div className="flex justify-between items-center p-[10px_12px] rounded-md bg-muted text-muted-foreground text-[12px]">
+        <span className="max-w-[420px]">
           If you don't see your dream cat here, it just means it hasn't been imagined yet. That's what CatBot is for.
         </span>
-        <div className={styles.emptyStateCta}>
+        <div className="text-[12px] font-medium text-foreground cursor-pointer">
           Take the Cat Personality Quiz →
         </div>
       </div>
