@@ -1,4 +1,7 @@
 class HealthController < ApplicationController
+  # Capture boot time when this controller is first loaded
+  BOOT_TIME = Time.current.freeze
+
   # GET /health
   # Comprehensive health check that aggregates status from all components
   def show
@@ -62,9 +65,22 @@ class HealthController < ApplicationController
   end
 
   def uptime_string
-    # Calculate approximate uptime since Rails booted
-    boot_time = defined?(Rails.application.initialized?) ? Time.current : Time.current
-    "running"
+    # Calculate uptime since Rails booted
+    seconds = (Time.current - BOOT_TIME).to_i
+    return "just started" if seconds < 1
+
+    parts = []
+    days, seconds = seconds.divmod(86_400)
+    hours, seconds = seconds.divmod(3_600)
+    minutes, seconds = seconds.divmod(60)
+
+    parts << "#{days}d" if days > 0
+    parts << "#{hours}h" if hours > 0
+    parts << "#{minutes}m" if minutes > 0
+    parts << "#{seconds}s" if seconds > 0 || parts.empty?
+
+    parts.join(" ")
   end
 end
+
 

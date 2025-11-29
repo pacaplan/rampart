@@ -8,3 +8,4 @@ app/infrastructure/cat_content/persistence/models/
 
 See [engines/AGENTS.md](../../../AGENTS.md) for architecture guidelines.
 
+

@@ -7,8 +7,7 @@ module CatContent
         class CatListingMapper
           def to_domain(record)
             profile = if record.age_months || record.traits&.any? || record.temperament
-              Entities::CatProfile.new(
-                id: record.id,
+              ValueObjects::CatProfile.new(
                 age_months: record.age_months,
                 traits: ValueObjects::TraitSet.new(values: record.traits || []),
                 temperament: record.temperament

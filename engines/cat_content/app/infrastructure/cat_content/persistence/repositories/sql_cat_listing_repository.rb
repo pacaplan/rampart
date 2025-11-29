@@ -33,7 +33,13 @@ module CatContent
                         .offset((page - 1) * per_page)
                         .limit(per_page)
                         .map { |r| @mapper.to_domain(r) }
-            { cats: cats, meta: { page: page, per_page: per_page, total: total } }
+
+            ValueObjects::PaginatedResult.new(
+              items: cats,
+              total_count: total,
+              page: page,
+              per_page: per_page
+            )
           end
 
           def update(aggregate)

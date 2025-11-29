@@ -23,3 +23,4 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Comment explaining the schema isolation approach
 COMMENT ON SCHEMA cat_content IS 'Cat & Content bounded context - isolated schema for catalog and custom cat management';
 
+

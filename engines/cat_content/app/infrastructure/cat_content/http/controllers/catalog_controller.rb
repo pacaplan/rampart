@@ -8,21 +8,17 @@ module CatContent
           # GET /catalog
           # Returns paginated list of published cat listings
           def index
-            page = params[:page]&.to_i || 1
-            per_page = [params[:per_page]&.to_i || 20, 100].min
-            tags = parse_tags(params[:tags])
-
             query = Queries::ListCatListingsQuery.new(
-              tags: tags,
-              page: page,
-              per_page: per_page
+              tags: parse_tags(params[:tags]),
+              page: params[:page]&.to_i || 1,
+              per_page: [params[:per_page]&.to_i || 20, 100].min
             )
 
-            result = cat_listing_service.list(query)
+            paginated = cat_listing_service.list(query)
 
             render json: {
-              cats: result[:cats].map { |c| serializer(c).as_json },
-              meta: result[:meta]
+              cats: paginated.items.map { |c| serializer(c).as_json },
+              meta: paginated.to_meta
             }
           end
 
@@ -47,7 +43,7 @@ module CatContent
           private
 
           def cat_listing_service
-            Wiring::Container.resolve(:cat_listing_service)
+            @cat_listing_service ||= Wiring::Container.resolve(:cat_listing_service)
           end
 
           def serializer(cat)
