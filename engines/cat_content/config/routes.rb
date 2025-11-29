@@ -1,7 +1,8 @@
 CatContent::Engine.routes.draw do
-  get "health", to: "health#show"
-  
+  # All controllers live in app/infrastructure/cat_content/http/controllers/
+  get "health", to: "infrastructure/http/controllers/health#show"
+
   # Public catalog endpoints
-  get "catalog", to: "catalog#index"
-  get "catalog/:slug", to: "catalog#show"
+  get "catalog", to: "infrastructure/http/controllers/catalog#index"
+  get "catalog/:slug", to: "infrastructure/http/controllers/catalog#show"
 end

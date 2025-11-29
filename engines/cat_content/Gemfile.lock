@@ -1,7 +1,20 @@
 PATH
+  remote: ../../gems/hexddd
+  specs:
+    hexddd (0.1.0)
+      dry-auto_inject (~> 1.0)
+      dry-container (~> 0.11)
+      dry-initializer (~> 3.1)
+      dry-monads (~> 1.6)
+      dry-struct (~> 1.6)
+      dry-types (~> 1.7)
+
+PATH
   remote: .
   specs:
     cat_content (0.1.0)
+      dry-struct (~> 1.6)
+      dry-types (~> 1.7)
       rails (>= 8.1.1)
 
 GEM
@@ -91,6 +104,38 @@ GEM
     date (3.5.0)
     diff-lcs (1.6.2)
     drb (2.2.3)
+    dry-auto_inject (1.1.0)
+      dry-core (~> 1.1)
+      zeitwerk (~> 2.6)
+    dry-container (0.11.0)
+      concurrent-ruby (~> 1.0)
+    dry-core (1.1.0)
+      concurrent-ruby (~> 1.0)
+      logger
+      zeitwerk (~> 2.6)
+    dry-inflector (1.2.0)
+    dry-initializer (3.2.0)
+    dry-logic (1.6.0)
+      bigdecimal
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 1.1)
+      zeitwerk (~> 2.6)
+    dry-monads (1.9.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 1.1)
+      zeitwerk (~> 2.6)
+    dry-struct (1.8.0)
+      dry-core (~> 1.1)
+      dry-types (~> 1.8, >= 1.8.2)
+      ice_nine (~> 0.11)
+      zeitwerk (~> 2.6)
+    dry-types (1.8.3)
+      bigdecimal (~> 3.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 1.0)
+      dry-inflector (~> 1.0)
+      dry-logic (~> 1.4)
+      zeitwerk (~> 2.6)
     erb (6.0.0)
     erubi (1.13.1)
     factory_bot (6.5.6)
@@ -102,6 +147,7 @@ GEM
       activesupport (>= 6.1)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
+    ice_nine (0.11.2)
     io-console (0.8.1)
     irb (1.15.3)
       pp (>= 0.6.0)
@@ -294,6 +340,7 @@ PLATFORMS
 DEPENDENCIES
   cat_content!
   factory_bot_rails (~> 6.5)
+  hexddd!
   pg
   puma
   rspec-rails (~> 8.0)
