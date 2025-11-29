@@ -40,13 +40,13 @@ Each bounded context is a self-contained Rails engine:
 Each engine under `engines/` follows this layout:
 
 ```
-engines/catalog/
+engines/cat_content/
 ├── app/
 │   ├── domain/           # Aggregates, entities, value objects
 │   ├── application/      # Services, use cases
 │   └── infrastructure/   # Controllers, AR models, repos
 ├── lib/
-└── catalog.gemspec
+└── cat_content.gemspec
 ```
 
 ## Conventions

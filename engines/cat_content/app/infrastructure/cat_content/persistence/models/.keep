@@ -1,0 +1,3 @@
+# Models directory for ActiveRecord models
+# All models should inherit from BaseRecord to enforce schema isolation
+

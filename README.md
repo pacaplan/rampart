@@ -13,6 +13,40 @@ This project demonstrates creativity, engineering rigor, and practical coding ab
 
 ---
 
+## Getting Started
+
+### Quick Setup
+
+1. **Install Prerequisites**
+   - Ruby 3.3.6: `asdf install ruby 3.3.6`
+   - Docker Desktop (for Supabase)
+   - Supabase CLI: `brew install supabase/tap/supabase`
+
+2. **Start Supabase**
+   ```bash
+   supabase start
+   ```
+
+3. **Set up Rails API**
+   ```bash
+   cd apps/api
+   bundle install
+   rake db:setup:all
+   ```
+
+4. **Verify Setup**
+   ```bash
+   rake db:test:isolation
+   rails server
+   ```
+
+For detailed setup instructions, see:
+- [Rails API Setup](apps/api/README.md#setup)
+- [Cat & Content Engine](engines/cat_content/README.md#development)
+- [HexDDD Gem](gems/hexddd/README.md#installation)
+
+---
+
 ## 1. Product Concept: The Cat E‑commerce App
 The fictional application gives you room to be creative while still modeling realistic business logic. Key components include:
 - A **Cat-alog** for browsing pre-made cats
@@ -89,13 +123,13 @@ hexddd/
 │       └── ...
 │
 ├── engines/
-│   └── catalog/                      # Catalog bounded context engine
+│   └── cat_content/                  # Cat & Content bounded context engine
 │       ├── app/
 │       │   ├── domain/
 │       │   ├── application/
 │       │   └── infrastructure/
 │       ├── lib/
-│       ├── catalog.gemspec
+│       ├── cat_content.gemspec
 │       └── ...
 │
 ├── gems/
@@ -116,7 +150,7 @@ hexddd/
 |-----------|---------|
 | `apps/web` | Next.js application serving the cat e-commerce UI |
 | `apps/api` | Rails application that mounts bounded context engines and exposes the API |
-| `engines/catalog` | Rails engine implementing the Catalog bounded context using HexDDD patterns |
+| `engines/cat_content` | Rails engine implementing the Cat & Content bounded context using HexDDD patterns |
 | `gems/hexddd` | Pure-Ruby gem providing DDD + Hexagonal Architecture building blocks |
 | `docs/` | Architecture documentation, specs, and bounded context definitions |
 
@@ -127,7 +161,7 @@ Each bounded context lives in its own Rails engine under `engines/`. The main Ra
 ```ruby
 # apps/api/config/routes.rb
 Rails.application.routes.draw do
-  mount Catalog::Engine, at: "/catalog"
+  mount CatContent::Engine, at: "/catalog"
   # Future: mount Commerce::Engine, at: "/commerce"
   # Future: mount Auth::Engine, at: "/auth"
 end
@@ -146,12 +180,12 @@ end
 └──────┬──────┘
        │ mounts
        ▼
-┌─────────────────────────────────────┐
-│            engines/*                │
-│  ┌─────────┐  ┌─────────┐  ┌─────┐  │
-│  │ catalog │  │commerce │  │auth │  │
-│  └────┬────┘  └────┬────┘  └──┬──┘  │
-└───────┼────────────┼──────────┼─────┘
+┌──────────────────────────────────────────┐
+│            engines/*                     │
+│  ┌────────────┐  ┌─────────┐  ┌─────┐   │
+│  │cat_content │  │commerce │  │auth │   │
+│  └─────┬──────┘  └────┬────┘  └──┬──┘   │
+└────────┼─────────────┼──────────┼────────┘
         │            │          │
         └────────────┼──────────┘
                      │ depends on
