@@ -2,15 +2,6 @@
 
 # Avoid CORS issues when API is called from the frontend app.
 # Handle Cross-Origin Resource Sharing (CORS) in order to accept cross-origin Ajax requests.
-#
-# Configuration:
-# - All environments: Reads from FRONTEND_URL environment variable
-#   Example: FRONTEND_URL=https://app.example.com
-#   Multiple origins: FRONTEND_URL=https://app.example.com,https://www.example.com
-# - Development: Can be set in .env.development file
-# - Production: Must be set as environment variable
-#
-# Read more: https://github.com/cyu/rack-cors
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
@@ -20,7 +11,13 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
     
     origins(
       if origin_env.nil? || origin_env.empty?
-        raise "CORS: FRONTEND_URL environment variable must be set in production"
+        if Rails.env.production?
+          raise "CORS: FRONTEND_URL environment variable must be set in production"
+        else
+          # Development fallback if .env.development is missing
+          Rails.logger.warn("CORS: FRONTEND_URL not set. Defaulting to http://localhost:3000")
+          "http://localhost:3000"
+        end
       else
         # Parse comma-separated origins or use single origin
         origins_list = origin_env.split(",").map(&:strip).reject(&:empty?)
@@ -28,8 +25,12 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
       end
     )
 
-    resource "*",
-      headers: :any,
-      methods: [:get, :post, :put, :patch, :delete, :options, :head]
-  end
-end
+# Rails.application.config.middleware.insert_before 0, Rack::Cors do
+#   allow do
+#     origins "example.com"
+#
+#     resource "*",
+#       headers: :any,
+#       methods: [:get, :post, :put, :patch, :delete, :options, :head]
+#   end
+# end

@@ -18,5 +18,12 @@ module CatContent
     # Eager load domain and application layers in production
     config.eager_load_paths << root.join('app/domain')
     config.eager_load_paths << root.join('app/application')
+    
+    # Explicitly load infrastructure persistence models since autoloading doesn't work
+    # due to directory structure mismatch (app/infrastructure/cat_content/* vs CatContent::Infrastructure::*)
+    config.to_prepare do
+      require_dependency Engine.root.join('app/infrastructure/cat_content/persistence/base_record')
+      require_dependency Engine.root.join('app/infrastructure/cat_content/persistence/models/cat_listing_record')
+    end
   end
 end
