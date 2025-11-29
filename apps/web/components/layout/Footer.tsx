@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="mt-5 pt-4 border-t border-transparent flex justify-between items-center text-xs gap-4">
+    <footer className="mt-5 pt-4 border-t border-border flex justify-between items-center text-xs gap-4">
       <div className="flex gap-3 flex-wrap">
         <Link href="/faq" className="text-muted-foreground cursor-pointer no-underline">FAQ</Link>
         <div className="text-muted-foreground cursor-pointer">Is this real?</div>

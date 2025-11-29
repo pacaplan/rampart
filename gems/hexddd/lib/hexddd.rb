@@ -3,12 +3,14 @@ require "dry-struct"
 require "dry-container"
 require "dry-auto_inject"
 require "dry-monads"
+require "dry-initializer"
 
 require_relative "hexddd/version"
 require_relative "hexddd/support/types"
 require_relative "hexddd/support/result"
-require_relative "hexddd/domain/aggregate_root"
+require_relative "hexddd/support/container"
 require_relative "hexddd/domain/entity"
+require_relative "hexddd/domain/aggregate_root"
 require_relative "hexddd/domain/value_object"
 require_relative "hexddd/domain/domain_event"
 require_relative "hexddd/domain/domain_exception"
@@ -21,4 +23,3 @@ require_relative "hexddd/ports/secondary_port"
 
 module HexDDD
 end
-

@@ -8,8 +8,9 @@ This is the main Rails API application that serves as the host for bounded conte
 
 1. **Bounded Contexts as Rails Engines** - Each bounded context lives in `engines/` as a mountable Rails engine
 2. **Schema Isolation** - Each engine uses its own PostgreSQL schema with restricted search_path
-3. **Pure Domain/Application Layers** - Domain and application code must be pure Ruby (no Rails)
-4. **Infrastructure Only in Rails** - Only infrastructure layer (controllers, repos, adapters) uses Rails
+3. **Supabase for Schema Management** - All database schemas/tables are created by Supabase migrations
+4. **Pure Domain/Application Layers** - Domain and application code must be pure Ruby (no Rails)
+5. **Infrastructure Only in Rails** - Only infrastructure layer (controllers, repos, adapters) uses Rails
 
 ## Database Configuration
 
@@ -17,6 +18,7 @@ The app uses local Supabase with PostgreSQL schema isolation:
 
 - **Primary Database**: Uses `public` schema for app-level tables
 - **Engine Databases**: Each engine uses its own schema (e.g., `cat_content`)
+- **Schema Creation**: Handled by Supabase migrations in `supabase/migrations/`
 - **Search Path Restriction**: Each connection only sees its designated schema
 
 ### Multi-Database Setup
@@ -72,9 +74,16 @@ development:
    mount ContextName::Engine => "/path"
    ```
 
-6. **Create schema migration in Supabase:**
+6. **Create Supabase migration** in `supabase/migrations/`:
    ```sql
    CREATE SCHEMA IF NOT EXISTS context_name;
+   
+   -- Create tables in the schema
+   CREATE TABLE context_name.your_table (
+     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+     -- columns...
+   );
+   
    GRANT USAGE ON SCHEMA context_name TO postgres;
    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA context_name TO postgres;
    ```
@@ -84,36 +93,16 @@ development:
    context_name:
      <<: *supabase_local
      schema_search_path: context_name
-     migrations_paths: db/migrate/context_name
    ```
-
-## Testing Schema Isolation
-
-Run the isolation test to verify schemas are properly separated:
-
-```bash
-rake db:test:isolation
-```
-
-This verifies:
-- Each schema can only see its own tables
-- Search paths are correctly configured
-- No cross-schema leakage
 
 ## Common Tasks
 
 ```bash
-# Start Supabase
+# Start Supabase (creates all schemas)
 supabase start
 
-# Set up all schemas
-rake db:setup:all
-
-# Run migrations for a specific engine
-rake db:context_name:migrate
-
-# Test schema isolation
-rake db:test:isolation
+# Reset database (recreates from migrations)
+supabase db reset
 
 # Start Rails server
 rails server
@@ -140,8 +129,7 @@ rails server
 ## Conventions
 
 - Engine models inherit from engine-specific `BaseRecord`
-- Migrations live in `engines/context_name/db/migrate`
+- Database schemas are managed by Supabase (not Rails migrations)
 - All domain/application code is pure Ruby
 - Infrastructure code can use Rails
 - Each engine is completely isolated from others
-

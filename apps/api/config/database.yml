@@ -34,12 +34,10 @@ development:
   primary:
     <<: *supabase_local
     schema_search_path: public
-    migrations_paths: db/migrate
   
   cat_content:
     <<: *supabase_local
     schema_search_path: cat_content
-    migrations_paths: db/migrate/cat_content
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -48,12 +46,10 @@ test:
   primary:
     <<: *supabase_local
     schema_search_path: public
-    migrations_paths: db/migrate
   
   cat_content:
     <<: *supabase_local
     schema_search_path: cat_content
-    migrations_paths: db/migrate/cat_content
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -90,7 +86,6 @@ production:
     host: <%= ENV.fetch("DATABASE_HOST", "localhost") %>
     port: <%= ENV.fetch("DATABASE_PORT", "5432") %>
     schema_search_path: public
-    migrations_paths: db/migrate
   
   cat_content:
     <<: *default
@@ -100,7 +95,6 @@ production:
     host: <%= ENV.fetch("DATABASE_HOST", "localhost") %>
     port: <%= ENV.fetch("DATABASE_PORT", "5432") %>
     schema_search_path: cat_content
-    migrations_paths: db/migrate/cat_content
   
   cache:
     <<: *default

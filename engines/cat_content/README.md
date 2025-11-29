@@ -47,7 +47,7 @@ This engine uses its own PostgreSQL schema (`cat_content`) completely isolated f
 
 - **Database Connection**: Dedicated connection with `search_path: "cat_content"`
 - **BaseRecord**: All models inherit from `CatContent::Infrastructure::Persistence::BaseRecord`
-- **Migrations**: Stored in `db/migrate/` within this engine
+- **Schema Management**: Handled by Supabase migrations (not Rails migrations)
 - **Tables**: Only visible to this engine's connection
 
 ```ruby
@@ -59,6 +59,8 @@ end
 ```
 
 ## Database Tables
+
+Tables are created by Supabase migrations in `supabase/migrations/`.
 
 ### cat_listings
 Premade, curated cats for the catalog.
@@ -92,48 +94,17 @@ User-generated custom cats created via AI.
 
 ## Setup
 
-This engine is automatically set up when you run `rake db:setup:all` from the host application (`apps/api`).
-
-### Manual Setup
-
-If you need to set up the engine separately:
-
-1. **Create the schema:**
-   ```bash
-   cd apps/api
-   rake db:cat_content:create
-   ```
-
-2. **Run migrations:**
-   ```bash
-   rake db:cat_content:migrate
-   ```
-
-3. **Verify isolation:**
-   ```bash
-   rake db:test:isolation
-   ```
-
-## Development
-
-### Running Migrations
+This engine uses tables created by Supabase. Just run `supabase start` from the project root.
 
 ```bash
-# From host app (apps/api)
-rake db:cat_content:migrate
-rake db:cat_content:rollback
+# From project root
+supabase start
 ```
 
-### Testing Schema Isolation
-
+To recreate schemas:
 ```bash
-rake db:test:isolation
+supabase db reset
 ```
-
-This verifies that:
-1. Primary database cannot see cat_content tables
-2. Cat_content database can see its own tables
-3. Search paths are correctly configured
 
 ## API Endpoints
 

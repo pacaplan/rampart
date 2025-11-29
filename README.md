@@ -31,14 +31,35 @@ This project demonstrates creativity, engineering rigor, and practical coding ab
    ```bash
    cd apps/api
    bundle install
-   rake db:setup:all
    ```
 
-4. **Verify Setup**
+4. **Set up Web App**
    ```bash
-   rake db:test:isolation
-   rails server
+   cd apps/web
+   npm install
    ```
+
+5. **Start both servers**
+   ```bash
+   # From the project root
+   scripts/start_dev.sh
+   ```
+   
+   This will start:
+   - Web app on http://localhost:3000
+   - API on http://localhost:8000
+   
+   Or start them individually:
+   ```bash
+   # API only
+   cd apps/api && rails server
+   
+   # Web app only
+   cd apps/web && npm run dev
+   ```
+
+> **Note**: Supabase handles all database schema creation via its migrations.
+> Rails just connects to what Supabase created - no Rails migrations needed.
 
 For detailed setup instructions, see:
 - [Rails API Setup](apps/api/README.md#setup)

@@ -6,7 +6,7 @@ Rails 8 API application implementing Hexagonal Architecture with DDD principles,
 
 This application uses:
 - **Bounded Contexts as Rails Engines** - Each bounded context is a separate Rails engine
-- **Schema Isolation** - Each engine uses its own PostgreSQL schema
+- **Schema Isolation** - Each engine uses its own PostgreSQL schema (managed by Supabase)
 - **HexDDD Framework** - Pure Ruby DDD building blocks (domain, application, ports/adapters)
 - **Local Supabase** - PostgreSQL with separate schemas for each bounded context
 
@@ -18,56 +18,30 @@ This application uses:
 
 ## Setup
 
-1. **Install dependencies:**
+1. **Start local Supabase** (from project root):
    ```bash
-   bundle install
-   ```
-
-2. **Start local Supabase:**
-   ```bash
-   # From project root
    supabase start
    ```
    
-   This will output connection details:
-   - **API URL**: http://localhost:54321
+   This creates all schemas and tables via Supabase migrations. Connection details:
    - **DB URL**: postgresql://postgres:postgres@localhost:54322/postgres
    - **Studio URL**: http://localhost:54323
-   - **Anon Key**: (generated key)
-   - **Service Role Key**: (generated key)
 
-3. **Set up all database schemas:**
+2. **Install dependencies:**
    ```bash
-   rake db:setup:all
-   ```
-   
-   This creates:
-   - The `public` schema (for primary database)
-   - The `cat_content` schema (for Cat & Content bounded context)
-   - Runs migrations for all schemas
-
-4. **Verify schema isolation:**
-   ```bash
-   rake db:test:isolation
-   ```
-   
-   Expected output:
-   ```
-   🔍 Testing schema isolation...
-   1️⃣ Testing primary database (public schema)...
-      ✅ PASSED: Primary database isolated from cat_content
-   2️⃣ Testing cat_content database (cat_content schema)...
-      ✅ PASSED: Cat_content database can see its tables
-   3️⃣ Testing search_path configuration...
-      ✅ PASSED: Cat_content search_path correctly configured
+   cd apps/api
+   bundle install
    ```
 
-5. **Start the Rails server:**
+3. **Start the Rails server:**
    ```bash
    rails server
    ```
    
-   API will be available at http://localhost:3000
+   API will be available at http://localhost:8000
+
+> **Note**: Supabase handles all database schema creation via its migrations in `supabase/migrations/`.
+> Rails just connects to what Supabase created - no Rails migrations needed.
 
 ### Troubleshooting
 
@@ -83,14 +57,7 @@ If you see "Cannot connect to Docker daemon":
 3. Verify `config/database.yml` has correct host/port
 
 **Schema Not Found:**
-1. Run migrations: `supabase db reset`
-2. Recreate schemas: `rake db:setup:all`
-
-**Engine Can See Other Engine's Tables:**
-If schema isolation is broken:
-1. Check BaseRecord uses `connects_to`
-2. Verify database.yml has correct `schema_search_path`
-3. Run isolation test: `rake db:test:isolation`
+Run `supabase db reset` to recreate all schemas from migrations.
 
 ## Schema Isolation
 
@@ -101,34 +68,7 @@ Each bounded context engine has its own PostgreSQL schema with isolated `search_
 | Primary App | `public` | `public` | App-level tables |
 | Cat & Content | `cat_content` | `cat_content` | `cat_listings`, `custom_cats` |
 
-### Testing Schema Isolation
-
-Run the isolation test to verify schemas are properly isolated:
-
-```bash
-rake db:test:isolation
-```
-
-This test verifies:
-1. Primary database cannot see cat_content tables
-2. Cat_content database can see its own tables
-3. Search paths are correctly configured
-
-### Database Commands
-
-```bash
-# Create cat_content schema
-rake db:cat_content:create
-
-# Run cat_content migrations
-rake db:cat_content:migrate
-
-# Rollback cat_content migrations
-rake db:cat_content:rollback
-
-# Run isolation test
-rake db:test:isolation
-```
+Schemas are created by Supabase migrations in `supabase/migrations/`.
 
 ## Bounded Contexts
 
@@ -149,7 +89,7 @@ rails server
 # Access Supabase Studio
 open http://localhost:54323
 
-# Run console with cat_content connection
+# Run console
 rails console
 ```
 
@@ -160,9 +100,6 @@ apps/api/
 ├── app/              # Primary application code
 ├── config/
 │   └── database.yml  # Multi-schema configuration
-└── lib/
-    └── tasks/
-        └── db_schemas.rake  # Schema management tasks
 
 engines/
 └── cat_content/      # Cat & Content bounded context
@@ -170,13 +107,14 @@ engines/
     │   ├── domain/            # Pure Ruby domain layer
     │   ├── application/       # Pure Ruby application layer
     │   └── infrastructure/    # Rails-specific infrastructure
-    └── db/
-        └── migrate/           # Cat_content schema migrations
 
 gems/
 └── hexddd/          # DDD framework gem
     └── lib/
         └── hexddd/  # Domain, application, and port abstractions
+
+supabase/
+└── migrations/      # Source of truth for all database schemas
 ```
 
 ## Testing
@@ -192,8 +130,6 @@ gems/
 - Cat & Content engine mounted at `/catalog`
 - HexDDD gem integration
 - Kamal deployment configuration
-- Database management rake tasks
-- Schema isolation testing
 
 ### 🔜 Next Steps
 1. Implement domain models (Value Objects, Entities, Aggregates)

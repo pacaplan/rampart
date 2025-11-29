@@ -1,229 +1,4 @@
-# HexDDD Framework + Cat & Content Bounded Context
-
-This document describes the full technical specification for:
-
-1. **HexDDD** — a pure-Ruby framework implementing Domain‑Driven Design + Hexagonal Architecture using dry‑rb gems.
-2. **Cat & Content Bounded Context Implementation** inside a Rails engine — using HexDDD for domain and application layers, and Rails only inside the infrastructure layer.
-
-It includes:
-- Directory structure
-- Component architecture
-- Example implementations
-- Rails integration details
-
----
-
-## 1. HexDDD GEM — Architecture and Design
-
-HexDDD is a pure-Ruby gem that provides foundational building blocks for creating bounded contexts.
-
-### 1.1 Principles
-- **No Rails dependency**
-- Built on **dry-types**, **dry-struct**, **dry-container**, **dry-auto_inject**, **dry-monads**
-- Provides abstractions for Domain, Application, Ports, Adapters
-- Follows Hexagonal Architecture conventions
-
-### 1.2 Directory Structure
-```
-hexddd/
-  lib/
-    hexddd.rb
-    hexddd/
-      domain/
-        aggregate_root.rb
-        entity.rb
-        value_object.rb
-        domain_event.rb
-        domain_exception.rb
-        domain_service.rb
-      application/
-        command.rb
-        query.rb
-        service.rb
-        transaction.rb
-      ports/
-        secondary_port.rb
-      support/
-        result.rb
-        types.rb
-    hexddd/version.rb
-```
-
-### 1.3 Example Implementations
-
-#### AggregateRoot
-```ruby
-module HexDDD
-  module Domain
-    class AggregateRoot
-      attr_reader :id, :unpublished_events
-
-      def initialize(id:)
-        @id = id
-        @unpublished_events = []
-      end
-
-      private
-
-      def apply(event)
-        @unpublished_events << event
-        handler = "on_#{event.class.name.split('::').last.underscore}"
-        send(handler, event) if respond_to?(handler, true)
-      end
-
-      def clear_events!
-        @unpublished_events.clear
-      end
-    end
-  end
-end
-```
-
-#### Entity
-```ruby
-module HexDDD
-  module Domain
-    class Entity < Dry::Struct
-      # Entities have identity and can be compared by id
-      def ==(other)
-        other.is_a?(self.class) && other.id == id
-      end
-    end
-  end
-end
-```
-
-#### Secondary Port (Interface)
-```ruby
-module HexDDD
-  module Ports
-    class SecondaryPort
-      def self.abstract_method(*names)
-        names.each do |name|
-          define_method(name) { |*| raise NotImplementedError, "#{self.class}##{name}" }
-        end
-      end
-    end
-  end
-end
-```
-
-#### Domain Exception
-```ruby
-module HexDDD
-  module Domain
-    class DomainException < StandardError
-      attr_reader :code, :context
-
-      def initialize(message, code: nil, context: {})
-        @code = code
-        @context = context
-        super(message)
-      end
-    end
-  end
-end
-```
-
-Example domain-specific exceptions:
-```ruby
-module CatContent
-  module Exceptions
-    class CatNotFoundError < HexDDD::Domain::DomainException
-      def initialize(cat_id)
-        super(
-          "Cat #{cat_id} not found",
-          code: :cat_not_found,
-          context: { cat_id: cat_id }
-        )
-      end
-    end
-
-    class InvalidSlugError < HexDDD::Domain::DomainException
-      def initialize(slug, reason:)
-        super(
-          "Invalid slug '#{slug}': #{reason}",
-          code: :invalid_slug,
-          context: { slug: slug, reason: reason }
-        )
-      end
-    end
-  end
-end
-```
-
-#### Command / Query
-```ruby
-module HexDDD
-  module Application
-    class Command < Dry::Struct
-      transform_keys(&:to_sym)
-    end
-
-    class Query < Dry::Struct
-      transform_keys(&:to_sym)
-    end
-  end
-end
-```
-
-#### Application Service
-```ruby
-module HexDDD
-  module Application
-    class Service
-      include Dry::Monads[:result]
-
-      def initialize(dependencies = {})
-        dependencies.each { |k, v| instance_variable_set("@#{k}", v) }
-      end
-    end
-  end
-end
-```
-
-#### Transaction Boundary
-```ruby
-module HexDDD
-  module Application
-    class Transaction
-      def initialize(adapter)
-        @adapter = adapter
-      end
-
-      def call(&block)
-        @adapter.call(&block)
-      end
-    end
-  end
-end
-```
-
-#### Domain Event (with Versioning)
-```ruby
-require "dry-struct"
-require "securerandom"
-
-module HexDDD
-  module Domain
-    class DomainEvent < Dry::Struct
-      # Schema version enables event evolution without breaking consumers.
-      # Increment when adding/removing/renaming attributes.
-      SCHEMA_VERSION = 1
-
-      attribute :event_id, Types::String.default { SecureRandom.uuid }
-      attribute :occurred_at, Types::Time.default { Time.now }
-      attribute :schema_version, Types::Integer.default { self::SCHEMA_VERSION }
-
-      def event_type
-        self.class.name
-      end
-    end
-  end
-end
-```
-
----
+# Cat & Content Bounded Context
 
 # 2. Rails Engine — Cat & Content Bounded Context
 
@@ -338,7 +113,7 @@ engines/cat_content/
 ```ruby
 module CatContent
   module ValueObjects
-    class CatId < Dry::Struct
+    class CatId < HexDDD::Domain::ValueObject
       attribute :value, Types::String
 
       def to_s = value
@@ -355,7 +130,7 @@ end
 ```ruby
 module CatContent
   module ValueObjects
-    class CustomCatId < Dry::Struct
+    class CustomCatId < HexDDD::Domain::ValueObject
       attribute :value, Types::String
 
       def to_s = value
@@ -368,7 +143,7 @@ end
 ```ruby
 module CatContent
   module ValueObjects
-    class CatName < Dry::Struct
+    class CatName < HexDDD::Domain::ValueObject
       MAX_LENGTH = 100
       MIN_LENGTH = 1
 
@@ -387,7 +162,7 @@ end
 ```ruby
 module CatContent
   module ValueObjects
-    class Slug < Dry::Struct
+    class Slug < HexDDD::Domain::ValueObject
       VALID_SLUG_PATTERN = /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/
       MAX_LENGTH = 100
 
@@ -418,7 +193,7 @@ end
 ```ruby
 module CatContent
   module ValueObjects
-    class TagList < Dry::Struct
+    class TagList < HexDDD::Domain::ValueObject
       attribute :values, Types::Array.of(Types::String)
 
       def include?(tag)
@@ -435,7 +210,7 @@ end
 ```ruby
 module CatContent
   module ValueObjects
-    class TraitSet < Dry::Struct
+    class TraitSet < HexDDD::Domain::ValueObject
       VALID_TRAITS = %i[playful lazy curious friendly independent vocal cuddly adventurous].freeze
 
       attribute :values, Types::Array.of(Types::Symbol.enum(*VALID_TRAITS))
@@ -454,7 +229,7 @@ end
 ```ruby
 module CatContent
   module ValueObjects
-    class Visibility < Dry::Struct
+    class Visibility < HexDDD::Domain::ValueObject
       STATES = %i[public private archived].freeze
 
       attribute :value, Types::Symbol.enum(*STATES)
@@ -473,7 +248,7 @@ end
 ```ruby
 module CatContent
   module ValueObjects
-    class ContentBlock < Dry::Struct
+    class ContentBlock < HexDDD::Domain::ValueObject
       MAX_LENGTH = 5000
 
       attribute :text, Types::String.constrained(max_size: MAX_LENGTH)
@@ -488,7 +263,7 @@ end
 ```ruby
 module CatContent
   module ValueObjects
-    class CatMedia < Dry::Struct
+    class CatMedia < HexDDD::Domain::ValueObject
       attribute :url, Types::String
       attribute :alt_text, Types::String.optional.default(nil)
       attribute :content_type, Types::String.optional.default(nil)
@@ -501,7 +276,7 @@ end
 ```ruby
 module CatContent
   module ValueObjects
-    class CatPrompt < Dry::Struct
+    class CatPrompt < HexDDD::Domain::ValueObject
       attribute :text, Types::String
       attribute :quiz_results, Types::Hash.optional.default(nil)
 
@@ -515,7 +290,7 @@ end
 ```ruby
 module CatContent
   module ValueObjects
-    class CatStory < Dry::Struct
+    class CatStory < HexDDD::Domain::ValueObject
       attribute :text, Types::String
       attribute :generated_at, Types::Time.default { Time.now }
 
@@ -529,7 +304,7 @@ end
 ```ruby
 module CatContent
   module ValueObjects
-    class Money < Dry::Struct
+    class Money < HexDDD::Domain::ValueObject
       attribute :amount_cents, Types::Integer
       attribute :currency, Types::String.default("USD")
 
@@ -573,19 +348,15 @@ end
 module CatContent
   module Aggregates
     class CatListing < HexDDD::Domain::AggregateRoot
-      attr_reader :name, :description, :price, :slug, :visibility, :profile, :media, :tags
-
-      def initialize(id:, name:, description:, price:, slug:, visibility:, tags: nil, profile: nil, media: nil)
-        super(id: id)
-        @name = name
-        @description = description
-        @price = price
-        @slug = slug
-        @visibility = visibility
-        @tags = tags || ValueObjects::TagList.new(values: [])
-        @profile = profile
-        @media = media
-      end
+      attribute :id, ValueObjects::CatId
+      attribute :name, ValueObjects::CatName
+      attribute :description, ValueObjects::ContentBlock
+      attribute :price, ValueObjects::Money
+      attribute :slug, ValueObjects::Slug
+      attribute :visibility, ValueObjects::Visibility
+      attribute :tags, ValueObjects::TagList
+      attribute :profile, Entities::CatProfile.optional.default(nil)
+      attribute :media, ValueObjects::CatMedia.optional.default(nil)
 
       def self.create(id:, name:, description:, price:, slug:, tags: nil)
         listing = new(
@@ -633,17 +404,13 @@ end
 module CatContent
   module Aggregates
     class CustomCat < HexDDD::Domain::AggregateRoot
-      attr_reader :user_id, :name, :prompt, :story, :visibility, :media
-
-      def initialize(id:, user_id:, name:, prompt:, story:, visibility:, media: nil)
-        super(id: id)
-        @user_id = user_id
-        @name = name
-        @prompt = prompt
-        @story = story
-        @visibility = visibility
-        @media = media
-      end
+      attribute :id, ValueObjects::CustomCatId
+      attribute :user_id, Types::String
+      attribute :name, ValueObjects::CatName
+      attribute :prompt, ValueObjects::CatPrompt
+      attribute :story, ValueObjects::CatStory
+      attribute :visibility, ValueObjects::Visibility
+      attribute :media, ValueObjects::CatMedia.optional.default(nil)
 
       def self.create(id:, user_id:, name:, prompt:, story:)
         cat = new(
@@ -907,23 +674,11 @@ end
 module CatContent
   module Services
     class CatListingService < HexDDD::Application::Service
-      def initialize(
-        cat_listing_repo:,
-        id_generator:,
-        clock:,
-        transaction:,
-        event_bus:
-      )
-        @repo = cat_listing_repo
-        @id_gen = id_generator
-        @clock = clock
-        @tx = transaction
-        @bus = event_bus
-      end
+      include Import[:cat_listing_repo, :id_generator, :clock, :transaction, :event_bus]
 
       # [Consumer] Browse/filter Cat-alog
       def list(query)
-        @repo.list_public(
+        cat_listing_repo.list_public(
           tags: query.tags,
           page: query.page,
           per_page: query.per_page
@@ -932,13 +687,13 @@ module CatContent
 
       # [Consumer] Retrieve single cat details
       def get(id)
-        @repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
+        cat_listing_repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
       end
 
       # [Admin] Create a new premade cat
       def create(command)
-        @tx.call do
-          id = ValueObjects::CatId.new(value: @id_gen.generate)
+        transaction.call do
+          id = ValueObjects::CatId.new(value: id_generator.generate)
           name = ValueObjects::CatName.new(value: command.name)
           description = ValueObjects::ContentBlock.new(text: command.description)
           price = ValueObjects::Money.new(
@@ -959,7 +714,7 @@ module CatContent
             tags: tags
           )
 
-          @repo.add(listing)
+          cat_listing_repo.add(listing)
           publish_events(listing)
           Success(listing)
         end
@@ -967,10 +722,10 @@ module CatContent
 
       # [Admin] Make cat publicly visible
       def publish(id)
-        @tx.call do
-          listing = @repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
+        transaction.call do
+          listing = cat_listing_repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
           listing.publish!
-          @repo.update(listing)
+          cat_listing_repo.update(listing)
           publish_events(listing)
           Success(listing)
         end
@@ -978,10 +733,10 @@ module CatContent
 
       # [Admin] Remove cat from public view
       def archive(id)
-        @tx.call do
-          listing = @repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
+        transaction.call do
+          listing = cat_listing_repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
           listing.archive!
-          @repo.update(listing)
+          cat_listing_repo.update(listing)
           publish_events(listing)
           Success(listing)
         end
@@ -990,7 +745,7 @@ module CatContent
       private
 
       def publish_events(aggregate)
-        aggregate.unpublished_events.each { |e| @bus.publish(e) }
+        aggregate.unpublished_events.each { |e| event_bus.publish(e) }
         aggregate.clear_events!
       end
     end
@@ -1003,44 +758,30 @@ end
 module CatContent
   module Services
     class CustomCatService < HexDDD::Application::Service
-      def initialize(
-        custom_cat_repo:,
-        language_model:,
-        id_generator:,
-        clock:,
-        transaction:,
-        event_bus:
-      )
-        @repo = custom_cat_repo
-        @llm = language_model
-        @id_gen = id_generator
-        @clock = clock
-        @tx = transaction
-        @bus = event_bus
-      end
+      include Import[:custom_cat_repo, :language_model, :id_generator, :clock, :transaction, :event_bus]
 
       # [Consumer] List user's custom cats
       def list(user_id, include_archived: false)
-        @repo.list_by_user(user_id, include_archived: include_archived)
+        custom_cat_repo.list_by_user(user_id, include_archived: include_archived)
       end
 
       # [Consumer] Retrieve single custom cat details
       def get(id)
-        @repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
+        custom_cat_repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
       end
 
       # [Consumer] Create new custom cat via LLM
       def generate(command)
-        @tx.call do
-          id = ValueObjects::CustomCatId.new(value: @id_gen.generate)
+        transaction.call do
+          id = ValueObjects::CustomCatId.new(value: id_generator.generate)
           prompt = ValueObjects::CatPrompt.new(
             text: command.prompt_text,
             quiz_results: command.quiz_results
           )
 
           # Generate name suggestions and story via LLM
-          names = @llm.generate_names(prompt)
-          story_text = @llm.generate_story(prompt, names.first)
+          names = language_model.generate_names(prompt)
+          story_text = language_model.generate_story(prompt, names.first)
           story = ValueObjects::CatStory.new(text: story_text)
           name = ValueObjects::CatName.new(value: names.first)
 
@@ -1052,7 +793,7 @@ module CatContent
             story: story
           )
 
-          @repo.add(cat)
+          custom_cat_repo.add(cat)
           publish_events(cat)
           Success(cat)
         end
@@ -1060,12 +801,12 @@ module CatContent
 
       # [Consumer] Regenerate AI description
       def regenerate_description(id)
-        @tx.call do
-          cat = @repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
-          new_story_text = @llm.regenerate_description(cat.prompt, cat.name)
+        transaction.call do
+          cat = custom_cat_repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
+          new_story_text = language_model.regenerate_description(cat.prompt, cat.name)
           new_story = ValueObjects::CatStory.new(text: new_story_text)
           cat.regenerate_story!(new_story)
-          @repo.update(cat)
+          custom_cat_repo.update(cat)
           publish_events(cat)
           Success(cat)
         end
@@ -1073,11 +814,11 @@ module CatContent
 
       # [Consumer] Archive a custom cat
       def archive(id, user_id:)
-        @tx.call do
-          cat = @repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
+        transaction.call do
+          cat = custom_cat_repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
           raise Exceptions::UnauthorizedError.new unless cat.user_id == user_id
           cat.archive!
-          @repo.update(cat)
+          custom_cat_repo.update(cat)
           publish_events(cat)
           Success(cat)
         end
@@ -1085,7 +826,7 @@ module CatContent
 
       # [Admin] List all custom cats for moderation
       def list_all(query)
-        @repo.list_all(
+        custom_cat_repo.list_all(
           page: query.page,
           per_page: query.per_page
         )
@@ -1094,7 +835,7 @@ module CatContent
       private
 
       def publish_events(aggregate)
-        aggregate.unpublished_events.each { |e| @bus.publish(e) }
+        aggregate.unpublished_events.each { |e| event_bus.publish(e) }
         aggregate.clear_events!
       end
     end
@@ -1422,44 +1163,33 @@ end
 
 ## 5.7 Dependency Container
 
+The bounded context uses `dry-container` for dependency registration and `dry-auto_inject` for 
+automatic dependency injection. Services declare their dependencies via `include Import[...]` 
+and the container handles all wiring automatically.
+
 ```ruby
 module CatContent
-  module Infrastructure
-    class Container
-      extend Dry::Container::Mixin
+  class Container
+    extend Dry::Container::Mixin
 
-      register(:clock) { Adapters::SystemClockAdapter.new }
-      register(:id_generator) { Adapters::UuidIdGeneratorAdapter.new }
-      register(:transaction) { Adapters::DatabaseTransactionAdapter.new }
-      register(:event_bus) { Rails.configuration.event_bus }
+    # Infrastructure adapters
+    register(:clock) { Infrastructure::Adapters::SystemClockAdapter.new }
+    register(:id_generator) { Infrastructure::Adapters::UuidIdGeneratorAdapter.new }
+    register(:transaction) { Infrastructure::Adapters::DatabaseTransactionAdapter.new }
+    register(:event_bus) { Rails.configuration.event_bus }
+    register(:language_model) { Infrastructure::Adapters::OpenAIApiLanguageModelAdapter.new }
 
-      register(:language_model) { Adapters::OpenAIApiLanguageModelAdapter.new }
+    # Repositories
+    register(:cat_listing_repo) { Infrastructure::Persistence::SqlCatListingRepository.new }
+    register(:custom_cat_repo) { Infrastructure::Persistence::SqlCustomCatRepository.new }
 
-      register(:cat_listing_repo) { Persistence::SqlCatListingRepository.new }
-      register(:custom_cat_repo) { Persistence::SqlCustomCatRepository.new }
-
-      register(:cat_listing_service) do
-        Services::CatListingService.new(
-          cat_listing_repo: resolve(:cat_listing_repo),
-          id_generator: resolve(:id_generator),
-          clock: resolve(:clock),
-          transaction: resolve(:transaction),
-          event_bus: resolve(:event_bus)
-        )
-      end
-
-      register(:custom_cat_service) do
-        Services::CustomCatService.new(
-          custom_cat_repo: resolve(:custom_cat_repo),
-          language_model: resolve(:language_model),
-          id_generator: resolve(:id_generator),
-          clock: resolve(:clock),
-          transaction: resolve(:transaction),
-          event_bus: resolve(:event_bus)
-        )
-      end
-    end
+    # Application services (auto-inject handles dependency wiring)
+    register(:cat_listing_service) { Services::CatListingService.new }
+    register(:custom_cat_service) { Services::CustomCatService.new }
   end
+
+  # Import mixin for automatic dependency injection
+  Import = Dry::AutoInject(Container)
 end
 ```
 

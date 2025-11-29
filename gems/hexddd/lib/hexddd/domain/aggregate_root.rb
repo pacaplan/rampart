@@ -1,10 +1,10 @@
 module HexDDD
   module Domain
-    class AggregateRoot
-      attr_reader :id, :unpublished_events
+    class AggregateRoot < Entity
+      attr_reader :unpublished_events
 
-      def initialize(id:)
-        @id = id
+      def initialize(...)
+        super
         @unpublished_events = []
       end
 
@@ -22,4 +22,3 @@ module HexDDD
     end
   end
 end
-
