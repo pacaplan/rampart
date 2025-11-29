@@ -4,7 +4,6 @@ import Footer from '@/components/layout/Footer';
 import PageHero from '@/components/layout/PageHero';
 import FAQItem from '@/components/faq/FAQItem';
 import FAQAside from '@/components/faq/FAQAside';
-import styles from './page.module.css';
 
 const faqData = [
   {
@@ -56,20 +55,20 @@ const faqData = [
 
 export default function FAQPage() {
   return (
-    <div className={styles.page}>
-      <div className={styles.pageInner}>
+    <div className="bg-background text-foreground min-h-screen flex flex-col">
+      <div className="max-w-[1120px] mx-auto p-[24px_32px_40px_32px] flex flex-col gap-6">
         <Header />
         <PageHero
           title="FAQ & About This Cat‑periment"
           subtitle="Publicly visible answers for curious humans, recruiters, and anyone wondering if they've accidentally stumbled into a real cat store (you have not)."
           meta="Spoiler: everything here is imaginary, but the code and the human who wrote it are very real."
         />
-        <main className={styles.faqLayout}>
-          <section className={styles.faqMain}>
-            <div className={styles.faqSectionLabel}>
+        <main className="flex gap-5 items-start">
+          <section className="flex-1 flex flex-col gap-5">
+            <div className="text-xs text-muted-foreground uppercase tracking-[0.08em] font-extrabold">
               Core questions humans keep asking
             </div>
-            <div className={styles.faqList}>
+            <div className="flex flex-col gap-4">
               {faqData.map((faq, index) => (
                 <FAQItem
                   key={index}
