@@ -1,10 +1,40 @@
 # Rampart
 
-A pure-Ruby framework for building Domain-Driven Design applications with Hexagonal Architecture.
+A pure-Ruby framework for building Domain-Driven Design applications with Hexagonal Architecture and Clean Architecture principles.
 
 ## Overview
 
 Rampart provides building blocks for implementing DDD patterns in Ruby applications. It enforces clean architecture by separating domain logic from infrastructure concerns.
+
+## Architecture Patterns
+
+Rampart implements three complementary architectural approaches from the [Rampart Vision](../../docs/rampart/rampart_vision.md):
+
+### 3.1 Domain-Driven Design (DDD)
+
+Strategic and tactical patterns for aligning software with business domains:
+- **Aggregates** - Consistency boundaries with `AggregateRoot`
+- **Entities** - Objects with identity via `Entity`
+- **Value Objects** - Immutable objects compared by value via `ValueObject`
+- **Domain Events** - Business-meaningful occurrences via `DomainEvent`
+- **Domain Services** - Logic that doesn't belong to entities via `DomainService`
+
+### 3.2 Hexagonal Architecture (Ports & Adapters)
+
+Domain and application logic in the center, infrastructure as adapters:
+- **Secondary Ports** - Outbound interfaces defined in domain layer (`SecondaryPort`)
+- **Adapters** - Infrastructure implementations of ports
+- **Dependency Inversion** - Domain depends on abstractions, not implementations
+
+### 3.3 Clean Architecture Alignment
+
+Rampart's patterns align with Uncle Bob's Clean Architecture principles:
+- **Dependency Rule** - Domain and Application layers have no outward dependencies
+- **Framework Independence** - Domain layer is pure Ruby with no Rails dependencies
+- **Use Cases** - Application Services orchestrate domain logic (equivalent to Clean Architecture "use cases")
+- **Testability** - Business rules can be tested without UI, database, or external systems
+
+The layer-first directory structure (`domain/`, `application/`, `infrastructure/`) provides predictable navigation and AI-friendly conventions across all bounded contexts.
 
 ## Features
 

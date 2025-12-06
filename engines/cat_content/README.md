@@ -8,7 +8,26 @@ This engine manages:
 - **Cat Listings** - Premade, curated cats in the catalog
 - **Custom Cats** - User-generated, AI-created cat records
 
-The engine follows strict Hexagonal Architecture + DDD principles with complete schema isolation.
+## Architecture Patterns
+
+This engine implements three architectural approaches from the [Rampart Vision](../../docs/rampart/rampart_vision.md):
+
+| Pattern | Implementation |
+|---------|----------------|
+| **3.1 DDD** | Aggregates (`CatListing`, `CustomCat`), Value Objects, Domain Events, Ports |
+| **3.2 Hexagonal** | Ports in `domain/ports/`, Adapters in `infrastructure/` |
+| **3.3 Clean Architecture** | Dependency rule, framework-independent domain, use cases as Application Services |
+
+### Why Layer-First (Not Feature-First)
+
+The engine uses layer-first organization (`domain/`, `application/`, `infrastructure/`) rather than feature-first ("Screaming Architecture") because:
+
+1. **The engine name IS the scream** - `cat_content` clearly identifies the bounded context
+2. **Shared domain objects** - Aggregates and ports are used across multiple use cases
+3. **Predictable navigation** - Consistent structure across all bounded context engines
+4. **AI-friendly** - Tools can predict file locations without knowing feature names
+
+Application Services (`CatListingService`, `CustomCatService`) serve as Clean Architecture "use cases", orchestrating domain logic while maintaining the dependency rule.
 
 ## Architecture
 
