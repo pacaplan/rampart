@@ -1,4 +1,4 @@
-# Agent Guidelines for HexDDD Project
+# Agent Guidelines for Rampart Project
 
 ## Project Overview
 
@@ -11,7 +11,7 @@ This is a monorepo showcasing DDD + Hexagonal Architecture patterns through a ca
 | `apps/web/` | Next.js | Frontend UI for the cat e-commerce app |
 | `apps/api/` | Rails | Backend API that mounts bounded context engines |
 | `engines/*/` | Rails Engines | Isolated bounded contexts (Catalog, Commerce, Auth) |
-| `gems/hexddd/` | Pure Ruby | Framework gem with DDD building blocks |
+| `gems/rampart/` | Pure Ruby | Framework gem with DDD building blocks |
 | `docs/` | Markdown | Architecture specs and bounded context definitions |
 
 ---
@@ -52,7 +52,7 @@ Before starting a non-trivial task, create a plan document in `docs/plans/`:
 
 ## Reference Documentation
 
-- [HexDDD Architecture](docs/framework/hexdd_architecture.md)
+- [Rampart Architecture](docs/framework/hexdd_architecture.md)
 - [Bounded Contexts Overview](docs/cat_app/all_bounded_contexts.md)
 - [Cat & Content BC Architecture](docs/cat_app/cat_content_architecture.md)
 - [Implementation Spec](docs/cat_app/cat_content_implementation.md)

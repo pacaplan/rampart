@@ -1,9 +1,9 @@
-# HexDDD Framework + Catalog Bounded Context
+# Rampart Framework + Catalog Bounded Context
 
 This document describes the full technical specification for:
 
-1. **HexDDD** — a pure-Ruby framework implementing Domain‑Driven Design + Hexagonal Architecture using dry‑rb gems.
-2. **Catalog Bounded Context Implementation** inside a Rails app — using HexDDD for domain and application layers, and Rails only inside the infrastructure layer.
+1. **Rampart** — a pure-Ruby framework implementing Domain‑Driven Design + Hexagonal Architecture using dry‑rb gems.
+2. **Catalog Bounded Context Implementation** inside a Rails app — using Rampart for domain and application layers, and Rails only inside the infrastructure layer.
 
 It includes:
 - Directory structure
@@ -13,9 +13,9 @@ It includes:
 
 ---
 
-## 1. HexDDD GEM — Architecture and Design
+## 1. Rampart GEM — Architecture and Design
 
-HexDDD is a pure-Ruby gem that provides foundational building blocks for creating bounded contexts.
+Rampart is a pure-Ruby gem that provides foundational building blocks for creating bounded contexts.
 
 ### 1.1 Principles
 - **No Rails dependency**
@@ -25,10 +25,10 @@ HexDDD is a pure-Ruby gem that provides foundational building blocks for creatin
 
 ### 1.2 Directory Structure
 ```
-hexddd/
+rampart/
   lib/
-    hexddd.rb
-    hexddd/
+    rampart.rb
+    rampart/
       domain/
         aggregate_root.rb
         entity.rb
@@ -52,14 +52,14 @@ hexddd/
       support/
         result.rb
         id.rb
-    hexddd/version.rb
+    rampart/version.rb
 ```
 
 ### 1.3 Example Implementations
 
 #### AggregateRoot
 ```ruby
-module HexDDD
+module Rampart
   module Domain
     class AggregateRoot
       attr_reader :id, :unpublished_events
@@ -87,7 +87,7 @@ end
 
 #### Repository Interface
 ```ruby
-module HexDDD
+module Rampart
   module Domain
     class Repository
       def add(_)  = raise NotImplementedError
@@ -100,7 +100,7 @@ end
 
 #### Domain Exception
 ```ruby
-module HexDDD
+module Rampart
   module Domain
     class DomainException < StandardError
       attr_reader :code, :context
@@ -119,7 +119,7 @@ Example domain-specific exceptions:
 ```ruby
 module Catalog
   module Exceptions
-    class CatAlreadyListedError < HexDDD::Domain::DomainException
+    class CatAlreadyListedError < Rampart::Domain::DomainException
       def initialize(cat_id)
         super(
           "Cat #{cat_id} is already listed",
@@ -129,7 +129,7 @@ module Catalog
       end
     end
 
-    class InvalidSlugError < HexDDD::Domain::DomainException
+    class InvalidSlugError < Rampart::Domain::DomainException
       def initialize(slug, reason:)
         super(
           "Invalid slug '#{slug}': #{reason}",
@@ -144,7 +144,7 @@ end
 
 #### Command / Query
 ```ruby
-module HexDDD
+module Rampart
   module Application
     class Command
       def initialize(**attrs)
@@ -163,7 +163,7 @@ end
 
 #### Transaction Boundary
 ```ruby
-module HexDDD
+module Rampart
   module Application
     class Transaction
       def initialize(adapter)
@@ -183,7 +183,7 @@ end
 require "dry-struct"
 require "securerandom"
 
-module HexDDD
+module Rampart
   module Domain
     class DomainEvent < Dry::Struct
       # Schema version enables event evolution without breaking consumers.
@@ -206,7 +206,7 @@ Example versioned domain event:
 ```ruby
 module Catalog
   module Events
-    class CatListed < HexDDD::Domain::DomainEvent
+    class CatListed < Rampart::Domain::DomainEvent
       SCHEMA_VERSION = 1
 
       attribute :cat_id, Types::String
@@ -215,7 +215,7 @@ module Catalog
     end
 
     # Example: V2 adds a new field without breaking existing consumers
-    class CatListedV2 < HexDDD::Domain::DomainEvent
+    class CatListedV2 < Rampart::Domain::DomainEvent
       SCHEMA_VERSION = 2
 
       attribute :cat_id, Types::String
@@ -230,7 +230,7 @@ end
 
 #### Primary & Secondary Ports
 ```ruby
-module HexDDD
+module Rampart
   module Ports
     module PrimaryPort; end
     module SecondaryPort; end
@@ -359,7 +359,7 @@ end
 ```ruby
 module Catalog
   module Aggregates
-    class CatListing < HexDDD::Domain::AggregateRoot
+    class CatListing < Rampart::Domain::AggregateRoot
       STATUS_LISTED = "listed"
       STATUS_UNLISTED = "unlisted"
 
@@ -403,8 +403,8 @@ end
 
 ## Command Example
 ```ruby
-class Catalog::Application::Commands::ListCat < HexDDD::Application::Command
-  include HexDDD::Ports::PrimaryPort
+class Catalog::Application::Commands::ListCat < Rampart::Application::Command
+  include Rampart::Ports::PrimaryPort
 
   attr_reader :id, :name, :price_cents, :currency, :slug, :cat_type
 end
@@ -412,7 +412,7 @@ end
 
 ## Handler Example
 ```ruby
-class Catalog::Application::Handlers::ListCatHandler < HexDDD::Application::Handler
+class Catalog::Application::Handlers::ListCatHandler < Rampart::Application::Handler
   include Dry::Monads[:result]
 
   def initialize(cat_listing_repo:, transaction:, event_bus:)
@@ -554,7 +554,7 @@ end
 ## Rails Wiring
 ```ruby
 Catalog::Infrastructure::Wiring::Registry.register(:catalog_transaction) do
-  HexDDD::Application::Transaction.new(->(&block) { ActiveRecord::Base.transaction(&block) })
+  Rampart::Application::Transaction.new(->(&block) { ActiveRecord::Base.transaction(&block) })
 end
 
 Catalog::Infrastructure::Wiring::Registry.register(:cat_listing_repo) do

@@ -1,4 +1,4 @@
-# Cat & Content Bounded Context – HexDDD Component Map
+# Cat & Content Bounded Context – Rampart Component Map
 
 ## 0. Scope of this BC
 
@@ -138,5 +138,5 @@ Examples:
 
 ---
 
-This is the complete HexDDD component map for the **Cat & Content bounded context only**, derived from all three project documents (bounded context diagram, HexDDD table, and functional spec).
+This is the complete Rampart component map for the **Cat & Content bounded context only**, derived from all three project documents (bounded context diagram, Rampart table, and functional spec).
 

@@ -176,7 +176,7 @@ Publicly visible FAQ with curated humorous content. The FAQ serves dual purposes
 - **Q:** Like — really?
   **A:** Of course not, silly!
 - **Q:** Then why does this exist?
-  **A:** I am available for work as a software engineer. This is my purr‑tfolio! Check out the code on https://github.com/pacaplan/hexddd.
+  **A:** This is an example application for the "Architecture on Rails" framework: https://github.com/pacaplan/rampart.
 - **Q:** But I need a cat!
   **A:** There are many excellent models available for adoption! Find the one for you here: https://www.aspca.org/adopt-pet/find-shelter
 

@@ -1,5 +1,5 @@
 {
-  "name": "@hexddd/web",
+  "name": "@rampart/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {

@@ -25,7 +25,7 @@ export default function FAQAside() {
         </div>
         <div className="mt-[6px] flex flex-col gap-1 text-[12px]">
           <div className="text-[12px] font-medium text-accent-foreground bg-accent rounded-md px-2 py-[6px] cursor-pointer inline-flex items-center gap-1 no-underline mb-1">
-            View the code on github.com/pacaplan/hexddd
+            View the code on github.com/pacaplan/rampart
           </div>
           <div className="text-[11px] text-muted-foreground mt-1">
             Want to talk? You can open an issue, reach out via the contact info in the repo, or just mention the "imaginary cat store" in your message so I know how you found me.

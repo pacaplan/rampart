@@ -1,13 +1,13 @@
-# HexDDD Project Summary
+# Rampart Project Summary
 
 ## Overview
-The HexDDD project is a cohesive portfolio piece designed to showcase a complete spectrum of software engineering skills across product ideation, user interface design, architecture, and implementation.
+The Rampart project is a cohesive portfolio piece designed to showcase a complete spectrum of software engineering skills across product ideation, user interface design, architecture, and implementation.
 
 At its core, it combines:
 - **A playful product concept** (a fictional cat e-commerce platform)
 - **A strong architectural foundation** (Domain-Driven Design + Hexagonal Architecture)
-- **A custom Ruby framework** (HexDDD) that formalizes these patterns
-- **A real Rails implementation** of the Catalog bounded context using the HexDDD library
+- **A custom Ruby framework** (Rampart) that formalizes these patterns
+- **A real Rails implementation** of the Catalog bounded context using the Rampart library
 
 This project demonstrates creativity, engineering rigor, and practical coding ability.
 
@@ -28,8 +28,8 @@ This creates a fun but meaningful environment for demonstrating domain modeling 
 
 ---
 
-## 2. Architecture: Hexagonal + DDD (HexDDD)
-The HexDDD framework encapsulates:
+## 2. Architecture: Hexagonal + DDD (Rampart)
+The Rampart framework encapsulates:
 - Aggregates, entities, value objects, and domain events
 - Repository interfaces and implementations
 - Domain and application services
@@ -48,7 +48,7 @@ This portion of the project showcases architectural thinking at a senior/staff l
 ---
 
 ## 3. Reference Implementation: Catalog BC in Rails
-A Rails application provides a concrete example of using the HexDDD framework in practice. It:
+A Rails application provides a concrete example of using the Rampart framework in practice. It:
 - Places `domain`, `application`, and `infrastructure` directories directly under `app/`
 - Uses *only* the infrastructure layer for Rails specifics (controllers, ActiveRecord)
 - Keeps domain and application layers pure Ruby
@@ -65,16 +65,16 @@ This entire effort forms a single, polished portfolio narrative:
 - **Product creativity** through the Cat-alog concept
 - **UI skill** through the planned frontend design
 - **Architecture expertise** through DDD + hex modeling and documentation
-- **Software craftsmanship** through the HexDDD Ruby library and Rails reference implementation
+- **Software craftsmanship** through the Rampart Ruby library and Rails reference implementation
 
-**In short: the goal of the HexDDD cat e-commerce project is to build a playful but serious end-to-end showcase of your design, architecture, and coding skills, suitable for recruiters, hiring managers, and engineering leaders.**
+**In short: the goal of the Rampart cat e-commerce project is to build a playful but serious end-to-end showcase of your design, architecture, and coding skills, suitable for recruiters, hiring managers, and engineering leaders.**
 
 ---
 
 ## 5. Monorepo Structure
 
 ```
-hexddd/
+rampart/
 ├── apps/
 │   ├── web/                          # Next.js frontend
 │   │   ├── app/
@@ -99,10 +99,10 @@ hexddd/
 │       └── ...
 │
 ├── gems/
-│   └── hexddd/                       # HexDDD framework gem
+│   └── rampart/                       # Rampart framework gem
 │       ├── lib/
-│       │   └── hexddd/
-│       ├── hexddd.gemspec
+│       │   └── rampart/
+│       ├── rampart.gemspec
 │       └── ...
 │
 └── docs/
@@ -116,8 +116,8 @@ hexddd/
 |-----------|---------|
 | `apps/web` | Next.js application serving the cat e-commerce UI |
 | `apps/api` | Rails application that mounts bounded context engines and exposes the API |
-| `engines/catalog` | Rails engine implementing the Catalog bounded context using HexDDD patterns |
-| `gems/hexddd` | Pure-Ruby gem providing DDD + Hexagonal Architecture building blocks |
+| `engines/catalog` | Rails engine implementing the Catalog bounded context using Rampart patterns |
+| `gems/rampart` | Pure-Ruby gem providing DDD + Hexagonal Architecture building blocks |
 | `docs/` | Architecture documentation, specs, and bounded context definitions |
 
 ### Engine Mounting
@@ -157,7 +157,7 @@ end
                      │ depends on
                      ▼
               ┌─────────────┐
-              │ gems/hexddd │  (pure Ruby)
+              │ gems/rampart │  (pure Ruby)
               └─────────────┘
 ```
 

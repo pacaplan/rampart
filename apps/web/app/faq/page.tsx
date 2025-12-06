@@ -20,8 +20,8 @@ const faqData = [
     question: 'Then why does this exist?',
     answer: 'I am available for work as a software engineer. This is my purr‑tfolio — a playground to show product thinking, UX decisions, and front‑end implementation. If you\'re a recruiter, hiring manager, or future teammate, you can inspect the code and architecture here:',
     tag: 'Developer disclosure',
-    linkText: 'github.com/pacaplan/hexddd',
-    linkUrl: 'https://github.com/pacaplan/hexddd',
+    linkText: 'github.com/pacaplan/rampart',
+    linkUrl: 'https://github.com/pacaplan/rampart',
     note: 'Yes, that link is manually typed on purpose so you can see it clearly in screenshots and screen recordings.'
   },
   {
