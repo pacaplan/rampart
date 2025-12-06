@@ -39,6 +39,13 @@ Only approaches that score **High** on at least one of these goals are included 
 - **Maintain Sync Between Code and Architecture**: Support workflows where changes in one must be reflected in the other.
 - **Rails‑Friendly, Not Rails‑Dependent**: The design supports Rails engines but keeps the core principles framework‑agnostic.
 
+### What Rampart Is Not
+
+- Rampart is not a Rails rewrite.
+- It is not a code generator for business logic; scaffolding stays minimal and structural.
+- It is not a static analyzer like RuboCop.
+- It does not prescribe specific ORMs, controllers, or background job frameworks.
+
 ---
 
 ## 3. Architecture Approaches
