@@ -13,6 +13,61 @@ This project demonstrates creativity, engineering rigor, and practical coding ab
 
 ---
 
+## Getting Started
+
+### Quick Setup
+
+1. **Install Prerequisites**
+   - Ruby 3.3.6: `asdf install ruby 3.3.6`
+   - Docker Desktop (for Supabase)
+   - Supabase CLI: `brew install supabase/tap/supabase`
+
+2. **Start Supabase**
+   ```bash
+   supabase start
+   ```
+
+3. **Set up Rails API**
+   ```bash
+   cd apps/api
+   bundle install
+   ```
+
+4. **Set up Web App**
+   ```bash
+   cd apps/web
+   npm install
+   ```
+
+5. **Start both servers**
+   ```bash
+   # From the project root
+   scripts/start_dev.sh
+   ```
+   
+   This will start:
+   - Web app on http://localhost:3000
+   - API on http://localhost:8000
+   
+   Or start them individually:
+   ```bash
+   # API only
+   cd apps/api && rails server
+   
+   # Web app only
+   cd apps/web && npm run dev
+   ```
+
+> **Note**: Supabase handles all database schema creation via its migrations.
+> Rails just connects to what Supabase created - no Rails migrations needed.
+
+For detailed setup instructions, see:
+- [Rails API Setup](apps/api/README.md#setup)
+- [Cat & Content Engine](engines/cat_content/README.md#development)
+- [Rampart Gem](gems/rampart/README.md#installation)
+
+---
+
 ## 1. Product Concept: The Cat E‑commerce App
 The fictional application gives you room to be creative while still modeling realistic business logic. Key components include:
 - A **Cat-alog** for browsing pre-made cats
@@ -89,13 +144,13 @@ rampart/
 │       └── ...
 │
 ├── engines/
-│   └── catalog/                      # Catalog bounded context engine
+│   └── cat_content/                  # Cat & Content bounded context engine
 │       ├── app/
 │       │   ├── domain/
 │       │   ├── application/
 │       │   └── infrastructure/
 │       ├── lib/
-│       ├── catalog.gemspec
+│       ├── cat_content.gemspec
 │       └── ...
 │
 ├── gems/
@@ -116,7 +171,7 @@ rampart/
 |-----------|---------|
 | `apps/web` | Next.js application serving the cat e-commerce UI |
 | `apps/api` | Rails application that mounts bounded context engines and exposes the API |
-| `engines/catalog` | Rails engine implementing the Catalog bounded context using Rampart patterns |
+| `engines/cat_content` | Rails engine implementing the Cat & Content bounded context using Rampart patterns |
 | `gems/rampart` | Pure-Ruby gem providing DDD + Hexagonal Architecture building blocks |
 | `docs/` | Architecture documentation, specs, and bounded context definitions |
 
@@ -127,7 +182,7 @@ Each bounded context lives in its own Rails engine under `engines/`. The main Ra
 ```ruby
 # apps/api/config/routes.rb
 Rails.application.routes.draw do
-  mount Catalog::Engine, at: "/catalog"
+  mount CatContent::Engine, at: "/catalog"
   # Future: mount Commerce::Engine, at: "/commerce"
   # Future: mount Auth::Engine, at: "/auth"
 end
@@ -146,12 +201,12 @@ end
 └──────┬──────┘
        │ mounts
        ▼
-┌─────────────────────────────────────┐
-│            engines/*                │
-│  ┌─────────┐  ┌─────────┐  ┌─────┐  │
-│  │ catalog │  │commerce │  │auth │  │
-│  └────┬────┘  └────┬────┘  └──┬──┘  │
-└───────┼────────────┼──────────┼─────┘
+┌──────────────────────────────────────────┐
+│            engines/*                     │
+│  ┌────────────┐  ┌─────────┐  ┌─────┐   │
+│  │cat_content │  │commerce │  │auth │   │
+│  └─────┬──────┘  └────┬────┘  └──┬──┘   │
+└────────┼─────────────┼──────────┼────────┘
         │            │          │
         └────────────┼──────────┘
                      │ depends on

@@ -1,0 +1,25 @@
+require "dry-types"
+require "dry-struct"
+require "dry-container"
+require "dry-auto_inject"
+require "dry-monads"
+require "dry-initializer"
+
+require_relative "rampart/version"
+require_relative "rampart/support/types"
+require_relative "rampart/support/result"
+require_relative "rampart/support/container"
+require_relative "rampart/domain/entity"
+require_relative "rampart/domain/aggregate_root"
+require_relative "rampart/domain/value_object"
+require_relative "rampart/domain/domain_event"
+require_relative "rampart/domain/domain_exception"
+require_relative "rampart/domain/domain_service"
+require_relative "rampart/application/command"
+require_relative "rampart/application/query"
+require_relative "rampart/application/service"
+require_relative "rampart/application/transaction"
+require_relative "rampart/ports/secondary_port"
+
+module Rampart
+end

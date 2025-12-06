@@ -22,6 +22,7 @@ Returns a paginated list of published premade cats.
 **Query Parameters:**
 - `page` (optional) — Page number (default: 1)
 - `per_page` (optional) — Items per page (default: 20, max: 100)
+- `tags` (optional) — Filter by tags (comma-separated)
 
 **Response:**
 ```json
@@ -34,8 +35,7 @@ Returns a paginated list of published premade cats.
       "description": "A majestic...",
       "image_url": "https://...",
       "price": { "amount_cents": 9999, "currency": "USD" },
-      "traits": ["fluffy", "dignified"],
-      "status": "listed"
+      "tags": ["fluffy", "dignified"]
     }
   ],
   "meta": { "page": 1, "per_page": 20, "total": 42 }
@@ -56,14 +56,13 @@ Returns full details of a single cat.
   "image_url": "https://...",
   "price": { "amount_cents": 9999, "currency": "USD" },
   "profile": {
-    "age": "2 years",
+    "age_months": 24,
     "temperament": "Dignified observer",
     "traits": ["fluffy", "dignified", "mysterious"]
   },
   "media": [
     { "url": "https://...", "alt_text": "Whiskers lounging" }
-  ],
-  "seo": { "title": "...", "description": "..." }
+  ]
 }
 ```
 
@@ -84,7 +83,7 @@ Manage user-specific AI-generated cats.
 Returns all custom cats belonging to the authenticated user.
 
 **Query Parameters:**
-- `status` (optional) — Filter by status: `active`, `archived` (default: `active`)
+- `include_archived` (optional) — Include archived cats (default: `false`)
 
 **Response:**
 ```json
@@ -95,7 +94,7 @@ Returns all custom cats belonging to the authenticated user.
       "name": "Lord Fluffington III",
       "description": "An AI-generated...",
       "image_url": "https://...",
-      "status": "active",
+      "visibility": "private",
       "created_at": "2025-01-15T10:30:00Z"
     }
   ]
@@ -113,10 +112,10 @@ Returns full details of a custom cat owned by the current user.
   "name": "Lord Fluffington III",
   "description": "An AI-generated noble feline...",
   "image_url": "https://...",
-  "status": "active",
+  "visibility": "private",
   "prompt": {
-    "original_text": "A regal cat with chaotic energy",
-    "quiz_result": "Chaotic Gremlin"
+    "text": "A regal cat with chaotic energy",
+    "quiz_results": { "personality": "Chaotic Gremlin" }
   },
   "story": "Once upon a time in a cardboard castle...",
   "created_at": "2025-01-15T10:30:00Z"
@@ -150,8 +149,8 @@ Generates a new custom cat based on user input and optional quiz results.
 **Request:**
 ```json
 {
-  "prompt": "A fluffy orange cat with chaotic energy",
-  "quiz_result": "Chaotic Gremlin",
+  "prompt_text": "A fluffy orange cat with chaotic energy",
+  "quiz_results": { "personality": "Chaotic Gremlin" },
   "selected_name": "Sir Fluffington"
 }
 ```
@@ -164,7 +163,7 @@ Generates a new custom cat based on user input and optional quiz results.
   "name": "Sir Fluffington",
   "description": "An orange ball of pure chaos...",
   "image_url": "https://...",
-  "status": "active"
+  "visibility": "private"
 }
 ```
 
@@ -250,7 +249,7 @@ Manage premade cats and view/moderate custom cats.
 | `PUT` | `/api/admin/cats/:id` | Update a premade cat | Admin |
 | `DELETE` | `/api/admin/cats/:id` | Archive/delete a cat | Admin |
 | `PATCH` | `/api/admin/cats/:id/publish` | Publish a premade cat | Admin |
-| `PATCH` | `/api/admin/cats/:id/unpublish` | Unpublish a premade cat | Admin |
+| `PATCH` | `/api/admin/cats/:id/archive` | Archive a premade cat | Admin |
 
 ### `GET /api/admin/cats`
 
@@ -258,7 +257,7 @@ Returns all cats with admin-level details.
 
 **Query Parameters:**
 - `type` (optional) — Filter: `premade`, `custom`
-- `status` (optional) — Filter: `listed`, `unlisted`, `archived`
+- `visibility` (optional) — Filter: `public`, `private`, `archived`
 - `user_id` (optional) — Filter custom cats by owner
 
 **Response:**
@@ -269,7 +268,7 @@ Returns all cats with admin-level details.
       "id": "uuid",
       "name": "Whiskers",
       "type": "premade",
-      "status": "listed",
+      "visibility": "public",
       "creator_user_id": null,
       "created_at": "2025-01-01T00:00:00Z",
       "updated_at": "2025-01-10T00:00:00Z"
@@ -291,7 +290,7 @@ Creates a new premade cat listing.
   "image_url": "https://...",
   "price_cents": 9999,
   "currency": "USD",
-  "traits": ["fluffy", "dignified"],
+  "tags": ["fluffy", "dignified"],
   "slug": "whiskers-mcfluff"
 }
 ```
@@ -313,51 +312,33 @@ Updates a premade cat. Custom cats cannot be edited by admin.
 
 ### `PATCH /api/admin/cats/:id/publish`
 
-Publishes a premade cat to the public catalog.
+Publishes a premade cat to the public catalog (sets visibility to `public`).
 
 **Response:**
 ```json
 {
   "id": "uuid",
-  "status": "listed",
+  "visibility": "public",
   "published_at": "2025-01-15T12:00:00Z"
 }
 ```
 
-### `PATCH /api/admin/cats/:id/unpublish`
+### `PATCH /api/admin/cats/:id/archive`
 
-Removes a cat from the public catalog (remains in system).
-
----
-
-## 5. Content Pages (Optional)
-
-Static content pages managed by this BC.
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `GET` | `/api/pages/:slug` | Get a content page by slug | No |
-
-### `GET /api/pages/:slug`
-
-Returns a structured content page (e.g., About page).
+Archives a cat (sets visibility to `archived`). Removes from public catalog but remains in system.
 
 **Response:**
 ```json
 {
-  "slug": "about",
-  "title": "About Custom Cats",
-  "blocks": [
-    { "type": "heading", "content": "Our Story" },
-    { "type": "paragraph", "content": "..." }
-  ],
-  "seo": { "title": "...", "description": "..." }
+  "id": "uuid",
+  "visibility": "archived",
+  "archived_at": "2025-01-15T12:00:00Z"
 }
 ```
 
 ---
 
-## 6. Error Response Format
+## 5. Error Response Format
 
 All endpoints return errors in a consistent format:
 
@@ -377,4 +358,3 @@ All endpoints return errors in a consistent format:
 - `403 Forbidden` — Insufficient permissions (e.g., non-admin accessing admin endpoints)
 - `404 Not Found` — Resource does not exist
 - `422 Unprocessable Entity` — Validation errors
-

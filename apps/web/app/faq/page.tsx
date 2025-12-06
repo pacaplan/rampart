@@ -64,11 +64,11 @@ export default function FAQPage() {
           meta="Spoiler: everything here is imaginary, but the code and the human who wrote it are very real."
         />
         <main className="flex gap-5 items-start">
-          <section className="flex-1 flex flex-col gap-5">
+          <section className="flex-1 flex flex-col gap-3">
             <div className="text-xs text-muted-foreground uppercase tracking-[0.08em] font-extrabold">
               Core questions humans keep asking
             </div>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               {faqData.map((faq, index) => (
                 <FAQItem
                   key={index}

@@ -35,3 +35,15 @@ When updating UI components or pages:
 2. Interact with elements to test functionality (clicks, forms, navigation)
 3. Take screenshots to confirm visual appearance when appropriate
 
+## Health Check Endpoint
+
+The frontend provides a health check API route for troubleshooting:
+
+**Route:** `GET /api/health`
+
+**Purpose:** Aggregates health status from frontend and backend services
+
+**Checks:**
+- Frontend service status
+- Backend API connectivity and response time
+- Full backend health details (including database and engines)

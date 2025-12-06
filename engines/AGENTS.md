@@ -40,13 +40,13 @@ Each bounded context is a self-contained Rails engine:
 Each engine under `engines/` follows this layout:
 
 ```
-engines/catalog/
+engines/cat_content/
 ├── app/
 │   ├── domain/           # Aggregates, entities, value objects
 │   ├── application/      # Services, use cases
 │   └── infrastructure/   # Controllers, AR models, repos
 ├── lib/
-└── catalog.gemspec
+└── cat_content.gemspec
 ```
 
 ## Conventions
@@ -75,3 +75,12 @@ engines/catalog/
 3. Mount engine in `apps/api/config/routes.rb`
 4. Document context in `docs/cat_app/`
 
+## Health Check Endpoint
+
+Each engine should implement a health check endpoint for troubleshooting:
+
+**Location:** `app/controllers/context_name/health_controller.rb`
+
+**Route:** `GET /mount_path/health` (e.g., `/catalog/health` for cat_content)
+
+**Purpose:** Verify database connectivity to the engine's isolated schema
