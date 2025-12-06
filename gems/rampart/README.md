@@ -8,7 +8,7 @@ Rampart provides building blocks for implementing DDD patterns in Ruby applicati
 
 ## Architecture Patterns
 
-Rampart implements four complementary architectural approaches from the [Rampart Vision](../../docs/rampart/rampart_vision.md):
+Rampart implements five complementary architectural approaches from the [Rampart Vision](../../docs/rampart/rampart_vision.md):
 
 ### 3.1 Domain-Driven Design (DDD)
 
@@ -43,6 +43,15 @@ Rampart patterns are designed for use within Rails Engines, supporting the Modul
 - **Schema Isolation** - Dedicated database schema per bounded context
 - **Vertical Slice at BC Level** - Engine contains all layers for one domain
 - **Extractability** - Engine structure enables future extraction to standalone service
+
+### 3.5 Lightweight CQRS & Task-Based Interfaces
+
+Rampart separates reads from writes with immutable Command and Query objects:
+- **Command DTOs** - Task-based, intent-revealing objects (e.g., `ShipOrder`, `GenerateCustomCat`) for state changes
+- **Query DTOs** - Read-focused objects optimized for listing, filtering, or projections without touching domain aggregates
+- **Application Services** - Coordinate commands and queries, enforcing business rules at clear boundaries
+- **Result Monads** - Commands return `Success(value)` or `Failure(error)` so adapters can render deterministic responses
+This lightweight CQRS approach keeps a single data store but enforces explicit interfaces that clarify bounded-context ownership and make code easier for humans and AI tools to follow.
 
 ## Features
 
@@ -252,4 +261,3 @@ end
 ## License
 
 The gem is available as open source under the terms of the Apache License 2.0.
-
