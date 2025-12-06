@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.authors = ["Rampart Team"]
   spec.email = ["team@rampart.dev"]
 
-  spec.summary = "Hexagonal Architecture and Domain-Driven Design framework"
+  spec.summary = "Architecture on Rails"
   spec.description = "A pure-Ruby framework for building DDD applications with Hexagonal Architecture"
   spec.homepage = "https://github.com/pacaplan/rampart"
   spec.license = "Apache-2.0"

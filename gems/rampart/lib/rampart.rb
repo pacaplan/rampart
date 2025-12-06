@@ -21,6 +21,7 @@ require_relative "rampart/application/service"
 require_relative "rampart/application/transaction"
 require_relative "rampart/ports/secondary_port"
 require_relative "rampart/ports/event_bus_port"
+require_relative "rampart/testing" if defined?(RSpec)
 
 module Rampart
 end

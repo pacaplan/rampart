@@ -61,6 +61,14 @@ Domain events capture business facts in past tense and enable decoupled reaction
 - **Event Bus Port** - `EventBusPort` abstraction lets applications publish events to any transport
 - **Pragmatic Scope** - Event publishing without mandating full event sourcing or an event store
 
+### 3.7 Architecture Fitness Functions / Architecture-as-Code
+
+Executable checks keep bounded contexts aligned with their intended shape:
+- **Rampart::Testing::ArchitectureMatchers** - RSpec helpers for inheritance checks, immutability, port implementation coverage, and Rails dependency bans
+- **Per-Engine Architecture Specs** - Use matchers to assert aggregates/value objects/ports/CQRS DTOs inherit from Rampart base classes and repositories return domain objects
+- **Blueprint JSON** - Optional machine-readable description of layers and allowed dependencies for future CLI verification
+- **Packwerk Deferred** - Static layer enforcement is noted but postponed until multiple bounded contexts exist
+
 ## Features
 
 - **Pure Ruby** - No Rails dependencies, works in any Ruby application

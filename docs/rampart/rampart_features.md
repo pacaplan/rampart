@@ -62,28 +62,23 @@
 
 ## 3.7 Architecture Fitness Functions / Enforcement Tools ⚠️
 
-Tools that enforce architectural rules, preventing erosion of boundaries and dependencies:
+- [ ] **Packwerk** - Static analysis for layer boundaries (deferred)
+  - Layer rules:
+    - `domain/` package: No dependencies on application or infrastructure
+    - `application/` package: Can depend on domain, not infrastructure
+    - `infrastructure/` package: Can depend on domain and application
+  - Cross-BC boundary enforcement (when multiple engines exist)
+  - CI integration via `packwerk check`
+  - *Status: Deferred until multiple bounded contexts exist*
 
-- [ ] **Packwerk** - Static analysis for enforcing layering and module boundaries
-  - Prevent accidental cross-module constant references (between engines)
-  - Enforce layering rules within single engine (domain ↔ application ↔ infrastructure)
-    - Domain cannot depend on infrastructure
-    - Application cannot depend on infrastructure
-    - Only infrastructure can depend on Rails/external libraries
-  - Visualize dependency graphs between modules/components
-  - Integrate with CI/pull request workflows
-  - *Status: Not yet integrated; YAGNI for single bounded context, valuable for multiple engines*
+- [x] **RSpec Pattern Verification** - Rules Packwerk can't enforce
+  - Class inheritance validation (aggregates, value objects, ports, CQRS DTOs)
+  - Immutability checks (no setter methods on value objects)
+  - Port implementation coverage and repository return-type assertions
 
-- [ ] **Architecture Fitness Rules** - Executable constraints via JSON/YAML configuration
-  - Codify architectural decisions as enforceable rules
-  - Layer boundary enforcement (layering constraints)
-  - Bounded context isolation rules
-  - Naming convention validation
-  - Forbidden dependency patterns
-  - *Status: Future; would be part of `rampart verify` CLI tool*
+- [x] **Rampart::Testing::ArchitectureMatchers** - Reusable matchers
+  - `have_no_rails_dependencies`, `inherit_from_rampart_base`, `implement_all_abstract_methods`
+  - Designed for reuse across bounded contexts and engines
 
-- [ ] **Drift Detection** - Compare code structure against architecture blueprints
-  - Detect missing use cases or domain events
-  - Identify violations of fitness rules
-  - Compare actual code organization to declared architecture
-  - *Status: Future; would be part of `rampart sync` CLI tool*
+- [x] **Architecture Blueprint JSON** - Documentation artifact
+  - Machine-readable representation of layers, boundaries, and components

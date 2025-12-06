@@ -87,3 +87,35 @@ Direct method calls remain fine for in-process, single-consumer workflows where 
 - **Event Sourcing by Accident**: Publishing events does not imply persisting every event forever.
 - **Chatty or Generic Events**: `EntityUpdated` offers no meaning; emit specific, purposeful facts.
 - **Hidden Coupling**: Do not require consumers to reach back into aggregates for missing context that should be in the event payload.
+
+## 3.7 Architecture Fitness Functions / Architecture-as-Code
+
+### What Are Fitness Functions?
+
+Fitness functions are executable constraints that continuously verify architectural decisions: layer boundaries, dependency rules, naming conventions, and invariants that keep the system aligned with its intended shape. They turn "architecture docs" into living checks that fail loudly when drift occurs.
+
+### Rampart's Approach
+
+- **Start with RSpec**: Reusable matchers plus per-engine specs deliver immediate value without new tooling.
+- **Blueprints Then CLI**: A JSON blueprint captures layers, dependencies, and key components as machine-readable metadata. A future `rampart verify` CLI can consume it.
+- **Use Packwerk**: Packwerk or similar tools will be levearged.
+
+### Integration with DDD + Hexagonal
+
+- **Ports & Adapters**: Specs verify ports inherit from Rampart base classes and have adapter implementations.
+- **Layer Discipline**: Tests assert domain remains free of Rails dependencies and that application code only depends inward.
+- **Immutability**: Value objects remain setter-free to protect invariants and keep domain objects predictable.
+- **CQRS Alignment**: Commands/queries stay on the correct base classes, and repositories return domain objects rather than ActiveRecord records.
+
+### Anti-Patterns to Avoid
+
+- **Docs Without Enforcement**: Writing principles without executable checks invites drift.
+- **Static Analysis Only**: Relying solely on Packwerk misses behavioral rules (inheritance, immutability) that specs can cover.
+- **Overly Broad Rules**: Blanket bans that create friction get ignored; prefer targeted, high-signal checks.
+- **CI-Only Enforcement**: Run fitness specs locally to catch issues before pull requests.
+
+### References
+
+- Neal Ford et al. — ["Building Evolutionary Architectures"](https://www.thoughtworks.com/en/insights/articles/building-evolutionary-architectures-fitness-functions)
+- Thoughtworks Tech Radar — ["Fitness Functions"](https://www.thoughtworks.com/radar/techniques/architectural-fitness-function)
+- Martin Fowler — ["Architecture for Agile Developers"](https://martinfowler.com/ieeeSoftware/fowler.pdf)

@@ -37,3 +37,11 @@ Whenever a command wades into generic territory, revisit the workflow and ask, "
 - **Meaningful payloads**: Include identifiers and only the state consumers need; avoid forcing lookups for basics.
 - **Schema versioning**: Use `schema_version` to evolve payloads; favor additive changes and keep backward compatibility where possible.
 - **Avoid generic verbs**: `EntityUpdated` or `ItemChanged` hide intent and lead to tight coupling.
+
+## Architecture Fitness Functions
+
+- **Add rules when boundaries wobble**: Introduce new matchers/specs in response to real drift (e.g., a domain class pulling in Rails) rather than hypothetical fears.
+- **Balance strictness and flow**: Start with high-signal checks (inheritance, immutability, ports with implementations). Avoid noisy dependency bans that slow delivery without clear value.
+- **Default Rampart rules**: Ports inherit from `Rampart::Ports::SecondaryPort`, aggregates from `Rampart::Domain::AggregateRoot`, value objects from `Rampart::Domain::ValueObject` with no setters, repositories return domain objects, and CQRS DTOs inherit from Rampart base classes.
+- **Customize per bounded context**: Keep shared matchers in `Rampart::Testing`, but write BC-specific specs in each engine to codify local conventions and directory structure.
+- **Keep specs executable**: Run architecture specs with the rest of the test suite; failing fast on drift is the whole point.

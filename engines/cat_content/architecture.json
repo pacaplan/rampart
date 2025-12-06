@@ -1,0 +1,68 @@
+{
+  "bounded_context": "cat_content",
+  "layers": [
+    {
+      "name": "domain",
+      "path": "app/domain/cat_content",
+      "allowed_dependencies": [],
+      "forbidden_dependencies": [
+        "app/application/cat_content",
+        "app/infrastructure/cat_content"
+      ]
+    },
+    {
+      "name": "application",
+      "path": "app/application/cat_content",
+      "allowed_dependencies": [
+        "app/domain/cat_content"
+      ],
+      "forbidden_dependencies": [
+        "app/infrastructure/cat_content"
+      ]
+    },
+    {
+      "name": "infrastructure",
+      "path": "app/infrastructure/cat_content",
+      "allowed_dependencies": [
+        "app/domain/cat_content",
+        "app/application/cat_content"
+      ],
+      "forbidden_dependencies": []
+    }
+  ],
+  "aggregates": [
+    {
+      "name": "CatContent::Aggregates::CatListing",
+      "value_objects": [
+        "CatContent::ValueObjects::CatId",
+        "CatContent::ValueObjects::CatMedia",
+        "CatContent::ValueObjects::CatName",
+        "CatContent::ValueObjects::CatProfile",
+        "CatContent::ValueObjects::ContentBlock",
+        "CatContent::ValueObjects::Money",
+        "CatContent::ValueObjects::Slug",
+        "CatContent::ValueObjects::TagList",
+        "CatContent::ValueObjects::TraitSet",
+        "CatContent::ValueObjects::Visibility"
+      ],
+      "ports_used": [
+        "CatContent::Ports::CatListingRepository"
+      ],
+      "events": []
+    }
+  ],
+  "ports": [
+    {
+      "name": "CatContent::Ports::CatListingRepository",
+      "implementations": [
+        "CatContent::Infrastructure::Persistence::Repositories::SqlCatListingRepository"
+      ]
+    }
+  ],
+  "cqrs": {
+    "commands": [],
+    "queries": [
+      "CatContent::Queries::ListCatListingsQuery"
+    ]
+  }
+}
