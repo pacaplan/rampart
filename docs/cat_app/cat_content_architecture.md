@@ -129,7 +129,6 @@ Interfaces defining what the domain/application needs from external systems. Imp
 
 ---
 
-<<<<<<< HEAD
 ## 4. Summary Structure
 
 ### Domain
@@ -151,8 +150,4 @@ Interfaces defining what the domain/application needs from external systems. Imp
 
 ---
 
-This is the complete Rampart component map for the **Cat & Content bounded context only**, derived from all three project documents (bounded context diagram, Rampart table, and functional spec).
-
-=======
 This is the complete Rampart component map for the **Cat & Content bounded context only**, derived from the bounded context diagram, Rampart architecture, and functional spec.
->>>>>>> main

@@ -1,14 +1,9 @@
-<<<<<<< HEAD
-# Rampart Framework + Catalog Bounded Context
-=======
-# Cat & Content Bounded Context
->>>>>>> main
+# Rampart Framework + Cat & Content Bounded Context
 
-# 2. Rails Engine — Cat & Content Bounded Context
+This document describes the full technical specification for:
 
-<<<<<<< HEAD
 1. **Rampart** — a pure-Ruby framework implementing Domain‑Driven Design + Hexagonal Architecture using dry‑rb gems.
-2. **Catalog Bounded Context Implementation** inside a Rails app — using Rampart for domain and application layers, and Rails only inside the infrastructure layer.
+2. **Cat & Content Bounded Context Implementation** inside a Rails engine — using Rampart for domain and application layers, and Rails only inside the infrastructure layer.
 
 It includes:
 - Directory structure
@@ -245,12 +240,9 @@ end
 
 ---
 
-# 2. Rails App — Catalog Bounded Context
+# 2. Rails Engine — Cat & Content Bounded Context
 
-The Rails app uses `app/domain`, `app/application`, `app/infrastructure`.
-=======
 The Rails engine uses `app/domain`, `app/application`, `app/infrastructure`.
->>>>>>> main
 
 Rails is **only allowed in infrastructure**.
 
@@ -595,11 +587,6 @@ end
 ```ruby
 module CatContent
   module Aggregates
-<<<<<<< HEAD
-    class CatListing < Rampart::Domain::AggregateRoot
-      STATUS_LISTED = "listed"
-      STATUS_UNLISTED = "unlisted"
-=======
     class CatListing < Rampart::Domain::AggregateRoot
       attribute :id, ValueObjects::CatId
       attribute :name, ValueObjects::CatName
@@ -610,7 +597,6 @@ module CatContent
       attribute :tags, ValueObjects::TagList
       attribute :profile, Entities::CatProfile.optional.default(nil)
       attribute :media, ValueObjects::CatMedia.optional.default(nil)
->>>>>>> main
 
       def self.create(id:, name:, description:, price:, slug:, tags: nil)
         listing = new(
@@ -712,15 +698,10 @@ end
 
 ### CatListingPublished
 ```ruby
-<<<<<<< HEAD
-class Catalog::Application::Commands::ListCat < Rampart::Application::Command
-  include Rampart::Ports::PrimaryPort
-=======
 module CatContent
   module Events
     class CatListingPublished < Rampart::Domain::DomainEvent
       SCHEMA_VERSION = 1
->>>>>>> main
 
       attribute :cat_id, Types::String
       attribute :name, Types::String
@@ -732,15 +713,10 @@ end
 
 ### CatListingArchived
 ```ruby
-<<<<<<< HEAD
-class Catalog::Application::Handlers::ListCatHandler < Rampart::Application::Handler
-  include Dry::Monads[:result]
-=======
 module CatContent
   module Events
     class CatListingArchived < Rampart::Domain::DomainEvent
       SCHEMA_VERSION = 1
->>>>>>> main
 
       attribute :cat_id, Types::String
       attribute :archived_at, Types::Time.default { Time.now }
@@ -1297,11 +1273,6 @@ end
 
 ### Other Adapters
 ```ruby
-<<<<<<< HEAD
-Catalog::Infrastructure::Wiring::Registry.register(:catalog_transaction) do
-  Rampart::Application::Transaction.new(->(&block) { ActiveRecord::Base.transaction(&block) })
-end
-=======
 module CatContent
   module Infrastructure
     module Adapters
@@ -1310,7 +1281,6 @@ module CatContent
           Time.current
         end
       end
->>>>>>> main
 
       class UuidIdGeneratorAdapter < Ports::IdGeneratorPort
         def generate
