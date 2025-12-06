@@ -3,10 +3,9 @@
 ## Framework Classes ✅
 
 ### Domain Layer Classes
-- [x] **AggregateRoot** - Consistency boundaries with event tracking
-  - Event sourcing support via `apply()` and `unpublished_events`
-  - Automatic event handler delegation via `on_*` naming convention
-  - `clear_events!()` for post-persistence cleanup
+- [x] **AggregateRoot** - Consistency boundaries with immutable state
+  - Domain methods return new instances; no in-place mutation or event accumulation
+  - Event publishing handled by Application Services (imperative shell)
 - [x] **Entity** - Objects with unique identity
 - [x] **ValueObject** - Immutable value types with type safety
   - Attribute validation via dry-types
@@ -55,8 +54,8 @@
 - [ ] **rampart scaffold** - Generate minimal scaffolding from architecture blueprints
 - [ ] **rampart plan** - Create migration plan for legacy codebases
 - [ ] **rampart verify** - Run architecture fitness checks and validation
-- [ ] **rampart sync** - Detect architecture/code drift (future)
-- [ ] **rampart extract** - Extract domain/use-case models from legacy code (future)
+- [ ] **rampart sync** - Detect architecture/code drift 
+- [ ] **rampart extract** - Extract domain/use-case models from legacy code
 
 ---
 
@@ -79,6 +78,7 @@
 - [x] **Rampart::Testing::ArchitectureMatchers** - Reusable matchers
   - `have_no_rails_dependencies`, `inherit_from_rampart_base`, `implement_all_abstract_methods`
   - Designed for reuse across bounded contexts and engines
+  - `be_immutable` and `have_no_mutable_instance_variables` enforce Functional Core immutability
 
 - [x] **Architecture Blueprint JSON** - Documentation artifact
   - Machine-readable representation of layers, boundaries, and components

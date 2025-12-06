@@ -4,10 +4,9 @@ require "securerandom"
 module Rampart
   module Domain
     # Domain events record meaningful business changes that already happened.
-    # Aggregates call `apply(event)` to:
-    # 1) capture the fact in `unpublished_events`, and
-    # 2) update local state via an `on_event_name` handler.
-    # Events are past-tense, immutable Dry::Structs with versioning baked in.
+    # Aggregates remain immutable and side-effect free; application services publish events
+    # after persisting new aggregate state. Events are past-tense, immutable Dry::Structs
+    # with versioning baked in.
     class DomainEvent < Dry::Struct
       # Schema version enables event evolution without breaking consumers.
       # Increment when adding/removing/renaming attributes.
@@ -23,4 +22,3 @@ module Rampart
     end
   end
 end
-

@@ -61,25 +61,14 @@ rampart/
 ```ruby
 module Rampart
   module Domain
-    class AggregateRoot
-      attr_reader :id, :unpublished_events
-
-      def initialize(id:)
-        @id = id
-        @unpublished_events = []
-      end
-
-      private
-
-      def apply(event)
-        @unpublished_events << event
-        handler = "on_#{event.class.name.split('::').last.underscore}"
-        send(handler, event) if respond_to?(handler, true)
-      end
-
-      def clear_events!
-        @unpublished_events.clear
-      end
+    class AggregateRoot < Entity
+      # Aggregates are immutable. Domain methods return new instances instead of mutating state.
+      # Events are published by application services (the imperative shell) after persistence.
+      #
+      # Example:
+      #   def publish
+      #     self.class.new(**attributes.merge(visibility: Visibility.public))
+      #   end
     end
   end
 end
@@ -611,28 +600,24 @@ module CatContent
         listing
       end
 
-      def publish!
-        return if visibility.public?
-        apply Events::CatListingPublished.new(cat_id: id.to_s, name: name.to_s)
+      def publish
+        return self if visibility.public?
+
+        self.class.new(**attributes.merge(
+          visibility: ValueObjects::Visibility.new(value: :public)
+        ))
       end
 
-      def archive!
-        return if visibility.archived?
-        apply Events::CatListingArchived.new(cat_id: id.to_s)
+      def archive
+        return self if visibility.archived?
+
+        self.class.new(**attributes.merge(
+          visibility: ValueObjects::Visibility.new(value: :archived)
+        ))
       end
 
       def public?
         visibility.public?
-      end
-
-      private
-
-      def on_cat_listing_published(_event)
-        @visibility = ValueObjects::Visibility.new(value: :public)
-      end
-
-      def on_cat_listing_archived(_event)
-        @visibility = ValueObjects::Visibility.new(value: :archived)
       end
     end
   end
@@ -653,7 +638,7 @@ module CatContent
       attribute :media, ValueObjects::CatMedia.optional.default(nil)
 
       def self.create(id:, user_id:, name:, prompt:, story:)
-        cat = new(
+        new(
           id: id,
           user_id: user_id,
           name: name,
@@ -661,31 +646,18 @@ module CatContent
           story: story,
           visibility: ValueObjects::Visibility.new(value: :private)
         )
-        cat.send(:apply, Events::CustomCatCreated.new(
-          custom_cat_id: id.to_s,
-          user_id: user_id,
-          name: name.to_s
+      end
+
+      def regenerate_story(new_story)
+        self.class.new(**attributes.merge(story: new_story))
+      end
+
+      def archive
+        return self if visibility.archived?
+
+        self.class.new(**attributes.merge(
+          visibility: ValueObjects::Visibility.new(value: :archived)
         ))
-        cat
-      end
-
-      def regenerate_story!(new_story)
-        @story = new_story
-        apply Events::CatDescriptionRegenerated.new(
-          cat_id: id.to_s,
-          regenerated_at: Time.now
-        )
-      end
-
-      def archive!
-        return if visibility.archived?
-        apply Events::CustomCatArchived.new(custom_cat_id: id.to_s)
-      end
-
-      private
-
-      def on_custom_cat_archived(_event)
-        @visibility = ValueObjects::Visibility.new(value: :archived)
       end
     end
   end
@@ -954,9 +926,9 @@ module CatContent
             tags: tags
           )
 
-          cat_listing_repo.add(listing)
-          publish_events(listing)
-          Success(listing)
+          persisted = cat_listing_repo.add(listing)
+          event_bus.publish(Events::CatListingCreated.new(cat_listing_id: persisted.id))
+          Success(persisted)
         end
       end
 
@@ -964,10 +936,10 @@ module CatContent
       def publish(id)
         transaction.call do
           listing = cat_listing_repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
-          listing.publish!
-          cat_listing_repo.update(listing)
-          publish_events(listing)
-          Success(listing)
+          published = listing.publish
+          cat_listing_repo.update(published)
+          event_bus.publish(Events::CatListingPublished.new(cat_listing_id: published.id))
+          Success(published)
         end
       end
 
@@ -975,18 +947,11 @@ module CatContent
       def archive(id)
         transaction.call do
           listing = cat_listing_repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
-          listing.archive!
-          cat_listing_repo.update(listing)
-          publish_events(listing)
-          Success(listing)
+          archived = listing.archive
+          cat_listing_repo.update(archived)
+          event_bus.publish(Events::CatListingArchived.new(cat_listing_id: archived.id))
+          Success(archived)
         end
-      end
-
-      private
-
-      def publish_events(aggregate)
-        aggregate.unpublished_events.each { |e| event_bus.publish(e) }
-        aggregate.clear_events!
       end
     end
   end
@@ -1033,9 +998,9 @@ module CatContent
             story: story
           )
 
-          custom_cat_repo.add(cat)
-          publish_events(cat)
-          Success(cat)
+          persisted = custom_cat_repo.add(cat)
+          event_bus.publish(Events::CustomCatCreated.new(custom_cat_id: persisted.id, user_id: persisted.user_id))
+          Success(persisted)
         end
       end
 
@@ -1045,10 +1010,10 @@ module CatContent
           cat = custom_cat_repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
           new_story_text = language_model.regenerate_description(cat.prompt, cat.name)
           new_story = ValueObjects::CatStory.new(text: new_story_text)
-          cat.regenerate_story!(new_story)
-          custom_cat_repo.update(cat)
-          publish_events(cat)
-          Success(cat)
+          updated = cat.regenerate_story(new_story)
+          custom_cat_repo.update(updated)
+          event_bus.publish(Events::CatDescriptionRegenerated.new(custom_cat_id: updated.id))
+          Success(updated)
         end
       end
 
@@ -1057,10 +1022,10 @@ module CatContent
         transaction.call do
           cat = custom_cat_repo.find(id) or raise Exceptions::CatNotFoundError.new(id)
           raise Exceptions::UnauthorizedError.new unless cat.user_id == user_id
-          cat.archive!
-          custom_cat_repo.update(cat)
-          publish_events(cat)
-          Success(cat)
+          archived = cat.archive
+          custom_cat_repo.update(archived)
+          event_bus.publish(Events::CustomCatArchived.new(custom_cat_id: archived.id, user_id: archived.user_id))
+          Success(archived)
         end
       end
 
@@ -1074,10 +1039,7 @@ module CatContent
 
       private
 
-      def publish_events(aggregate)
-        aggregate.unpublished_events.each { |e| event_bus.publish(e) }
-        aggregate.clear_events!
-      end
+      # Side effects (event publishing, persistence) stay in the application layer.
     end
   end
 end

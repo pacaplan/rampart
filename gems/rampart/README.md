@@ -57,7 +57,7 @@ This lightweight CQRS approach keeps a single data store but enforces explicit i
 
 Domain events capture business facts in past tense and enable decoupled reactions:
 - **Immutable Events** - `DomainEvent` value objects include `event_id`, `occurred_at`, and `schema_version`
-- **Aggregate Integration** - `AggregateRoot#apply` records unpublished events and updates state via handlers
+- **Application Integration** - Application services publish events after persistence; aggregates remain pure and immutable
 - **Event Bus Port** - `EventBusPort` abstraction lets applications publish events to any transport
 - **Pragmatic Scope** - Event publishing without mandating full event sourcing or an event store
 
@@ -68,6 +68,14 @@ Executable checks keep bounded contexts aligned with their intended shape:
 - **Per-Engine Architecture Specs** - Use matchers to assert aggregates/value objects/ports/CQRS DTOs inherit from Rampart base classes and repositories return domain objects
 - **Blueprint JSON** - Optional machine-readable description of layers and allowed dependencies for future CLI verification
 - **Packwerk Deferred** - Static layer enforcement is noted but postponed until multiple bounded contexts exist
+
+### 3.8 Functional Core / Imperative Shell
+
+Rampart keeps the domain layer pure and immutable (Functional Core) while concentrating I/O in the application and infrastructure layers (Imperative Shell):
+- **Immutable Aggregates** - Domain methods return new instances rather than mutating state or buffering events
+- **Side-Effect Free Domain** - No persistence, logging, or HTTP calls inside domain classes
+- **Application Services as Shell** - Coordinate repositories, publish events, and invoke adapters after persisting new aggregate state
+- **Clarity** - Predictable behavior for humans and AI tools with no hidden mutations
 
 ## Features
 
@@ -96,19 +104,22 @@ Pure business logic with no framework dependencies.
 ```ruby
 # Aggregate Root
 class Order < Rampart::Domain::AggregateRoot
-  def initialize(id:)
-    super(id: id)
-    @items = []
+  attribute :id, Types::String
+  attribute :customer_id, Types::String
+  attribute :items, Types::Array.default([].freeze)
+  attribute :status, Types::String
+
+  def self.create(id:, customer_id:)
+    new(id: id, customer_id: customer_id, items: [], status: "draft")
   end
-  
+
   def add_item(product, quantity)
-    apply ItemAdded.new(order_id: id, product: product, quantity: quantity)
+    updated_items = items + [LineItem.new(product: product, quantity: quantity)]
+    self.class.new(**attributes.merge(items: updated_items))
   end
-  
-  private
-  
-  def on_item_added(event)
-    @items << LineItem.new(product: event.product, quantity: event.quantity)
+
+  def submit
+    self.class.new(**attributes.merge(status: "submitted"))
   end
 end
 
@@ -124,10 +135,9 @@ class Money < Rampart::Domain::ValueObject
 end
 
 # Domain Event
-class ItemAdded < Rampart::Domain::DomainEvent
+class OrderSubmitted < Rampart::Domain::DomainEvent
   attribute :order_id, Types::String
-  attribute :product, Types::String
-  attribute :quantity, Types::Integer
+  attribute :submitted_by, Types::String
 end
 
 # Repository Interface (Port)
@@ -151,9 +161,10 @@ end
 class CreateOrderService < Rampart::Application::Service
   include Dry::Monads[:result]
   
-  def initialize(order_repo:, id_generator:)
+  def initialize(order_repo:, id_generator:, event_bus:)
     @order_repo = order_repo
     @id_generator = id_generator
+    @event_bus = event_bus
   end
   
   def call(command)
@@ -162,10 +173,12 @@ class CreateOrderService < Rampart::Application::Service
       customer_id: command.customer_id
     )
     
-    command.items.each { |item| order.add_item(item) }
-    
-    @order_repo.save(order)
-    Success(order)
+    order_with_items = command.items.reduce(order) { |agg, item| agg.add_item(item) }
+
+    persisted = @order_repo.save(order_with_items)
+    @event_bus.publish(OrderSubmitted.new(order_id: persisted.id, submitted_by: command.customer_id))
+
+    Success(persisted)
   rescue => e
     Failure([:error, e.message])
   end
@@ -264,12 +277,10 @@ Domain and application layers should be tested without any infrastructure:
 RSpec.describe Order do
   it "adds items to order" do
     order = Order.create(id: "123", customer_id: "456")
-    order.add_item("product-1", 2)
+    updated = order.add_item("product-1", 2)
     
-    expect(order.items.count).to eq(1)
-    expect(order.unpublished_events).to contain_exactly(
-      an_instance_of(ItemAdded)
-    )
+    expect(updated.items.count).to eq(1)
+    expect(order.items.count).to eq(0) # immutability: original instance untouched
   end
 end
 ```

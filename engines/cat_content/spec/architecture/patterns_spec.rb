@@ -47,14 +47,13 @@ RSpec.describe "Architecture::Patterns", type: :architecture, skip_db: true do
   it "keeps aggregates on Rampart base classes" do
     expect(aggregates).to all(inherit_from_rampart_base(Rampart::Domain::AggregateRoot))
     expect(aggregates).to all(have_no_rails_dependencies)
+    expect(aggregates).to all(be_immutable)
   end
 
   it "keeps value objects immutable and on Rampart base class" do
     expect(value_objects).to all(inherit_from_rampart_base(Rampart::Domain::ValueObject))
     expect(value_objects).to all(have_no_rails_dependencies)
-
-    mutable = value_objects.select { |klass| klass.instance_methods(false).grep(/[^=]=$/).any? }
-    expect(mutable).to be_empty
+    expect(value_objects).to all(be_immutable)
   end
 
   it "keeps ports on Rampart base class and implemented" do

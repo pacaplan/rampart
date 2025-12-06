@@ -1,24 +1,13 @@
 module Rampart
   module Domain
     class AggregateRoot < Entity
-      attr_reader :unpublished_events
-
-      def initialize(...)
-        super
-        @unpublished_events = []
-      end
-
-      def clear_events!
-        @unpublished_events.clear
-      end
-
-      private
-
-      def apply(event)
-        @unpublished_events << event
-        handler = "on_#{event.class.name.split('::').last.gsub(/([A-Z])/) { "_#{$1.downcase}" }.sub(/^_/, '')}"
-        send(handler, event) if respond_to?(handler, true)
-      end
+      # Aggregates are immutable. Domain methods return new instances instead of mutating state.
+      # Application services publish events after persistence rather than accumulating them here.
+      #
+      # Example:
+      #   def publish
+      #     self.class.new(**attributes.merge(visibility: Visibility.public))
+      #   end
     end
   end
 end

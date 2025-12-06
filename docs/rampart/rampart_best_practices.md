@@ -38,6 +38,13 @@ Whenever a command wades into generic territory, revisit the workflow and ask, "
 - **Schema versioning**: Use `schema_version` to evolve payloads; favor additive changes and keep backward compatibility where possible.
 - **Avoid generic verbs**: `EntityUpdated` or `ItemChanged` hide intent and lead to tight coupling.
 
+## Functional Core / Imperative Shell
+
+- **Immutable domain objects**: Aggregate and entity methods should return new instances (often via `self.class.new(**attributes.merge(...))`) rather than mutating instance variables.
+- **No hidden buffers**: Do not accumulate unpublished events inside aggregates; application services publish events after persistence.
+- **Pure domain services**: Keep domain services free of I/O so they remain part of the Functional Core.
+- **Side effects live in the shell**: Application services orchestrate repositories, event buses, and external adapters; domain logic should never trigger HTTP/DB/logging directly.
+
 ## Architecture Fitness Functions
 
 - **Add rules when boundaries wobble**: Introduce new matchers/specs in response to real drift (e.g., a domain class pulling in Rails) rather than hypothetical fears.

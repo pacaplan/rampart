@@ -64,8 +64,8 @@ Domain Events record business facts that already happened, named in past tense (
 
 ### How Rampart Uses Events
 
-- Aggregates call `apply(event)` to both track unpublished events and mutate internal state via `on_event_name` handlers.
-- Application services publish accumulated events through an `EventBus` port after persistence, keeping infrastructure swappable.
+- Aggregates are immutable and return new instances; they do not accumulate unpublished events or mutate internal state in-place.
+- Application services publish events through an `EventBus` port after persistence, keeping infrastructure swappable and side effects centralized.
 - Events include `event_id`, `occurred_at`, and `schema_version` for traceability and version evolution.
 
 ### When to Prefer Events Over Direct Calls
@@ -104,7 +104,7 @@ Fitness functions are executable constraints that continuously verify architectu
 
 - **Ports & Adapters**: Specs verify ports inherit from Rampart base classes and have adapter implementations.
 - **Layer Discipline**: Tests assert domain remains free of Rails dependencies and that application code only depends inward.
-- **Immutability**: Value objects remain setter-free to protect invariants and keep domain objects predictable.
+- **Immutability**: Value objects and aggregates remain setter-free to protect invariants and keep domain objects predictable.
 - **CQRS Alignment**: Commands/queries stay on the correct base classes, and repositories return domain objects rather than ActiveRecord records.
 
 ### Anti-Patterns to Avoid
@@ -119,3 +119,26 @@ Fitness functions are executable constraints that continuously verify architectu
 - Neal Ford et al. — ["Building Evolutionary Architectures"](https://www.thoughtworks.com/en/insights/articles/building-evolutionary-architectures-fitness-functions)
 - Thoughtworks Tech Radar — ["Fitness Functions"](https://www.thoughtworks.com/radar/techniques/architectural-fitness-function)
 - Martin Fowler — ["Architecture for Agile Developers"](https://martinfowler.com/ieeeSoftware/fowler.pdf)
+
+## 3.8 Functional Core / Imperative Shell (FC/IS)
+
+### What Is FC/IS?
+
+Functional Core / Imperative Shell separates pure, deterministic logic from side effects. The Functional Core (domain layer) is immutable and side-effect free; the Imperative Shell (application and infrastructure layers) handles I/O, persistence, and event publication.
+
+### Why Rampart Uses Immutable Aggregates
+
+- **Clarity for Humans and AI**: No hidden mutations or implicit event buffers; each domain method returns a new aggregate instance representing the next state.
+- **Predictable Testing**: Pure functions are trivial to unit test without stubbing infrastructure or event buses.
+- **Composability**: New behaviors compose by transforming data rather than mutating shared objects.
+
+### Mapping to DDD + Hexagonal Layers
+
+- **Functional Core**: Aggregates, entities, value objects, and domain services are pure Ruby with no I/O. Methods return new instances instead of mutating state.
+- **Imperative Shell**: Application services coordinate repositories, publish events, and invoke adapters. Side effects live here, not in the domain.
+
+### Anti-Patterns to Avoid
+
+- Mutating instance variables inside domain objects (other than within generated Dry::Struct initialization).
+- Accumulating unpublished events inside aggregates via `apply`/`on_*` handlers.
+- Triggering I/O (HTTP calls, database writes, logging) from domain classes.
