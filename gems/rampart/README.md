@@ -8,7 +8,7 @@ Rampart provides building blocks for implementing DDD patterns in Ruby applicati
 
 ## Architecture Patterns
 
-Rampart implements three complementary architectural approaches from the [Rampart Vision](../../docs/rampart/rampart_vision.md):
+Rampart implements four complementary architectural approaches from the [Rampart Vision](../../docs/rampart/rampart_vision.md):
 
 ### 3.1 Domain-Driven Design (DDD)
 
@@ -35,6 +35,14 @@ Rampart's patterns align with Uncle Bob's Clean Architecture principles:
 - **Testability** - Business rules can be tested without UI, database, or external systems
 
 The layer-first directory structure (`domain/`, `application/`, `infrastructure/`) provides predictable navigation and AI-friendly conventions across all bounded contexts.
+
+### 3.4 Modular Monolith Support
+
+Rampart patterns are designed for use within Rails Engines, supporting the Modular Monolith architecture:
+- **Engine Isolation** - Each bounded context is a separate Rails Engine with `isolate_namespace`
+- **Schema Isolation** - Dedicated database schema per bounded context
+- **Vertical Slice at BC Level** - Engine contains all layers for one domain
+- **Extractability** - Engine structure enables future extraction to standalone service
 
 ## Features
 

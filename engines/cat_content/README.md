@@ -10,13 +10,14 @@ This engine manages:
 
 ## Architecture Patterns
 
-This engine implements three architectural approaches from the [Rampart Vision](../../docs/rampart/rampart_vision.md):
+This engine implements four architectural approaches from the [Rampart Vision](../../docs/rampart/rampart_vision.md):
 
 | Pattern | Implementation |
 |---------|----------------|
 | **3.1 DDD** | Aggregates (`CatListing`, `CustomCat`), Value Objects, Domain Events, Ports |
 | **3.2 Hexagonal** | Ports in `domain/ports/`, Adapters in `infrastructure/` |
 | **3.3 Clean Architecture** | Dependency rule, framework-independent domain, use cases as Application Services |
+| **3.4 Modular Monolith** | Engine isolation, schema isolation, vertical slice at BC level |
 
 ### Why Layer-First (Not Feature-First)
 
