@@ -24,4 +24,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "dry-auto_inject", "~> 1.0"
   spec.add_dependency "dry-monads", "~> 1.6"
   spec.add_dependency "dry-initializer", "~> 3.1"
+  spec.add_dependency "rspec", "~> 3.13"
+  spec.add_dependency "standard", "~> 1.42"
 end

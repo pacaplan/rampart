@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
+require "rspec"
+
 module Rampart
   module Testing
   end
 end
 
-if defined?(RSpec)
-  require_relative "testing/architecture_matchers"
+require_relative "testing/architecture_matchers"
 
-  RSpec.configure do |config|
-    config.include Rampart::Testing::ArchitectureMatchers
-  end
+RSpec.configure do |config|
+  config.include Rampart::Testing::ArchitectureMatchers
 end

@@ -4,6 +4,96 @@ This document captures the architectural principles that guide Rampart. For the 
 
 ---
 
+## 3.1 Domain-Driven Design (DDD) — Foundational
+
+### What Is DDD?
+
+Domain-Driven Design aligns software models with real business domains using ubiquitous language, bounded contexts, and tactical patterns (aggregates, entities, value objects, domain services).
+
+### Why Rampart Centers on DDD
+
+- **Goal 1 — Bounded Context Autonomy**: Bounded contexts make team seams explicit so each slice of the monolith can move independently.
+- **Goal 2 — Human/AI Clarity**: Ubiquitous language and aggregate boundaries keep intent obvious to humans and AI agents.
+
+### How Rampart Implements DDD
+
+- **Strategic**: Treat each Rails engine as a bounded context with its own models, ports, and rules. Context maps live in architecture blueprints and docs.
+- **Tactical**: Use Rampart base classes—`AggregateRoot`, `Entity`, `ValueObject`, `DomainService`, `DomainEvent`, `DomainException`—to encode modeling decisions in code.
+- **Immutability**: Aggregates and value objects stay immutable (see FC/IS), keeping state changes explicit.
+- **Context Isolation**: Shared Kernel remains minimal; cross-context interactions prefer domain events over direct coupling.
+
+### Anti-Patterns to Avoid
+
+- **Anemic Domain Models**: Pushing rules into services while aggregates become data bags.
+- **Context Leakage**: Reusing domain objects across contexts or bypassing them with generic data mappers.
+- **Framework Coupling**: Allowing ActiveRecord concerns, callbacks, or Rails helpers into the domain layer.
+- **Transaction Scripts**: Skipping aggregates in favor of procedural scripts that hide invariants.
+
+---
+
+## 3.2 Hexagonal Architecture — Foundational
+
+### What Is Hexagonal?
+
+Hexagonal Architecture keeps domain and application logic at the center, surrounded by primary adapters (incoming) and secondary adapters (outgoing) wired through explicit ports.
+
+### Rampart’s Hexagonal Shape
+
+- **Ports & Adapters**: Define secondary ports with `SecondaryPort`; implement adapters in `infrastructure/` for persistence, messaging, and integrations.
+- **Primary Adapters**: Controllers, jobs, and CLIs call application services (use cases) rather than domain objects directly.
+- **Repository Boundary**: Repositories return domain objects, not ActiveRecord models, preserving pure domain logic.
+- **Swappability**: Ports hide infrastructure details so adapters can change without touching domain/application.
+
+### Anti-Patterns to Avoid
+
+- **Domain Knows Rails**: No `ActiveRecord` or framework modules in domain/application layers.
+- **Adapter Logic in Use Cases**: Keep I/O and transformations inside adapters, not application services.
+- **Adapter Reuse Across Contexts**: Each bounded context owns its ports/adapters; avoid a shared integration grab bag.
+
+---
+
+## 3.3 Clean Architecture / Onion / Screaming Architecture
+
+### What It Means in Rampart
+
+Clean Architecture emphasizes strict layer direction: domain <- application <- interfaces. The codebase should scream the domain through directory and module naming.
+
+### Rampart Mapping
+
+- **Use Cases**: Application services encapsulate single business flows and orchestrate repositories, ports, and transactions.
+- **DTO Discipline**: Commands/queries (CQRS) carry validated data into use cases; responses stay intent-revealing.
+- **Layering**: Domain has no framework dependencies; application depends on domain; interfaces/adapters depend inward.
+- **Screaming**: Directory names (catalog, commerce) and aggregate names reflect ubiquitous language rather than Rails defaults.
+
+### Anti-Patterns to Avoid
+
+- **Fat Controllers/Jobs**: Business logic should live in use cases, not entrypoints.
+- **Leaky Dependencies**: Application importing Rails concerns or infrastructure helpers.
+- **Anemic Use Cases**: Pass-through services that simply call repositories without expressing business rules.
+
+---
+
+## 3.4 Modular Monolith / Vertical Slice Architecture
+
+### Why Modular Monolith
+
+Organizing the monolith into vertical slices (bounded contexts) yields autonomy without distributed systems overhead.
+
+### Rampart Implementation
+
+- **Engines as Slices**: Each Rails engine houses its own domain/application/infrastructure, plus architecture specs, to keep boundaries explicit.
+- **Cross-Context Communication**: Prefer domain events or anti-corruption layers over direct model sharing.
+- **Shared Kernel Discipline**: Only truly ubiquitous primitives belong in shared spaces; everything else stays inside the owning context.
+- **Migration Path**: Strong internal slices keep future extraction (services, separate repos) feasible if needed.
+
+### Anti-Patterns to Avoid
+
+- **Shared ActiveRecord Models**: Duplicates or shared models create tight coupling; expose data via queries or events instead.
+- **Global Helper/Util Dumps**: Cross-context "common" modules erode boundaries.
+- **Cross-Engine Persistence**: One context writing directly to another’s tables/contracts without clear ACLs or events.
+
+---
+
 ## 3.5 Lightweight CQRS & Task-Based Interfaces
 
 ### What Is Lightweight CQRS?
