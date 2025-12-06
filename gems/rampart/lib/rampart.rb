@@ -20,6 +20,7 @@ require_relative "rampart/application/query"
 require_relative "rampart/application/service"
 require_relative "rampart/application/transaction"
 require_relative "rampart/ports/secondary_port"
+require_relative "rampart/ports/event_bus_port"
 
 module Rampart
 end

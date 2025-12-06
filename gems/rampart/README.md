@@ -53,6 +53,14 @@ Rampart separates reads from writes with immutable Command and Query objects:
 - **Result Monads** - Commands return `Success(value)` or `Failure(error)` so adapters can render deterministic responses
 This lightweight CQRS approach keeps a single data store but enforces explicit interfaces that clarify bounded-context ownership and make code easier for humans and AI tools to follow.
 
+### 3.6 Domain Events & Event-Driven Modeling
+
+Domain events capture business facts in past tense and enable decoupled reactions:
+- **Immutable Events** - `DomainEvent` value objects include `event_id`, `occurred_at`, and `schema_version`
+- **Aggregate Integration** - `AggregateRoot#apply` records unpublished events and updates state via handlers
+- **Event Bus Port** - `EventBusPort` abstraction lets applications publish events to any transport
+- **Pragmatic Scope** - Event publishing without mandating full event sourcing or an event store
+
 ## Features
 
 - **Pure Ruby** - No Rails dependencies, works in any Ruby application

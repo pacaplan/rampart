@@ -30,3 +30,10 @@ Commands should describe the business task being carried out with ubiquitous lan
 4. **Better Validation** - Task-specific invariants become obvious and easier to test
 
 Whenever a command wades into generic territory, revisit the workflow and ask, "What is the user actually trying to accomplish?" Rename the command to match that intent before adding new logic.
+
+## Domain Event Naming
+
+- **Past tense facts**: Name events after what happened (`CatListingPublished`, not `PublishCatListing`).
+- **Meaningful payloads**: Include identifiers and only the state consumers need; avoid forcing lookups for basics.
+- **Schema versioning**: Use `schema_version` to evolve payloads; favor additive changes and keep backward compatibility where possible.
+- **Avoid generic verbs**: `EntityUpdated` or `ItemChanged` hide intent and lead to tight coupling.

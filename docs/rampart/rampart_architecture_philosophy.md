@@ -49,3 +49,41 @@ Lightweight CQRS complements the DDD + Hexagonal stack:
 - CodeOpinion — ["Decomposing CRUD to a Task-Based UI"](https://codeopinion.com/decomposing-crud-to-a-task-based-ui/)
 - Task Based UI | CQRS — ["Task Based UI"](https://cqrs.wordpress.com/documents/task-based-ui/)
 - Arkency — ["CQRS example in the Rails app"](https://blog.arkency.com/2015/09/cqrs-example-in-the-rails-app/)
+
+## 3.6 Domain Events & Event-Driven Modeling
+
+### What Are Domain Events?
+
+Domain Events record business facts that already happened, named in past tense (`CatListingPublished`, `OrderShipped`). They are immutable value objects that travel across bounded contexts while preserving the domain language.
+
+### Why Use Them?
+
+- **Goal 1 — Decoupling**: Producers do not need to know about downstream consumers; events flow through an Event Bus port.
+- **Goal 2 — Clarity**: Past-tense names make intent explicit to humans and AI tools.
+- **Auditability**: Events provide a breadcrumb trail of meaningful changes without full event sourcing.
+
+### How Rampart Uses Events
+
+- Aggregates call `apply(event)` to both track unpublished events and mutate internal state via `on_event_name` handlers.
+- Application services publish accumulated events through an `EventBus` port after persistence, keeping infrastructure swappable.
+- Events include `event_id`, `occurred_at`, and `schema_version` for traceability and version evolution.
+
+### When to Prefer Events Over Direct Calls
+
+- Cross-bounded-context notifications (e.g., Catalog informs Commerce of a published listing)
+- Integrations that may fan out to multiple subscribers
+- Workloads that benefit from asynchronous processing without changing the transactional domain model
+
+Direct method calls remain fine for in-process, single-consumer workflows where indirection adds no value.
+
+### Naming & Versioning Guidelines
+
+- Past tense, domain language (`PaymentCaptured`, not `CapturePayment`)
+- Include identifiers needed by consumers; prefer event-carried state only when consumers require it
+- Bump `schema_version` when adding/removing/renaming attributes; favor additive changes
+
+### Anti-Patterns to Avoid
+
+- **Event Sourcing by Accident**: Publishing events does not imply persisting every event forever.
+- **Chatty or Generic Events**: `EntityUpdated` offers no meaning; emit specific, purposeful facts.
+- **Hidden Coupling**: Do not require consumers to reach back into aggregates for missing context that should be in the event payload.

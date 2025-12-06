@@ -19,6 +19,7 @@ This engine implements five architectural approaches from the [Rampart Vision](.
 | **3.3 Clean Architecture** | Dependency rule, framework-independent domain, use cases as Application Services |
 | **3.4 Modular Monolith** | Engine isolation, schema isolation, vertical slice at BC level |
 | **3.5 CQRS** | Commands for writes (`CreateCatListing`), Queries for reads (`ListCatListingsQuery`) |
+| **3.6 Domain Events** | Domain events on aggregates, published through an Event Bus port |
 
 ### Why Layer-First (Not Feature-First)
 
