@@ -71,30 +71,41 @@ RSpec.configure do |config|
 
   # Include FactoryBot syntax methods
   config.include FactoryBot::Syntax::Methods
-  
+
   # Use engine routes for request specs
   config.include CatContent::Engine.routes.url_helpers
-  
+
   # Eagerly load the infrastructure models for FactoryBot
   config.before(:suite) do
     engine_root = File.expand_path("../..", __FILE__)
     require File.join(engine_root, "app/infrastructure/cat_content/persistence/base_record")
     require File.join(engine_root, "app/infrastructure/cat_content/persistence/models/cat_listing_record")
   end
-  
+
   # Override the app method for request specs to use the engine directly
   config.before(:each, type: :request) do
     @routes = CatContent::Engine.routes
   end
-  
+
   # For request specs, use the engine as the app
   config.around(:each, type: :request) do |example|
     # Use engine as the app for this test
     def app
       CatContent::Engine
     end
-    
+
     example.run
   end
-end
 
+  # Architecture specs avoid touching the database
+  config.around(:each, skip_db: true) do |example|
+    original = config.use_transactional_fixtures
+    original_active_record = config.respond_to?(:use_active_record?) ? config.use_active_record? : true
+    config.use_transactional_fixtures = false
+    config.use_active_record = false if config.respond_to?(:use_active_record=)
+    example.run
+  ensure
+    config.use_active_record = original_active_record if config.respond_to?(:use_active_record=)
+    config.use_transactional_fixtures = original
+  end
+end

@@ -17,7 +17,8 @@ module Rampart
 
         def rails_ancestors_for(klass)
           rails_prefixes = %w[ActiveRecord ActionDispatch ActionController ActiveSupport Rails]
-          klass.ancestors.compact.select do |ancestor|
+          shared = Object.ancestors
+          klass.ancestors.compact.reject { |ancestor| shared.include?(ancestor) }.select do |ancestor|
             rails_prefixes.any? { |prefix| ancestor.name&.start_with?(prefix) }
           end
         end

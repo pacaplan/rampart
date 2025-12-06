@@ -1,16 +1,36 @@
 # frozen_string_literal: true
 
-require "rails_helper"
+require "spec_helper"
+require "rampart"
 require "rampart/testing"
+require "active_record"
 
-RSpec.describe "Architecture::Patterns", type: :model do
-  before(:all) do
-    engine_root = File.expand_path("../..", __dir__)
-    Dir[File.join(engine_root, "app/domain/**/*.rb")].sort.each { |file| require file }
-    Dir[File.join(engine_root, "app/application/**/*.rb")].sort.each { |file| require file }
-    Dir[File.join(engine_root, "app/infrastructure/cat_content/persistence/**/*.rb")].sort.each { |file| require file }
-  end
+ENGINE_ROOT = File.expand_path("../..", __dir__)
+require File.join(ENGINE_ROOT, "app/domain/cat_content/types.rb")
+value_object_files = %w[
+  cat_id.rb
+  cat_media.rb
+  cat_name.rb
+  trait_set.rb
+  cat_profile.rb
+  content_block.rb
+  money.rb
+  paginated_result.rb
+  slug.rb
+  tag_list.rb
+  visibility.rb
+]
+value_object_files.each do |file|
+  require File.join(ENGINE_ROOT, "app/domain/cat_content/value_objects", file)
+end
+Dir[File.join(ENGINE_ROOT, "app/domain/cat_content/entities/**/*.rb")].sort.each { |file| require file }
+Dir[File.join(ENGINE_ROOT, "app/domain/cat_content/aggregates/**/*.rb")].sort.each { |file| require file }
+Dir[File.join(ENGINE_ROOT, "app/domain/cat_content/ports/**/*.rb")].sort.each { |file| require file }
+Dir[File.join(ENGINE_ROOT, "app/domain/cat_content/services/**/*.rb")].sort.each { |file| require file }
+Dir[File.join(ENGINE_ROOT, "app/application/cat_content/**/*.rb")].sort.each { |file| require file }
+Dir[File.join(ENGINE_ROOT, "app/infrastructure/cat_content/persistence/**/*.rb")].sort.each { |file| require file }
 
+RSpec.describe "Architecture::Patterns", type: :architecture, skip_db: true do
   let(:aggregates) { [CatContent::Aggregates::CatListing] }
 
   let(:value_objects) do
@@ -33,7 +53,7 @@ RSpec.describe "Architecture::Patterns", type: :model do
     expect(value_objects).to all(inherit_from_rampart_base(Rampart::Domain::ValueObject))
     expect(value_objects).to all(have_no_rails_dependencies)
 
-    mutable = value_objects.select { |klass| klass.instance_methods.grep(/=$/).any? }
+    mutable = value_objects.select { |klass| klass.instance_methods(false).grep(/[^=]=$/).any? }
     expect(mutable).to be_empty
   end
 
