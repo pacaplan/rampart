@@ -48,14 +48,49 @@
 
 ## CLI Tools ❌
 
-- [ ] **rampart init** - Initialize project structure and JSON blueprints
-- [ ] **rampart design** - Interactive design of bounded contexts and architecture
-- [ ] **rampart visualize** - Generate diagrams (context maps, use-case maps, C4 diagrams)
-- [ ] **rampart scaffold** - Generate minimal scaffolding from architecture blueprints
-- [ ] **rampart plan** - Create migration plan for legacy codebases
-- [ ] **rampart verify** - Run architecture fitness checks and validation
-- [ ] **rampart sync** - Detect architecture/code drift 
-- [ ] **rampart extract** - Extract domain/use-case models from legacy code
+### Initialization
+- [ ] **rampart init** - Bootstrap Rampart in a project
+  - Create `architecture/` directory with empty JSON blueprint templates
+  - Generate generic architecture validation spec files
+  - Set up initializer/configuration files for Rampart
+  - Generate agent instruction files for AI-assisted development
+
+### Design
+- [ ] **rampart design** - Interactive architecture design
+  - Guide bounded context identification via interactive prompts
+  - Define domain models (aggregates, entities, value objects, domain services)
+  - Specify use cases, commands, queries, domain events, ports, and adapters
+  - Future: AI chatbot assistance for domain modeling decisions
+- [ ] **rampart visualize** - Generate architecture diagrams
+  - Context maps (inter-BC relationships)
+  - Use-case maps (command/query flows)
+  - C4 component diagrams (internal structure)
+
+### Implementation Planning
+- [ ] **rampart plan** - Generate implementation plan from architecture JSON
+  - Compare blueprint against current codebase state
+  - Output markdown document showing files to create/modify/delete
+  - Support greenfield and incremental (sync new elements) modes
+
+### Validation & Synchronization
+- [ ] **rampart verify** - Run architecture fitness checks
+  - Validate layer boundaries and dependency rules
+  - Check inheritance and immutability constraints
+  - Report violations with actionable guidance
+- [ ] **rampart sync** - Detect drift and update architecture JSON
+  - Scan codebase for added/modified/deleted elements
+  - Require confirmation before updating architecture blueprint
+  - Generate drift report for review and audit trail
+
+### Legacy Migration
+- [ ] **rampart extract** - Extract domain models from legacy code
+  - Analyze codebase to identify candidate domain concepts
+  - Generate preliminary BC and aggregate suggestions
+  - Create legacy-to-DDD mapping inventory
+- [ ] **rampart migrate** - Create phased migration plan for legacy codebases
+  - Map legacy code to target Rampart architecture
+  - Identify anti-corruption layers and extraction order
+  - Generate step-by-step migration playbook
 
 ---
 
