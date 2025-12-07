@@ -29,9 +29,9 @@ Only approaches that score **High** on at least one of these goals are included 
 
 ---
 
-## 2. Guiding Principles & Opinions
+## 2. Guiding Principles & Architectural Opinions
 
-Like Rails, Rampart is an **opinionated framework**. It provides "one right way" to implement features, reducing decision fatigue and ensuring consistency across teams. These opinions are not arbitrary—they emerge from the architecture principals defined in this document and from hard-won lessons in building maintainable, scalable systems.
+Like Rails, Rampart is an **opinionated framework**—but its opinions are focused squarely on architecture, not tooling. It provides "one right way" to structure bounded contexts, define domain models, and organize application layers, while remaining deliberately agnostic about testing frameworks, linters, ORMs, and other peripheral concerns.
 
 ### Core Principles
 
@@ -43,23 +43,32 @@ Like Rails, Rampart is an **opinionated framework**. It provides "one right way"
 - **Maintain Sync Between Code and Architecture**: Support workflows where changes in one must be reflected in the other.
 - **Rails‑Friendly, Not Rails‑Dependent**: The design supports Rails engines but keeps the core principles framework‑agnostic.
 
-### Rampart Opinions
+### Where Rampart Is Opinionated
 
-Rampart enforces specific choices where the architecture principals demand consistency or where the community has converged on clear best practices:
+Rampart enforces specific architectural choices where clarity and consistency are essential:
 
-- **Architecture Patterns**: The nine principals defined in Section 3 are not optional—they represent the canonical way to structure Rampart applications. There is one right way to model bounded contexts, one right way to define use cases, and one right way to structure domain events.
-- **Testing with RSpec**: RSpec is the required testing framework. Its expressive syntax aligns with domain-driven design, making tests readable as specifications of business behavior. Rampart includes architecture matchers designed specifically for RSpec.
-- **Code Style with StandardRB**: StandardRB is the required code formatter and linter. By eliminating style debates entirely, teams focus on architecture and domain modeling rather than bikeshedding over syntax.
-- **JSON for Blueprints**: Architecture blueprints use JSON (not YAML) for AI-safety and deterministic parsing (see Section 8).
-- **Dry-rb Ecosystem**: Rampart builds on dry-types, dry-struct, and dry-monads for type safety and functional patterns.
+- **The Nine Architecture Principals** (Section 3): These are not optional. DDD bounded contexts, Hexagonal Architecture layering, use case modeling, and event-driven patterns represent the canonical way to structure Rampart applications. There is one right way to model aggregates, one right way to define ports and adapters, and one right way to organize domain events.
+- **JSON for Architecture Blueprints**: Blueprints use JSON (not YAML) for AI-safety and deterministic parsing (see Section 8).
+- **Dry-rb Foundation**: Rampart builds on the dry-rb ecosystem (dry-types, dry-struct, dry-monads, dry-container) for type safety, immutability, and functional patterns. This provides a shared vocabulary and consistent abstractions across all Rampart applications.
+- **Fitness Function Enforcement**: Architecture boundaries are validated programmatically—this is non-negotiable for maintaining integrity over time.
 
-These opinions are examples, not an exhaustive list. As Rampart evolves, additional conventions will be codified where they serve the goals of bounded context autonomy and human + AI clarity.
+### Where Rampart Is Deliberately Unopinionated
+
+Teams bring their own preferences for:
+
+- **Testing frameworks** (RSpec, Minitest, etc.) — Rampart provides optional architecture matchers for RSpec but does not require it
+- **Code formatters and linters** (StandardRB, RuboCop, etc.)
+- **ORMs and databases** (ActiveRecord, ROM, Sequel)
+- **Web frameworks** (Rails, Hanami, Sinatra)
+- **Background job processors** (Sidekiq, GoodJob, etc.)
+
+The goal: strong opinions on architecture, flexibility on everything else.
 
 ### What Rampart Is Not
 
 - Rampart is not a Rails rewrite.
 - It is not a code generator for business logic; scaffolding stays minimal and structural.
-- It is not a static analyzer like RuboCop or StandardRB—though it requires StandardRB for code style.
+- It is not a linter or code formatter—it validates architecture, not syntax.
 - It does not prescribe specific ORMs, controllers, or background job frameworks.
 
 ---
