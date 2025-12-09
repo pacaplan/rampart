@@ -1,5 +1,11 @@
 # Rampart: Architecture on Rails — High‑Level Vision Document
 
+Product direction and strategic goals for the Rampart framework.
+
+**Related**: [Philosophy](rampart_architecture_philosophy.md) | [Best Practices](rampart_best_practices.md) | [Features](rampart_features.md)
+
+---
+
 ## 1. Executive Summary
 
 **Rampart** is an Architecture‑as‑Code toolkit designed to bring disciplined, maintainable architecture to Rails applications—without abandoning the productivity of the monolith.
@@ -73,122 +79,29 @@ The goal: strong opinions on architecture, flexibility on everything else.
 
 ---
 
-## 3. Architecture Principals
+## 3. Architecture Patterns
 
-Rampart provides clear, enforceable, AI‑friendly architecture patterns that maximize bounded context autonomy and code clarity. The following nine approaches form the foundation of the Rampart architectural philosophy.
+Rampart provides nine enforceable, AI‑friendly architecture patterns. Each is rated against the two core goals.
 
-### 3.1 Domain‑Driven Design (DDD) — Foundational
+> For detailed explanations, anti-patterns, and implementation guidance, see [Architecture Philosophy](rampart_architecture_philosophy.md).
 
-DDD aligns software models with real business domains using:
+| Pattern | Goal 1 (BC Autonomy) | Goal 2 (Clarity) |
+|---------|---------------------|------------------|
+| **Domain-Driven Design** | HIGH | HIGH |
+| **Hexagonal Architecture** | HIGH | HIGH |
+| **Clean Architecture / Onion** | HIGH | HIGH |
+| **Modular Monolith / Vertical Slices** | HIGH | MEDIUM–HIGH |
+| **Lightweight CQRS & Task-Based Interfaces** | MEDIUM–HIGH | HIGH |
+| **Domain Events & Event-Driven Modeling** | HIGH | MEDIUM |
+| **Architecture Fitness Functions** | HIGH | VERY HIGH |
+| **Functional Core / Imperative Shell** | MEDIUM | HIGH |
+| **C4 Model (Inside-the-Box)** | MEDIUM | HIGH |
 
-- Strategic patterns: bounded contexts, context maps, ubiquitous language
-- Tactical patterns: aggregates, entities, value objects, domain services
+### High Impact Summary
 
-**Goal 1 — HIGH**: Strongest tool for bounded context definition.
+**Bounded context autonomy**: DDD, Hexagonal, Clean Architecture, Modular Monolith, Domain Events, Fitness Functions
 
-**Goal 2 — HIGH**: Clear naming and business alignment improves comprehension.
-
----
-
-### 3.2 Hexagonal Architecture — Foundational
-
-Domain + application in the center, infrastructure as adapters.
-
-**Goal 1 — HIGH**: Domain insulated from frameworks.
-
-**Goal 2 — HIGH**: Predictable layering aids understanding for humans and AI.
-
----
-
-### 3.3 Clean Architecture / Onion / Screaming Architecture
-
-Strict layering, explicit use‑case classes, domain‑first organization.
-
-**Goal 1 — HIGH**: Clear boundaries around each BC.
-
-**Goal 2 — HIGH**: Well‑defined folder structures and predictable entry points.
-
----
-
-### 3.4 Modular Monolith / Vertical Slice Architecture
-
-A monolith subdivided into strong internal slices containing all layers of a BC.
-
-**Goal 1 — HIGH**: Empowers stream‑aligned teams.
-
-**Goal 2 — MEDIUM–HIGH**: Reduces cognitive load, ideal for AI tooling.
-
----
-
-### 3.5 Lightweight CQRS & Task‑Based Interfaces
-
-Commands for writes, queries for reads.
-
-**Goal 1 — MEDIUM–HIGH**: Clarifies responsibility, discourages cross‑BC leakage.
-
-**Goal 2 — HIGH**: Intention‑revealing patterns easy for AIs.
-
----
-
-### 3.6 Domain Events & Event‑Driven Modeling
-
-Events model meaningful business changes.
-
-**Goal 1 — HIGH**: Encourages decoupling.
-
-**Goal 2 — MEDIUM**: Depends on disciplined naming and documentation.
-
----
-
-### 3.7 Architecture Fitness Functions / Architecture‑as‑Code
-
-Executable rules to enforce architecture.
-
-**Goal 1 — HIGH**: Prevents erosion of BC boundaries.
-
-**Goal 2 — VERY HIGH**: AI systems operate best with explicit constraints.
-
----
-
-### 3.8 Functional Core / Imperative Shell
-
-Pure domain logic, side effects isolated.
-
-**Goal 1 — MEDIUM**: Improves cohesion but not inter‑BC autonomy.
-
-**Goal 2 — HIGH**: Pure functions are easy for humans and AIs.
-
----
-
-### 3.9 C4 Model (Inside‑the‑Box)
-
-Component‑level diagrams for visual understanding.
-
-**Goal 1 — MEDIUM**: Conveys structure, not enforcement.
-
-**Goal 2 — HIGH**: Visual clarity improves comprehension.
-
----
-
-### 3.10 Summary of High‑Impact Approaches
-
-#### High impact on bounded context autonomy:
-
-- Domain‑Driven Design
-- Hexagonal Architecture
-- Clean Architecture
-- Modular Monolith
-- Domain Events
-- Architecture Fitness Functions
-
-#### High impact on human + AI understandability:
-
-- Hexagonal Architecture
-- Clean Architecture
-- CQRS
-- Functional Core
-- Architecture Fitness Functions
-- C4 Diagrams
+**Human + AI clarity**: Hexagonal, Clean Architecture, CQRS, Functional Core, Fitness Functions, C4 Diagrams
 
 ---
 

@@ -1,5 +1,11 @@
 # Rampart Framework & Tooling Features
 
+Implementation details and roadmap for Rampart framework classes and CLI tools.
+
+**Related**: [Vision](rampart_vision.md) | [Philosophy](rampart_architecture_philosophy.md) | [Best Practices](rampart_best_practices.md)
+
+---
+
 ## Framework Classes ✅
 
 ### Domain Layer Classes
@@ -48,6 +54,8 @@
 
 ## CLI Tools ❌
 
+> For full capability descriptions, see [Vision: High-Level Capabilities](rampart_vision.md#4-high-level-capabilities) and [CLI Vision](rampart_vision.md#6-cli-vision).
+
 ### Initialization
 - [ ] **rampart init** - Bootstrap Rampart in a project
   - Create `architecture/` directory with empty JSON blueprint templates
@@ -94,7 +102,7 @@
 
 ---
 
-## 3.7 Architecture Fitness Functions / Enforcement Tools ⚠️
+## Architecture Fitness Functions / Enforcement Tools ⚠️
 
 - [ ] **Packwerk** - Static analysis for layer boundaries (deferred)
   - Layer rules:
