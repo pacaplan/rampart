@@ -54,6 +54,8 @@ Like Rails, Rampart is an **opinionated framework**—but its opinions are focus
 Rampart enforces specific architectural choices where clarity and consistency are essential:
 
 - **The Nine Architecture Principals** (Section 3): These are not optional. DDD bounded contexts, Hexagonal Architecture layering, use case modeling, and event-driven patterns represent the canonical way to structure Rampart applications. There is one right way to model aggregates, one right way to define ports and adapters, and one right way to organize domain events.
+- **Monorepo Structure**: All bounded contexts must reside in a single monorepo. This ensures centralized architecture governance, simplified dependency management, and consistent tooling across contexts.
+- **Rails Engine Implementation**: Bounded contexts must be implemented as Rails engines. This provides clear module boundaries, namespace isolation, and extractability. Future versions will add support for separate Rails applications, but engines remain the recommended approach for modular monoliths.
 - **JSON for Architecture Blueprints**: Blueprints use JSON (not YAML) for AI-safety and deterministic parsing (see Section 8).
 - **Dry-rb Foundation**: Rampart builds on the dry-rb ecosystem (dry-types, dry-struct, dry-monads, dry-container) for type safety, immutability, and functional patterns. This provides a shared vocabulary and consistent abstractions across all Rampart applications.
 - **Fitness Function Enforcement**: Architecture boundaries are validated programmatically—this is non-negotiable for maintaining integrity over time.
