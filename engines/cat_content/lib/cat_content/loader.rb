@@ -63,18 +63,18 @@ module CatContent
       def load_infrastructure_layer(root)
         infra = root.join("app/infrastructure/cat_content")
 
+        # Models and Controllers are autoloaded by Rails from app/models and app/controllers
+        # No need to manually load them here
+
         # Persistence
-        load_files(infra.join("persistence"), %w[base_record])
-        load_files(infra.join("persistence/models"), %w[cat_listing_record])
         load_files(infra.join("persistence/mappers"), %w[cat_listing_mapper])
         load_files(infra.join("persistence/repositories"), %w[sql_cat_listing_repository])
 
         # Wiring (DI container)
         load_files(infra.join("wiring"), %w[container])
 
-        # HTTP
+        # HTTP Serializers
         load_files(infra.join("http/serializers"), %w[cat_listing_serializer])
-        load_files(infra.join("http/controllers"), %w[health_controller catalog_controller])
       end
 
       def load_files(dir, files)

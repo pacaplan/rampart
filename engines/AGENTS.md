@@ -42,9 +42,11 @@ Each engine under `engines/` follows this layout:
 ```
 engines/cat_content/
 ├── app/
+│   ├── controllers/      # Controllers (Rails convention)
+│   ├── models/           # ActiveRecord models (Rails convention)
 │   ├── domain/           # Aggregates, entities, value objects
 │   ├── application/      # Services, use cases
-│   └── infrastructure/   # Controllers, AR models, repos
+│   └── infrastructure/   # Repos, adapters, other infrastructure
 ├── lib/
 └── cat_content.gemspec
 ```
@@ -79,7 +81,7 @@ engines/cat_content/
 
 Each engine should implement a health check endpoint for troubleshooting:
 
-**Location:** `app/controllers/context_name/health_controller.rb`
+**Location:** `app/controllers/health_controller.rb`
 
 **Route:** `GET /mount_path/health` (e.g., `/catalog/health` for cat_content)
 

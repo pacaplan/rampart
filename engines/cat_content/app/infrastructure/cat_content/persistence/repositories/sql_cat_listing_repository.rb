@@ -16,17 +16,17 @@ module CatContent
           end
 
           def find(id)
-            rec = Models::CatListingRecord.find_by(id: id.to_s)
+            rec = ::CatListingRecord.find_by(id: id.to_s)
             rec && @mapper.to_domain(rec)
           end
 
           def find_by_slug(slug)
-            rec = Models::CatListingRecord.find_by(slug: slug.to_s, visibility: "public")
+            rec = ::CatListingRecord.find_by(slug: slug.to_s, visibility: "public")
             rec && @mapper.to_domain(rec)
           end
 
           def list_public(tags: [], page: 1, per_page: 20)
-            scope = Models::CatListingRecord.where(visibility: "public")
+            scope = ::CatListingRecord.where(visibility: "public")
             scope = scope.where("tags && ARRAY[?]::text[]", tags) if tags.any?
             total = scope.count
             cats = scope.order(created_at: :desc)
@@ -47,7 +47,7 @@ module CatContent
           end
 
           def remove(id)
-            Models::CatListingRecord.where(id: id.to_s).delete_all
+            ::CatListingRecord.where(id: id.to_s).delete_all
           end
         end
       end

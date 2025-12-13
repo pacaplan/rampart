@@ -75,13 +75,6 @@ RSpec.configure do |config|
   # Use engine routes for request specs
   config.include CatContent::Engine.routes.url_helpers
 
-  # Eagerly load the infrastructure models for FactoryBot
-  config.before(:suite) do
-    engine_root = File.expand_path("../..", __FILE__)
-    require File.join(engine_root, "app/infrastructure/cat_content/persistence/base_record")
-    require File.join(engine_root, "app/infrastructure/cat_content/persistence/models/cat_listing_record")
-  end
-
   # Override the app method for request specs to use the engine directly
   config.before(:each, type: :request) do
     @routes = CatContent::Engine.routes

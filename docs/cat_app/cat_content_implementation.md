@@ -239,6 +239,16 @@ Rails is **only allowed in infrastructure**.
 ```
 engines/cat_content/
   app/
+    controllers/
+      cat_listings_controller.rb
+      custom_cats_controller.rb
+      health_controller.rb
+
+    models/
+      cat_listing_record.rb
+      custom_cat_record.rb
+      prompt_template_record.rb
+
     domain/
       cat_content/
         aggregates/
@@ -301,10 +311,6 @@ engines/cat_content/
     infrastructure/
       cat_content/
         persistence/
-          models/
-            cat_listing_record.rb
-            custom_cat_record.rb
-            prompt_template_record.rb
           mappers/
             cat_listing_mapper.rb
             custom_cat_mapper.rb
@@ -322,9 +328,6 @@ engines/cat_content/
           uuid_id_generator_adapter.rb
           database_transaction_adapter.rb
         http/
-          controllers/
-            cat_listings_controller.rb
-            custom_cats_controller.rb
           serializers/
             cat_listing_serializer.rb
             custom_cat_serializer.rb
@@ -1052,12 +1055,12 @@ end
 ## 5.1 ActiveRecord Models
 
 ```ruby
-# app/infrastructure/cat_content/persistence/models/cat_listing_record.rb
+# app/models/cat_listing_record.rb
 class CatListingRecord < ApplicationRecord
   self.table_name = "cat_listings"
 end
 
-# app/infrastructure/cat_content/persistence/models/custom_cat_record.rb
+# app/models/custom_cat_record.rb
 class CustomCatRecord < ApplicationRecord
   self.table_name = "custom_cats"
 end

@@ -38,43 +38,13 @@ development:
 
 ## Working with Engines
 
-### Adding a New Bounded Context Engine
+### Database Setup for New Bounded Context
 
-1. **Generate the engine:**
-   ```bash
-   rails plugin new engines/context_name --mountable --skip-test
-   ```
+> **Note:** Engine generation and initial setup is handled by `rampart init`. See [Rampart Features](../../docs/rampart/rampart_features.md) for details.
 
-2. **Create Rampart directory structure:**
-   ```bash
-   cd engines/context_name
-   mkdir -p app/domain/context_name/{aggregates,entities,value_objects,events,services,ports}
-   mkdir -p app/application/context_name/{services,commands,queries}
-   mkdir -p app/infrastructure/context_name/{persistence/{models,mappers,repositories},adapters,http/{controllers,serializers},wiring}
-   ```
+After generating a new bounded context engine, configure the database:
 
-3. **Create BaseRecord for schema isolation:**
-   ```ruby
-   # app/infrastructure/context_name/persistence/base_record.rb
-   module ContextName
-     class BaseRecord < ActiveRecord::Base
-       self.abstract_class = true
-       connects_to database: { writing: :context_name, reading: :context_name }
-     end
-   end
-   ```
-
-4. **Add to Gemfile:**
-   ```ruby
-   gem "context_name", path: "../../engines/context_name"
-   ```
-
-5. **Mount in routes:**
-   ```ruby
-   mount ContextName::Engine => "/path"
-   ```
-
-6. **Create Supabase migration** in `supabase/migrations/`:
+1. **Create Supabase migration** in `supabase/migrations/`:
    ```sql
    CREATE SCHEMA IF NOT EXISTS context_name;
    
@@ -88,7 +58,7 @@ development:
    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA context_name TO postgres;
    ```
 
-7. **Add database config:**
+2. **Add database config:**
    ```yaml
    context_name:
      <<: *supabase_local

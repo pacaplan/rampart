@@ -63,6 +63,45 @@ Implementation details and roadmap for Rampart framework classes and CLI tools.
   - Set up initializer/configuration files for Rampart
   - Generate agent instruction files for AI-assisted development
 
+- [ ] **rampart init [context_name]** - Generate a new bounded context engine
+  - **Generate the Rails engine:**
+    ```bash
+    rails plugin new engines/context_name --mountable --skip-test
+    ```
+
+  - **Create directory structure:**
+    ```bash
+    cd engines/context_name
+    mkdir -p app/controllers
+    mkdir -p app/models
+    mkdir -p app/domain/context_name/{aggregates,entities,value_objects,events,services,ports}
+    mkdir -p app/application/context_name/{services,commands,queries}
+    mkdir -p app/infrastructure/context_name/{persistence/{mappers,repositories},adapters,wiring}
+    ```
+
+  - **Create BaseRecord for schema isolation:**
+    ```ruby
+    # app/models/base_record.rb
+    module ContextName
+      class BaseRecord < ActiveRecord::Base
+        self.abstract_class = true
+        connects_to database: { writing: :context_name, reading: :context_name }
+      end
+    end
+    ```
+
+  - **Add to main app Gemfile:**
+    ```ruby
+    gem "context_name", path: "engines/context_name"
+    ```
+
+  - **Mount in main app routes:**
+    ```ruby
+    mount ContextName::Engine => "/path"
+    ```
+
+  - **Note:** Database migrations are project-specific (e.g., Supabase) and handled separately
+
 ### Design
 - [ ] **rampart design** - Interactive architecture design
   - Guide bounded context identification via interactive prompts

@@ -1,11 +1,11 @@
 # Models
 
-This engine follows **Hexagonal Architecture**. ActiveRecord models are persistence adapters and live in the infrastructure layer:
+ActiveRecord models live in this directory following Rails conventions:
 
 ```
-app/infrastructure/cat_content/persistence/models/
+app/models/
 ```
 
-See [engines/AGENTS.md](../../../AGENTS.md) for architecture guidelines.
+See [engines/AGENTS.md](../../AGENTS.md) for architecture guidelines.
 
 

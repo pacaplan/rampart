@@ -1,11 +1,11 @@
 # Controllers
 
-This engine follows **Hexagonal Architecture**. Controllers are HTTP adapters and live in the infrastructure layer:
+Controllers live in this directory following Rails conventions:
 
 ```
-app/infrastructure/cat_content/http/controllers/
+app/controllers/
 ```
 
-See [engines/AGENTS.md](../../../AGENTS.md) for architecture guidelines.
+See [engines/AGENTS.md](../../AGENTS.md) for architecture guidelines.
 
 

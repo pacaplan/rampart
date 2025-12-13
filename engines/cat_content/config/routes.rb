@@ -1,9 +1,8 @@
 CatContent::Engine.routes.draw do
-  # Controllers follow hexagonal architecture and live in infrastructure layer
-  # Route format: "module/submodule/controller#action" maps to CatContent::Module::Submodule::Controller
-  get "health", to: "infrastructure/http/controllers/health#show"
+  # Controllers follow Rails conventions and live in app/controllers
+  get "health", to: "health#show"
 
   # Public catalog endpoints
-  get "catalog", to: "infrastructure/http/controllers/catalog#index"
-  get "catalog/:slug", to: "infrastructure/http/controllers/catalog#show"
+  get "catalog", to: "catalog#index"
+  get "catalog/:slug", to: "catalog#show"
 end

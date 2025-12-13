@@ -34,7 +34,7 @@ module CatContent
           end
 
           def to_record(aggregate)
-            Models::CatListingRecord.find_or_initialize_by(id: aggregate.id.to_s).tap do |r|
+            ::CatListingRecord.find_or_initialize_by(id: aggregate.id.to_s).tap do |r|
               r.name = aggregate.name.to_s
               r.description = aggregate.description.to_s
               r.price_cents = aggregate.price.amount_cents
