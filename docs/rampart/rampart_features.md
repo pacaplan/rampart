@@ -55,33 +55,67 @@ Implementation details and roadmap for Rampart framework classes and CLI tools.
 ## CLI Tools ❌
 
 > For full capability descriptions, see [Vision: High-Level Capabilities](rampart_vision.md#4-high-level-capabilities) and [CLI Vision](rampart_vision.md#6-cli-vision).
+>
+> See [Best Practices: Rampart Change Lifecycle](rampart_best_practices.md#rampart-change-lifecycle) for the recommended workflow.
 
-### Initialization
-- [ ] **rampart init** - Bootstrap Rampart in a project
-  - Create `architecture/` directory with empty JSON blueprint templates
-  - Generate generic architecture validation spec files
+### Project Initialization
+- [ ] **rampart init** - Bootstrap Rampart in a new project
+  - Create `architecture/` directory
+  - Generate `architecture/system.json` with empty engines list
   - Set up initializer/configuration files for Rampart
   - Generate agent instruction files for AI-assisted development
 
-- [ ] **rampart init [context_name]** - Generate a new bounded context engine
-  - **Generate the Rails engine:**
-    ```bash
-    rails plugin new engines/context_name --mountable --skip-test
-    ```
+### Architecture Design
+- [ ] **rampart design** - Interactive architecture design (adds to system.json)
+  - **New bounded context flow:**
+    - Prompt for BC identifier, name, and description
+    - Add entry to `architecture/system.json` under `engines.items`
+    - Create `architecture/{bc_id}.json` with initial structure
+  - **Existing bounded context flow:**
+    - Select BC to modify from `system.json` engines list
+    - Guide through adding/modifying domain elements
+    - Update `architecture/{bc_id}.json`
+  - **Domain modeling prompts:**
+    - Define aggregates, entities, value objects, domain services
+    - Specify commands, queries, domain events
+    - Define ports (repositories, external services) and adapters
+  - Future: AI chatbot assistance for domain modeling decisions
 
-  - **Create directory structure:**
-    ```bash
-    cd engines/context_name
-    mkdir -p app/controllers
-    mkdir -p app/models
-    mkdir -p app/domain/context_name/{aggregates,entities,value_objects,events,services,ports}
-    mkdir -p app/application/context_name/{services,commands,queries}
-    mkdir -p app/infrastructure/context_name/{persistence/{mappers,repositories},adapters,wiring}
-    ```
+- [ ] **rampart visualize** - Generate architecture diagrams from blueprints
+  - Context maps (inter-BC relationships from `system.json`)
+  - Use-case maps (command/query flows)
+  - C4 component diagrams (internal structure)
 
-  - **Create BaseRecord for schema isolation:**
+### Bounded Context Initialization
+- [ ] **rampart init [context_name]** - Initialize Rampart structure in an existing Rails engine
+  - **Prerequisites:**
+    - Engine must already exist (created via `rails plugin new engines/{name} --mountable`)
+    - BC must be defined in `architecture/system.json`
+  - **Creates DDD directory structure:**
+    ```
+    engines/{context_name}/
+    ├── app/
+    │   ├── domain/{context_name}/
+    │   │   ├── aggregates/
+    │   │   ├── entities/
+    │   │   ├── value_objects/
+    │   │   ├── events/
+    │   │   ├── services/
+    │   │   └── ports/
+    │   ├── application/{context_name}/
+    │   │   ├── services/
+    │   │   ├── commands/
+    │   │   └── queries/
+    │   └── infrastructure/{context_name}/
+    │       ├── persistence/
+    │       │   ├── mappers/
+    │       │   └── repositories/
+    │       ├── adapters/
+    │       └── wiring/
+    ```
+  - **Creates BaseRecord for schema isolation:**
     ```ruby
-    # app/models/base_record.rb
+    # app/models/{context_name}/base_record.rb
     module ContextName
       class BaseRecord < ActiveRecord::Base
         self.abstract_class = true
@@ -89,51 +123,48 @@ Implementation details and roadmap for Rampart framework classes and CLI tools.
       end
     end
     ```
-
-  - **Add to main app Gemfile:**
-    ```ruby
-    gem "context_name", path: "engines/context_name"
-    ```
-
-  - **Mount in main app routes:**
-    ```ruby
-    mount ContextName::Engine => "/path"
-    ```
-
-  - **Note:** Database migrations are project-specific (e.g., Supabase) and handled separately
-
-### Design
-- [ ] **rampart design** - Interactive architecture design
-  - Guide bounded context identification via interactive prompts
-  - Define domain models (aggregates, entities, value objects, domain services)
-  - Specify use cases, commands, queries, domain events, ports, and adapters
-  - Future: AI chatbot assistance for domain modeling decisions
-- [ ] **rampart visualize** - Generate architecture diagrams
-  - Context maps (inter-BC relationships)
-  - Use-case maps (command/query flows)
-  - C4 component diagrams (internal structure)
+  - **Generates architecture spec files** for fitness function testing
+  - **Generates agent instruction files** for AI-assisted development
+  - **Note:** Adding gem to Gemfile and mounting routes are manual steps (project-specific)
 
 ### Implementation Planning
 - [ ] **rampart plan** - Generate implementation plan from architecture JSON
-  - Compare blueprint against current codebase state
-  - Output markdown document showing files to create/modify/delete
-  - Support greenfield and incremental (sync new elements) modes
+  - **If engine does not exist,** Include the following steps inthe plan:
+    - Run standard Rails generator: `rails plugin new engines/{bc_name} --mountable --skip-test`
+    - Add gem to main app Gemfile: `gem "{bc_name}", path: "engines/{bc_name}"`
+    - Mount in routes: `mount {BcName}::Engine => "/path"`
+    - Run `rampart init` (see above)
+  - **If engine exists:**
+    - Compare `architecture/{bc_id}.json` against current engine structure
+  - **Output markdown document showing:**
+    - Files to create (new aggregates, services, ports, etc.)
+    - Files to modify (adding methods, events, etc.)
+    - Missing implementations (ports without adapters, etc.)
+  - Support greenfield (new BC) and incremental (sync new elements) modes
+  - Generate TODO list for implementation
 
 ### Validation & Synchronization
 - [ ] **rampart verify** - Run architecture fitness checks
   - Validate layer boundaries and dependency rules
-  - Check inheritance and immutability constraints
+  - Check inheritance constraints (aggregates, value objects, ports inherit from Rampart bases)
+  - Check immutability constraints (no setters on value objects)
+  - Verify ports have adapter implementations
   - Report violations with actionable guidance
-- [ ] **rampart sync** - Detect drift and update architecture JSON
-  - Scan codebase for added/modified/deleted elements
-  - Require confirmation before updating architecture blueprint
-  - Generate drift report for review and audit trail
+
+- [ ] **rampart sync** - Detect drift between code and architecture JSON
+  - Scan codebase for:
+    - Architectural classes or methods not defined in blueprint
+    - Blueprint elements without corresponding code
+    - Structural differences (renamed classes, moved files)
+  - Generate drift report for review
+  - If needed, update architecture JSON (with confirmation)
 
 ### Legacy Migration
 - [ ] **rampart extract** - Extract domain models from legacy code
   - Analyze codebase to identify candidate domain concepts
   - Generate preliminary BC and aggregate suggestions
   - Create legacy-to-DDD mapping inventory
+
 - [ ] **rampart migrate** - Create phased migration plan for legacy codebases
   - Map legacy code to target Rampart architecture
   - Identify anti-corruption layers and extraction order

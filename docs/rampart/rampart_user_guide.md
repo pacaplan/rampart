@@ -1,4 +1,4 @@
-# Rampart Best Practices
+# Rampart User Guide
 
 Day-to-day usage rules and guidance for keeping Rampart implementations intention-revealing and predictable.
 
@@ -120,34 +120,26 @@ Whenever a command wades into generic territory, revisit the workflow and ask, "
 
 ## Rampart Change Lifecycle
 
-A Terraform-like workflow for evolving architecture:
+A Terraform-like workflow for evolving architecture. Rampart separates concerns between architecture design (what you want), engine creation (Rails infrastructure), and Rampart initialization (DDD/Hexagonal structure).
 
-1. **Modify blueprint** — Update the architecture JSON to reflect the desired bounded context structure
-2. **Run `rampart plan`** — Generate a diff showing what structures need to be created or modified
-3. **Scaffold** — Generate new aggregates, entities, ports, or services based on the plan
-4. **Implement** — Write domain logic, use cases, and adapter code
-5. **Verify with `rampart verify`** — Run architecture fitness checks to ensure boundaries are respected
-6. **Commit** — Check in both code and updated blueprint JSON to keep them in sync
+### Adding a New Bounded Context
 
-## Architecture Blueprint Schema (Preliminary)
+1. **Design the bounded context** — Run `rampart design` to interactively define the new BC
 
-The architecture blueprint JSON captures bounded context structure for CLI tooling:
+2. **Generate implementation plan** — Run `rampart plan` to create the engine and generate the implementation plan
 
-```json
-{
-  "bounded_context": "CatContent",
-  "aggregates": [
-    { "name": "CatListing", "entities": ["CatProfile"], "value_objects": ["CatId", "Slug"] }
-  ],
-  "entities": [],
-  "value_objects": ["TagList", "Visibility"],
-  "commands": ["CreateCatListing", "PublishCatListing", "ArchiveCatListing"],
-  "queries": ["FindCatListingById", "SearchCatListings"],
-  "domain_events": ["CatListingPublished", "CatListingArchived"],
-  "ports": ["CatListingRepository", "SearchIndexPort", "SlugGeneratorPort"],
-  "adapters": ["SqlCatListingRepository", "ElasticsearchAdapter"],
-  "rules": ["domain_has_no_rails_dependencies", "ports_have_implementations"]
-}
-```
+3. **Implement** — Write domain logic, use cases, and adapter code per the plan
 
-This schema is preliminary and will evolve as CLI tooling is implemented.
+4. **Verify** — Run `rampart verify` to ensure architecture fitness rules pass
+
+5. **Commit** — Check in code and architecture JSON together to keep them in sync
+
+### Modifying an Existing Bounded Context
+
+1. **Update the architecture blueprint** — Run `rampart design`
+
+2. **Follow steps 2-5 from "Adding a New Bounded Context" above**
+
+### Detecting Drift
+
+Run `rampart sync` to scan the codebase and detect differences between code and architecture JSON, then review the drift report before updating blueprints
