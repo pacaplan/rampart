@@ -1,0 +1,18 @@
+{
+  "name": "rampart-cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "rampart": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cilantro": "file:../../../../cilantro"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.0.0"
+  }
+}
