@@ -1,6 +1,27 @@
 # Rampart Best Practices
 
-Guidance for keeping Rampart implementations intention-revealing and predictable.
+Day-to-day usage rules and guidance for keeping Rampart implementations intention-revealing and predictable.
+
+**Related**: [Vision](rampart_vision.md) | [Philosophy](rampart_architecture_philosophy.md) | [Features](rampart_features.md)
+
+---
+
+## Glossary
+
+- **Bounded Context** — A logical boundary within which a domain model is defined and consistent; typically maps to a Rails engine.
+- **Aggregate** — A cluster of domain objects with a root entity that enforces invariants and acts as the consistency boundary.
+- **Entity** — An object with a unique identity that persists over time.
+- **Value Object** — An immutable object defined by its attributes, with no identity.
+- **Application Service (Use Case)** — Orchestrates domain logic, repositories, and ports to fulfill a single business operation.
+- **Command** — A DTO representing intent to change state; named for the task, not the data.
+- **Query** — A DTO representing a request to read data.
+- **Domain Event** — A record of something meaningful that happened in the domain, named in past tense.
+- **Repository** — A port that abstracts persistence, returning domain objects instead of ORM models.
+- **Port** — An interface defining how the application interacts with external systems.
+- **Adapter** — A concrete implementation of a port for a specific technology.
+- **Architecture Blueprint** — A JSON file describing bounded context structure, used by Rampart CLI tools.
+
+---
 
 ## Domain-Driven Design
 
@@ -84,3 +105,49 @@ Whenever a command wades into generic territory, revisit the workflow and ask, "
 - **Default Rampart rules**: Ports inherit from `Rampart::Ports::SecondaryPort`, aggregates from `Rampart::Domain::AggregateRoot`, value objects from `Rampart::Domain::ValueObject` with no setters, repositories return domain objects, and CQRS DTOs inherit from Rampart base classes.
 - **Customize per bounded context**: Keep shared matchers in `Rampart::Testing`, but write BC-specific specs in each engine to codify local conventions and directory structure.
 - **Keep specs executable**: Run architecture specs with the rest of the test suite; failing fast on drift is the whole point.
+
+## Layer Responsibilities
+
+| Layer | Responsibility | Dependencies | I/O Allowed | Transactions | Events |
+|-------|---------------|--------------|-------------|--------------|--------|
+| **Domain** | Business rules, invariants, domain logic | None (pure) | No | No | Defines events |
+| **Application** | Use case orchestration, workflow coordination | Domain | Via ports only | Wraps at edge | Publishes after persistence |
+| **Infrastructure** | Concrete implementations of ports | Application, Domain | Yes | Implements | Dispatches |
+
+- **Domain layer**: Contains aggregates, entities, value objects, domain services, domain events, and exceptions. Has zero external dependencies—no Rails, no I/O, no framework code.
+- **Application layer**: Contains commands, queries, and application services. Orchestrates domain logic through ports. Transactions wrap use case execution at this layer's edge.
+- **Infrastructure layer**: Contains adapters (repositories, external service clients, event bus implementations). All I/O lives here. Adapters depend inward only.
+
+## Rampart Change Lifecycle
+
+A Terraform-like workflow for evolving architecture:
+
+1. **Modify blueprint** — Update the architecture JSON to reflect the desired bounded context structure
+2. **Run `rampart plan`** — Generate a diff showing what structures need to be created or modified
+3. **Scaffold** — Generate new aggregates, entities, ports, or services based on the plan
+4. **Implement** — Write domain logic, use cases, and adapter code
+5. **Verify with `rampart verify`** — Run architecture fitness checks to ensure boundaries are respected
+6. **Commit** — Check in both code and updated blueprint JSON to keep them in sync
+
+## Architecture Blueprint Schema (Preliminary)
+
+The architecture blueprint JSON captures bounded context structure for CLI tooling:
+
+```json
+{
+  "bounded_context": "CatContent",
+  "aggregates": [
+    { "name": "CatListing", "entities": ["CatProfile"], "value_objects": ["CatId", "Slug"] }
+  ],
+  "entities": [],
+  "value_objects": ["TagList", "Visibility"],
+  "commands": ["CreateCatListing", "PublishCatListing", "ArchiveCatListing"],
+  "queries": ["FindCatListingById", "SearchCatListings"],
+  "domain_events": ["CatListingPublished", "CatListingArchived"],
+  "ports": ["CatListingRepository", "SearchIndexPort", "SlugGeneratorPort"],
+  "adapters": ["SqlCatListingRepository", "ElasticsearchAdapter"],
+  "rules": ["domain_has_no_rails_dependencies", "ports_have_implementations"]
+}
+```
+
+This schema is preliminary and will evolve as CLI tooling is implemented.

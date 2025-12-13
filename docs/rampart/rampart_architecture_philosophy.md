@@ -1,6 +1,8 @@
 # Rampart Architecture Philosophy
 
-This document captures the architectural principles that guide Rampart. For the strategic vision see `docs/rampart/rampart_vision.md`. For implementation tips see `docs/rampart/rampart_best_practices.md`.
+Timeless architectural principles that guide the Rampart framework.
+
+**Related**: [Vision](rampart_vision.md) | [Best Practices](rampart_best_practices.md) | [Features](rampart_features.md)
 
 ---
 
