@@ -1,7 +1,7 @@
 import { executePrompt, isInitialized } from "cilantro";
-import { parseArchitecture } from "../lib/architecture-parser.ts";
+import { buildArchitectureContext } from "../lib/architecture-parser.ts";
 import { buildPrompt } from "../lib/prompt-builder.ts";
-import { resolve, dirname, join } from "path";
+import { resolve, dirname, join, basename } from "path";
 
 interface PlanOptions {
   output?: string;
@@ -15,27 +15,33 @@ export async function plan(args: string[]) {
   }
 
   const outputIndex = args.findIndex((a) => a === "--output" || a === "-o");
-  const outputPath =
-    outputIndex !== -1
-      ? args[outputIndex + 1]
-      : join(dirname(archPath), "plan.md");
-
+  
   // Validate Cilantro is ready
   if (!(await isInitialized())) {
     throw new Error("Cilantro not initialized. Run 'cilantro init' first.");
   }
 
-  // Parse architecture.json
+  // Parse architecture.json and build context
   const resolvedPath = resolve(archPath);
-  const architecture = await parseArchitecture(resolvedPath);
+  const ctx = await buildArchitectureContext(resolvedPath);
 
-  // Determine working directory (engine root)
-  const workingDir = dirname(resolvedPath);
+  // Determine output path
+  // Default: docs/plans/{bc_id}_plan.md (in project root)
+  const outputPath =
+    outputIndex !== -1
+      ? args[outputIndex + 1]
+      : join(ctx.projectRoot, "docs", "plans", `${ctx.bcId}_plan.md`);
 
-  // Build the prompt
-  const prompt = buildPrompt(architecture);
+  // Determine working directory based on mode
+  const workingDir = ctx.engineExists ? ctx.enginePath : ctx.projectRoot;
 
-  console.log(`Analyzing ${architecture.name}...`);
+  // Build the prompt with full context
+  const prompt = buildPrompt(ctx);
+
+  console.log(`Analyzing ${ctx.architecture.name}...`);
+  console.log(`Mode: ${ctx.engineExists ? "Incremental" : "Greenfield"}`);
+  console.log(`Engine path: ${ctx.enginePath}`);
+  console.log(`Engine exists: ${ctx.engineExists}`);
   console.log(`Working directory: ${workingDir}`);
 
   // Execute via Cilantro
@@ -48,6 +54,10 @@ export async function plan(args: string[]) {
   if (!result.success) {
     throw new Error(`AI analysis failed: ${result.error}`);
   }
+
+  // Ensure output directory exists
+  const outputDir = dirname(outputPath);
+  await Bun.write(join(outputDir, ".keep"), ""); // Touch file to create dir
 
   // Write output
   const resolvedOutput = resolve(outputPath);

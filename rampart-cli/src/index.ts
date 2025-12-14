@@ -24,12 +24,21 @@ function printHelp() {
 rampart-cli - Architecture tooling for Rampart framework
 
 Commands:
-  plan <architecture.json>  Generate implementation plan
+  plan <architecture.json>  Generate implementation plan from architecture blueprint
   version                   Print version
   help                      Show this help
 
 Options:
-  --output, -o <path>       Output file (default: plan.md in same directory)
+  --output, -o <path>       Output file (default: docs/plans/{bc_id}_plan.md)
+
+Examples:
+  rampart plan architecture/cat_content.json
+  rampart plan architecture/commerce.json -o my_plan.md
+
+Modes:
+  Greenfield  - Engine doesn't exist; plan includes Rails generator, Gemfile,
+                routes mounting, and rampart init steps before implementation
+  Incremental - Engine exists; plan shows only missing/modified components
 `);
 }
 
