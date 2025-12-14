@@ -2,7 +2,7 @@
 
 Day-to-day usage rules and guidance for keeping Rampart implementations intention-revealing and predictable.
 
-**Related**: [Vision](rampart_vision.md) | [Philosophy](rampart_architecture_philosophy.md) | [Features](rampart_features.md)
+**Related**: [Philosophy](rampart_architecture_philosophy.md) | [Features](rampart_features.md)
 
 ---
 

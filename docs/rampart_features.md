@@ -2,7 +2,23 @@
 
 Implementation details and roadmap for Rampart framework classes and CLI tools.
 
-**Related**: [Vision](rampart_vision.md) | [Philosophy](rampart_architecture_philosophy.md) | [Best Practices](rampart_best_practices.md)
+**Related**: [Philosophy](rampart_architecture_philosophy.md) | [User Guide](rampart_user_guide.md)
+
+---
+
+## Architecture Blueprint Structure
+
+Rampart-powered projects store architecture definitions in JSON files:
+
+```
+architecture/
+  system.json      # System-wide config and engine list
+  catalog.json     # Per-bounded-context blueprint
+  payments.json
+  shipping.json
+```
+
+These JSON files act as the architectural source of truth.
 
 ---
 
@@ -54,9 +70,7 @@ Implementation details and roadmap for Rampart framework classes and CLI tools.
 
 ## CLI Tools ❌
 
-> For full capability descriptions, see [Vision: High-Level Capabilities](rampart_vision.md#4-high-level-capabilities) and [CLI Vision](rampart_vision.md#6-cli-vision).
->
-> See [Best Practices: Rampart Change Lifecycle](rampart_best_practices.md#rampart-change-lifecycle) for the recommended workflow.
+> See [User Guide: Rampart Change Lifecycle](rampart_user_guide.md#rampart-change-lifecycle) for the recommended workflow.
 
 ### Project Initialization
 - [ ] **rampart init** - Bootstrap Rampart in a new project
@@ -195,3 +209,27 @@ Implementation details and roadmap for Rampart framework classes and CLI tools.
 
 - [x] **Architecture Blueprint JSON** - Documentation artifact
   - Machine-readable representation of layers, boundaries, and components
+
+### Default Fitness Rules & Progressive Adoption
+
+Writing good architecture fitness functions is difficult. Overly strict rules slow teams down; overly permissive rules are security theater. Rampart addresses this by:
+
+- **Shipping sensible defaults** — Core rules like "domain layer cannot import infrastructure" and "bounded contexts cannot directly reference each other's internals" are provided out of the box.
+- **Progressive rule adoption** — Teams start with foundational rules and add custom constraints as their architectural maturity grows.
+- **Clear violation feedback** — When rules are violated, Rampart explains *why* the rule exists and *how* to fix the violation, not just that it failed.
+- **Rule templates** — Common patterns (e.g., "only application layer can call external APIs") are available as one-line additions rather than requiring teams to author from scratch.
+
+The goal is to make the first fitness function free—teams get value immediately without needing to become architecture experts first.
+
+---
+
+## Architecture-Aware Agent Integration
+
+Rampart generates instruction files used by AI agents to:
+
+- Follow layering constraints
+- Respect BC boundaries
+- Maintain fitness rules
+- Update architecture JSON (use cases, events, domain model) whenever code changes
+
+This enables AI coding assistants to work within architectural boundaries rather than accidentally violating them.

@@ -2,7 +2,7 @@
 
 Timeless architectural principles that guide the Rampart framework.
 
-**Related**: [Vision](rampart_vision.md) | [Best Practices](rampart_best_practices.md) | [Features](rampart_features.md)
+**Related**: [User Guide](rampart_user_guide.md) | [Features](rampart_features.md)
 
 ---
 
@@ -234,3 +234,80 @@ Functional Core / Imperative Shell separates pure, deterministic logic from side
 - Mutating instance variables inside domain objects (other than within generated Dry::Struct initialization).
 - Accumulating unpublished events inside aggregates via `apply`/`on_*` handlers.
 - Triggering I/O (HTTP calls, database writes, logging) from domain classes.
+
+---
+
+## 3.9 Why JSON (Not YAML)
+
+Although YAML is popular in the Rails community, JSON is significantly more reliable for AI-assisted workflows. Reasons include:
+
+- Deterministic syntax
+- No ambiguity in types or indentation
+- Easy to validate with schemas
+- Safer for incremental edits by LLMs
+
+Rampart uses **JSON as the authoritative format** for all architecture blueprints.
+
+---
+
+## 3.10 AI as Guardrail, Not Controller
+
+Current LLMs do not reliably follow architectural instructions. They hallucinate dependencies, flatten layers, and ignore boundaries—especially as context windows fill up. Rampart does not assume AI agents will behave perfectly. Instead, it positions itself as a **guardrail and reviewer**:
+
+- **Detect, don't prevent** — AI agents will make structural mistakes. Rampart catches them via drift detection and fitness validation, enabling fast correction rather than relying on prevention.
+- **Post-hoc verification** — After any AI-assisted code change, `rampart verify` confirms the architecture remains intact. This fits naturally into CI pipelines or pre-commit hooks.
+- **Blame-free feedback loops** — When violations are detected, Rampart provides actionable guidance that both humans and AI agents can use to self-correct.
+- **Improving over time** — As LLMs improve at following structured constraints, Rampart's JSON blueprints become more effective. The architecture is future-proofed for better AI tooling.
+
+The honest pitch: AI will make mistakes; Rampart catches them.
+
+---
+
+## 3.11 The Terraform Analogy
+
+Rampart can be viewed as a "Terraform for application architecture." The following parallels illuminate the design philosophy.
+
+### Core Parallels
+
+- Terraform defines **infrastructure as code**; Rampart defines **architecture as code**.
+- Terraform uses declarative files and a **plan/apply workflow**; Rampart uses JSON blueprints and a **design/plan/scaffold workflow**.
+- Terraform state captures intended infrastructure; Rampart JSON captures intended architecture.
+- Terraform modules map to Rampart **bounded contexts and internal components**.
+
+### Expanded Parallels Based on the Nine Patterns
+
+#### 1. Declarative Modeling of Use Cases (Clean Architecture + CQRS)
+
+Terraform models infrastructure **resources** declaratively. Rampart does the same for use cases: commands, queries, workflows/interactors, and associated domain events. These become first-class architectural "resources" in the blueprint.
+
+#### 2. Declarative Domain Events & Event Graphs (Event-Driven Modeling)
+
+As Terraform builds a dependency graph of resources, Rampart captures: which BC publishes which events, which BC subscribes, event-triggered workflows, and cross-context communication patterns. Event flows serve as the architectural dependency graph.
+
+#### 3. Architecture Fitness Validation (Fitness Functions)
+
+Terraform has `terraform validate`. Rampart introduces `rampart verify`, which executes architecture fitness functions that enforce layering constraints, BC boundaries, allowed dependencies, and required use cases/events in the model.
+
+#### 4. Component-Level Modeling (C4 Model)
+
+Terraform modules can be nested or composed. Rampart mirrors this by modeling internal components of a BC: adapters, domain services, controllers/handlers. These can be visualized via C4 component diagrams.
+
+#### 5. Expanded Drift Detection (Code ↔ Architecture Synchronization)
+
+Terraform highlights drift between infrastructure and state files. Rampart does the same across many architectural dimensions: missing use cases, new or missing domain events, changes to aggregates or value objects, missing or new adapters, violations of fitness rules, and component-level drift.
+
+#### 6. Legacy Code Import (Migration Planning)
+
+Terraform includes `terraform import` to bring unmanaged infra into its control. Rampart's equivalent analyzes legacy Rails apps, extracts bounded contexts, infers use cases and event candidates, identifies anti-corruption layers, and maps current structure into Rampart blueprints.
+
+### Mapping Summary
+
+| Terraform Concept    | Rampart Equivalent                                 |
+| -------------------- | -------------------------------------------------- |
+| Resource definitions | Use cases, events, domain objects, adapters        |
+| Dependency graph     | Event flows, inter-BC relationships, C4 components |
+| Validate             | Fitness functions (`rampart verify`)               |
+| Plan                 | Architectural plan (`rampart plan`)                |
+| Apply                | Scaffolding + agent-guided implementation          |
+| State file           | Rampart architecture JSON blueprints               |
+| Import               | Legacy extraction (`rampart extract`)              |
