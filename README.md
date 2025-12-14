@@ -1,218 +1,252 @@
-# Rampart Project Summary
+# Rampart
+
+A pure-Ruby framework for building Domain-Driven Design applications with Hexagonal Architecture and Clean Architecture principles.
 
 ## Overview
-The Rampart project is a cohesive portfolio piece designed to showcase a complete spectrum of software engineering skills across product ideation, user interface design, architecture, and implementation.
 
-At its core, it combines:
-- **A playful product concept** (a fictional cat e-commerce platform)
-- **A strong architectural foundation** (Domain-Driven Design + Hexagonal Architecture)
-- **A custom Ruby framework** (Rampart) that formalizes these patterns
-- **A real Rails implementation** of the Catalog bounded context using the Rampart library
+Rampart provides building blocks for implementing DDD patterns in Ruby applications. It enforces clean architecture by separating domain logic from infrastructure concerns.
 
-This project demonstrates creativity, engineering rigor, and practical coding ability.
+## Architecture Patterns
 
----
+Rampart implements complementary architectural approaches:
 
-## Getting Started
+### Domain-Driven Design (DDD)
 
-### Quick Setup
+Strategic and tactical patterns for aligning software with business domains:
+- **Aggregates** - Consistency boundaries with `AggregateRoot`
+- **Entities** - Objects with identity via `Entity`
+- **Value Objects** - Immutable objects compared by value via `ValueObject`
+- **Domain Events** - Business-meaningful occurrences via `DomainEvent`
+- **Domain Services** - Logic that doesn't belong to entities via `DomainService`
 
-1. **Install Prerequisites**
-   - Ruby 3.3.6: `asdf install ruby 3.3.6`
-   - Docker Desktop (for Supabase)
-   - Supabase CLI: `brew install supabase/tap/supabase`
+### Hexagonal Architecture (Ports & Adapters)
 
-2. **Start Supabase**
-   ```bash
-   supabase start
-   ```
+Domain and application logic in the center, infrastructure as adapters:
+- **Secondary Ports** - Outbound interfaces defined in domain layer (`SecondaryPort`)
+- **Adapters** - Infrastructure implementations of ports
+- **Dependency Inversion** - Domain depends on abstractions, not implementations
 
-3. **Set up Rails API**
-   ```bash
-   cd apps/api
-   bundle install
-   ```
+### Clean Architecture Alignment
 
-4. **Set up Web App**
-   ```bash
-   cd apps/web
-   npm install
-   ```
+Rampart's patterns align with Uncle Bob's Clean Architecture principles:
+- **Dependency Rule** - Domain and Application layers have no outward dependencies
+- **Framework Independence** - Domain layer is pure Ruby with no Rails dependencies
+- **Use Cases** - Application Services orchestrate domain logic
+- **Testability** - Business rules can be tested without UI, database, or external systems
 
-5. **Start both servers**
-   ```bash
-   # From the project root
-   scripts/start_dev.sh
-   ```
-   
-   This will start:
-   - Web app on http://localhost:3000
-   - API on http://localhost:8000
-   
-   Or start them individually:
-   ```bash
-   # API only
-   cd apps/api && rails server
-   
-   # Web app only
-   cd apps/web && npm run dev
-   ```
+## Features
 
-> **Note**: Supabase handles all database schema creation via its migrations.
-> Rails just connects to what Supabase created - no Rails migrations needed.
+- **Pure Ruby** - No Rails dependencies, works in any Ruby application
+- **DDD Building Blocks** - Aggregates, Entities, Value Objects, Domain Events, Domain Services
+- **Hexagonal Architecture** - Clear port/adapter separation with primary and secondary ports
+- **Type Safety** - Built on dry-types for runtime type checking
+- **Monadic Results** - Uses dry-monads for error handling without exceptions
+- **Container Support** - Dependency injection with dry-container
+- **Auto-Injection** - Automatic dependency resolution with dry-auto_inject
 
-For detailed setup instructions, see:
-- [Rails API Setup](apps/api/README.md#setup)
-- [Cat & Content Engine](engines/cat_content/README.md#development)
-- [Rampart Gem](gems/rampart/README.md#installation)
+## Installation
 
----
-
-## 1. Product Concept: The Cat E‑commerce App
-The fictional application gives you room to be creative while still modeling realistic business logic. Key components include:
-- A **Cat-alog** for browsing pre-made cats
-- Support for **custom cat listings**
-- Guest checkout for pre-made cats
-- Order update emails with unsubscribe flow
-- Hard-coded FAQs to keep scope manageable
-- Future-ready hooks for LLM-driven content (details out of scope for now)
-
-This creates a fun but meaningful environment for demonstrating domain modeling and system design.
-
-📄 [Functional Specification](docs/cat_app/functional_spec.md)
-
----
-
-## 2. Architecture: Hexagonal + DDD (Rampart)
-The Rampart framework encapsulates:
-- Aggregates, entities, value objects, and domain events
-- Repository interfaces and implementations
-- Domain and application services
-- Ports and adapters (primary and secondary)
-- A rigid **domain/application/infrastructure** separation
-
-Additionally, the project includes:
-- A full component map for DDD + hex concepts
-- Clearly defined bounded contexts (Catalog, Commerce, Auth)
-- ASCII diagrams illustrating context boundaries and responsibilities
-
-This portion of the project showcases architectural thinking at a senior/staff level.
-
-📄 [DDD & Hex Component Reference](docs/framework/hexdd_architecture.md) · [Bounded Contexts Overview](docs/cat_app/all_bounded_contexts.md) · [Cat & Content BC Architecture](docs/cat_app/cat_content_architecture.md)
-
----
-
-## 3. Reference Implementation: Catalog BC in Rails
-A Rails application provides a concrete example of using the Rampart framework in practice. It:
-- Places `domain`, `application`, and `infrastructure` directories directly under `app/`
-- Uses *only* the infrastructure layer for Rails specifics (controllers, ActiveRecord)
-- Keeps domain and application layers pure Ruby
-- Implements the Catalog bounded context end-to-end
-
-This serves as a living demonstration of how to structure a Rails app following DDD and hexagonal patterns.
-
-📄 [Full Implementation Spec](docs/cat_app/cat_content_implementation.md)
-
----
-
-## 4. Portfolio Goal
-This entire effort forms a single, polished portfolio narrative:
-- **Product creativity** through the Cat-alog concept
-- **UI skill** through the planned frontend design
-- **Architecture expertise** through DDD + hex modeling and documentation
-- **Software craftsmanship** through the Rampart Ruby library and Rails reference implementation
-
-**In short: the goal of the Rampart cat e-commerce project is to build a playful but serious end-to-end showcase of your design, architecture, and coding skills, suitable for recruiters, hiring managers, and engineering leaders.**
-
----
-
-## 5. Monorepo Structure
-
-```
-rampart/
-├── apps/
-│   ├── web/                          # Next.js frontend
-│   │   ├── app/
-│   │   ├── components/
-│   │   ├── package.json
-│   │   └── ...
-│   │
-│   └── api/                          # Rails backend (mounts engines)
-│       ├── app/
-│       ├── config/
-│       ├── Gemfile
-│       └── ...
-│
-├── engines/
-│   └── cat_content/                  # Cat & Content bounded context engine
-│       ├── app/
-│       │   ├── domain/
-│       │   ├── application/
-│       │   └── infrastructure/
-│       ├── lib/
-│       ├── cat_content.gemspec
-│       └── ...
-│
-├── gems/
-│   └── rampart/                       # Rampart framework gem
-│       ├── lib/
-│       │   └── rampart/
-│       ├── rampart.gemspec
-│       └── ...
-│
-└── docs/
-    ├── cat_app/
-    └── framework/
-```
-
-### Directory Overview
-
-| Directory | Purpose |
-|-----------|---------|
-| `apps/web` | Next.js application serving the cat e-commerce UI |
-| `apps/api` | Rails application that mounts bounded context engines and exposes the API |
-| `engines/cat_content` | Rails engine implementing the Cat & Content bounded context using Rampart patterns |
-| `gems/rampart` | Pure-Ruby gem providing DDD + Hexagonal Architecture building blocks |
-| `docs/` | Architecture documentation, specs, and bounded context definitions |
-
-### Engine Mounting
-
-Each bounded context lives in its own Rails engine under `engines/`. The main Rails app (`apps/api`) mounts these engines:
+Add to your Gemfile:
 
 ```ruby
-# apps/api/config/routes.rb
-Rails.application.routes.draw do
-  mount CatContent::Engine, at: "/catalog"
-  # Future: mount Commerce::Engine, at: "/commerce"
-  # Future: mount Auth::Engine, at: "/auth"
+gem 'rampart', path: '../rampart'  # For local development
+```
+
+Or install from a gem server (when published):
+
+```ruby
+gem 'rampart'
+```
+
+## Quick Start
+
+### Domain Layer
+
+Pure business logic with no framework dependencies.
+
+```ruby
+# Aggregate Root
+class Order < Rampart::Domain::AggregateRoot
+  attribute :id, Types::String
+  attribute :customer_id, Types::String
+  attribute :items, Types::Array.default([].freeze)
+  attribute :status, Types::String
+
+  def self.create(id:, customer_id:)
+    new(id: id, customer_id: customer_id, items: [], status: "draft")
+  end
+
+  def add_item(product, quantity)
+    updated_items = items + [LineItem.new(product: product, quantity: quantity)]
+    self.class.new(**attributes.merge(items: updated_items))
+  end
+end
+
+# Value Object
+class Money < Rampart::Domain::ValueObject
+  attribute :amount_cents, Types::Integer
+  attribute :currency, Types::String.default("USD")
+  
+  def +(other)
+    raise ArgumentError unless currency == other.currency
+    self.class.new(amount_cents: amount_cents + other.amount_cents, currency: currency)
+  end
+end
+
+# Domain Event
+class OrderSubmitted < Rampart::Domain::DomainEvent
+  attribute :order_id, Types::String
+  attribute :submitted_by, Types::String
+end
+
+# Repository Interface (Port)
+class OrderRepository < Rampart::Ports::SecondaryPort
+  abstract_method :find, :save
 end
 ```
 
-### Dependency Flow
+### Application Layer
+
+Use cases and application logic.
+
+```ruby
+# Command
+class CreateOrderCommand < Rampart::Application::Command
+  attribute :customer_id, Types::String
+  attribute :items, Types::Array
+end
+
+# Application Service
+class CreateOrderService < Rampart::Application::Service
+  include Dry::Monads[:result]
+  
+  def initialize(order_repo:, id_generator:, event_bus:)
+    @order_repo = order_repo
+    @id_generator = id_generator
+    @event_bus = event_bus
+  end
+  
+  def call(command)
+    order = Order.create(
+      id: @id_generator.generate,
+      customer_id: command.customer_id
+    )
+    
+    order_with_items = command.items.reduce(order) { |agg, item| agg.add_item(item) }
+
+    persisted = @order_repo.save(order_with_items)
+    @event_bus.publish(OrderSubmitted.new(order_id: persisted.id, submitted_by: command.customer_id))
+
+    Success(persisted)
+  rescue => e
+    Failure([:error, e.message])
+  end
+end
+```
+
+### Infrastructure Layer
+
+Framework-specific implementations (adapters).
+
+```ruby
+# Repository Implementation (Secondary Adapter)
+class SqlOrderRepository < OrderRepository
+  def find(id)
+    record = OrderRecord.find_by(id: id)
+    return nil unless record
+    OrderMapper.to_domain(record)
+  end
+  
+  def save(order)
+    record = OrderMapper.to_record(order)
+    record.save!
+    order.clear_events!
+    order
+  end
+end
+```
+
+## Core Classes
+
+### Domain
+
+- **AggregateRoot** - Base class for aggregate roots with event tracking
+- **Entity** - Base class for entities with identity
+- **ValueObject** - Base class for immutable value objects
+- **DomainEvent** - Base class for domain events with versioning
+- **DomainException** - Base exception with context
+- **DomainService** - Base class for domain services
+
+### Application
+
+- **Command** - Base class for commands (write operations)
+- **Query** - Base class for queries (read operations)
+- **Service** - Base class for application services
+- **Transaction** - Transaction boundary abstraction
+
+### Ports
+
+- **SecondaryPort** - Base class for secondary ports (outbound interfaces)
+
+## Project Structure
 
 ```
-┌─────────────┐
-│   apps/web  │  (Next.js)
-└──────┬──────┘
-       │ HTTP/JSON
-       ▼
-┌─────────────┐
-│   apps/api  │  (Rails)
-└──────┬──────┘
-       │ mounts
-       ▼
-┌──────────────────────────────────────────┐
-│            engines/*                     │
-│  ┌────────────┐  ┌─────────┐  ┌─────┐   │
-│  │cat_content │  │commerce │  │auth │   │
-│  └─────┬──────┘  └────┬────┘  └──┬──┘   │
-└────────┼─────────────┼──────────┼────────┘
-        │            │          │
-        └────────────┼──────────┘
-                     │ depends on
-                     ▼
-              ┌─────────────┐
-              │ gems/rampart │  (pure Ruby)
-              └─────────────┘
+rampart/
+├── lib/                    # Gem source code
+│   └── rampart/
+│       ├── domain/         # Domain layer base classes
+│       ├── application/    # Application layer base classes
+│       ├── ports/          # Port abstractions
+│       └── support/        # Supporting utilities
+├── cli/                    # CLI tools for architecture management
+├── docs/                   # Framework documentation
+├── rampart.gemspec         # Gem specification
+└── README.md               # This file
 ```
 
+## Documentation
+
+- [Architecture Philosophy](docs/rampart_architecture_philosophy.md) - Core principles and patterns
+- [User Guide](docs/rampart_user_guide.md) - Day-to-day usage guidance
+- [Features](docs/rampart_features.md) - Detailed feature documentation
+- [System Overview](docs/rampart_system.md) - System-level architecture
+- [Vision](docs/rampart_vision.md) - Long-term goals and direction
+
+## Demo Application
+
+Rampart is demonstrated through a real-world Rails + Next.js application:
+
+**Cats-as-a-Service** - A cat e-commerce platform showcasing Rampart patterns in practice.
+
+- Repository: https://github.com/pcaplan/cats-as-a-service
+- Features: Rails API with bounded context engines, Next.js frontend, Supabase database
+- Documentation: Complete implementation guide and architecture decisions
+
+## Testing
+
+Domain and application layers should be tested without any infrastructure:
+
+```ruby
+RSpec.describe Order do
+  it "adds items to order" do
+    order = Order.create(id: "123", customer_id: "456")
+    updated = order.add_item("product-1", 2)
+    
+    expect(updated.items.count).to eq(1)
+    expect(order.items.count).to eq(0) # immutability: original instance untouched
+  end
+end
+```
+
+## Dependencies
+
+- `dry-types ~> 1.7` - Type system and coercion
+- `dry-struct ~> 1.6` - Immutable struct with type checking
+- `dry-container ~> 0.11` - Dependency injection container
+- `dry-auto_inject ~> 1.0` - Automatic dependency injection
+- `dry-monads ~> 1.6` - Monadic error handling
+- `dry-initializer ~> 3.1` - Flexible object initialization
+
+## License
+
+The gem is available as open source under the terms of the Apache License 2.0.

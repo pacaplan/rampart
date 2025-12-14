@@ -1,18 +1,16 @@
-# Agent Guidelines for Rampart Project
+# Agent Guidelines for Rampart Framework
 
 ## Project Overview
 
-This is a monorepo showcasing DDD + Hexagonal Architecture patterns through a cat e-commerce application.
+Rampart is a pure-Ruby framework for building Domain-Driven Design applications with Hexagonal Architecture patterns.
 
 ### Key Directories
 
 | Path | Technology | Purpose |
 |------|------------|---------|
-| `apps/web/` | Next.js | Frontend UI for the cat e-commerce app |
-| `apps/api/` | Rails | Backend API that mounts bounded context engines |
-| `engines/*/` | Rails Engines | Isolated bounded contexts (Catalog, Commerce, Auth) |
-| `gems/rampart/` | Pure Ruby | Framework gem with DDD building blocks |
-| `docs/` | Markdown | Architecture specs and bounded context definitions |
+| `lib/` | Pure Ruby | Framework gem source code with DDD building blocks |
+| `cli/` | TypeScript/Bun | CLI tools for architecture management |
+| `docs/` | Markdown | Framework documentation and guides |
 
 ---
 
@@ -22,28 +20,56 @@ This is a monorepo showcasing DDD + Hexagonal Architecture patterns through a ca
 
 1. Ensure all tests pass
 2. Check for linting errors
-3. Verify UI changes in browser when applicable
+3. Verify gem builds correctly: `gem build rampart.gemspec`
 
 ### Documentation
 
-- Update relevant docs in `docs/` when changing architecture
-- Keep README files current in each app/engine/gem
+- Update relevant docs in `docs/` when changing architecture or patterns
+- Keep README.md current with framework usage examples
 - Document public APIs and important design decisions
+
+---
+
+## Framework Structure
+
+### Core Components
+
+- **Domain Layer** (`lib/rampart/domain/`) - Base classes for aggregates, entities, value objects, domain events
+- **Application Layer** (`lib/rampart/application/`) - Base classes for commands, queries, services, transactions
+- **Ports** (`lib/rampart/ports/`) - Port abstractions for hexagonal architecture
+- **Support** (`lib/rampart/support/`) - Utilities like container, result types
+
+### CLI Tools
+
+- **Architecture Parser** (`cli/src/lib/architecture-parser.ts`) - Parses architecture blueprints
+- **Prompt Builder** (`cli/src/lib/prompt-builder.ts`) - Builds prompts for AI tools
+- **Plan Command** (`cli/src/commands/plan.ts`) - Generates implementation plans
+
+---
+
+## Demo Application
+
+Rampart patterns are demonstrated through a reference application:
+
+**Cats-as-a-Service** - A Rails + Next.js e-commerce demo
+- Repository: https://github.com/pcaplan/cats-as-a-service
+- Shows Rampart patterns in practice with bounded contexts, engines, and clean architecture
 
 ---
 
 ## Common Tasks
 
-### Creating a new plan document
+### Adding a New Base Class
 
-Before starting a non-trivial task, create a plan document in `docs/plans/`:
+1. Add the class to the appropriate layer (`lib/rampart/domain/`, `lib/rampart/application/`, etc.)
+2. Update `lib/rampart.rb` to require the new file
+3. Add documentation to `docs/`
+4. Update README.md with usage examples
+5. Add tests if applicable
 
-1. Find the next available number by checking existing files (e.g., `01-`, `02-`, `03-`)
-2. Create a new file following the naming convention: `XX-short-description.md`
-3. Include sections for: Scope, Tech Stack, Directory Structure, Key Implementation Details
-4. Reference relevant mockups or specs from `docs/cat_app/`
+### Updating Documentation
 
-**Examples:**
-- `01-ui-prototype-catalog.md`
-- `02-ui-prototype-cart-checkout-faq.md`
-- `03-ui-prototype-catbot.md`
+- Framework philosophy: `docs/rampart_architecture_philosophy.md`
+- User guide: `docs/rampart_user_guide.md`
+- Features: `docs/rampart_features.md`
+- System overview: `docs/rampart_system.md`
