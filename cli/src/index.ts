@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 
 import { plan } from "./commands/plan.ts";
+import { init } from "./commands/init.ts";
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -9,6 +10,9 @@ async function main() {
   switch (command) {
     case "plan":
       await plan(args.slice(1));
+      break;
+    case "init":
+      await init(args.slice(1));
       break;
     case "version":
       console.log("rampart-cli v0.1.0");
@@ -25,6 +29,7 @@ rampart-cli - Architecture tooling for Rampart framework
 
 Commands:
   plan <architecture.json>  Generate implementation plan from architecture blueprint
+  init [engine_name]        Initialize Rampart in project or engine
   version                   Print version
   help                      Show this help
 
@@ -36,11 +41,8 @@ Examples:
   rampart plan architecture/cat_content.json
   rampart plan architecture/commerce.json -o my_plan.md
   rampart plan architecture/cat_content.json --backend cursor
-
-Modes:
-  Greenfield  - Engine doesn't exist; plan includes Rails generator, Gemfile,
-                routes mounting, and rampart init steps before implementation
-  Incremental - Engine exists; plan shows only missing/modified components
+  rampart init
+  rampart init cat_content
 `);
 }
 
