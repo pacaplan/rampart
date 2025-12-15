@@ -2,20 +2,26 @@
 
 An Architecture-as-Code toolkit designed to bring disciplined, maintainable architecture to Rails applications—without abandoning the productivity of the monolith.
 
+---
+
 ## Overview
 
-As AI-assisted development becomes ubiquitous, teams face a growing challenge: AI tools can accelerate coding but often introduce structural inconsistencies that erode architectural integrity over time. Meanwhile, teams want the rapid development Rails enables, but struggle to maintain clean boundaries as applications scale.
+### What problem does Rampart solve?
 
-Rampart addresses both needs by providing:
+Organizations choose Rails because it's fast. A small team can ship features at remarkable speed, and the monolith keeps things simple.
+
+Then the organization grows. A handful of developers become a hundred. Many teams work across many parts of the codebase. The original architects leave—and even those who stay can no longer keep the whole picture in their heads. Without explicit boundaries, entropy takes hold. The codebase becomes a big ball of mud: tangled dependencies, unclear ownership, and changes that ripple unpredictably across the system.
+
+The company adopts AI-assisted development hoping to accelerate delivery, only to discover it makes everything worse. AI tools generate code quickly but don't understand architectural intent. They hallucinate dependencies, flatten carefully designed layers, and ignore boundaries—introducing structural inconsistencies faster than teams can catch them.
+
+Rampart addresses both the scaling challenge and the AI challenge by providing:
 
 - **Declarative architecture blueprints** that serve as the single source of truth for system structure
 - **Nine curated architectural patterns**—centered on Domain-Driven Design and Hexagonal Architecture—that maximize both team autonomy and code clarity
 - **AI-native design** with machine-readable formats that enable AI agents to understand and respect architectural boundaries
 - **A Terraform-like workflow** for designing, scaffolding, validating, and evolving architecture over time
 
-Rampart supports greenfield development and legacy migration alike, positioning it as the preferred path for Rails teams seeking modern architectural discipline.
-
-### Core Goals
+### What are the core goals of Rampart?
 
 **Goal 1 — Bounded Context & Stream-Aligned Team Effectiveness**
 
@@ -25,91 +31,83 @@ Teams should be able to deliver end-to-end features *within a single bounded con
 
 Code should be predictable, structured, and easy for both humans and AIs to understand, navigate, and maintain.
 
-Only approaches that score **High** on at least one of these goals are included in Rampart.
+### Does Rampart replace Rails?
 
----
+No. Rampart is not a Rails rewrite or alternative. It works *with* Rails, not against it.
 
-## Guiding Principles & Architectural Opinions
+Rampart provides architectural discipline on top of Rails. It enforces structure for bounded contexts, domain models, and application layers while remaining deliberately agnostic about testing frameworks, linters, ORMs, and other peripheral concerns.
 
-Like Rails, Rampart is an **opinionated framework**—but its opinions are focused squarely on architecture, not tooling. It provides "one right way" to structure bounded contexts, define domain models, and organize application layers, while remaining deliberately agnostic about testing frameworks, linters, ORMs, and other peripheral concerns.
-
-### Core Principles
-
-- **Bounded Context Autonomy**: Architecture should maximize team independence by enabling end-to-end feature delivery within a single bounded context.
-- **Human & AI Clarity**: All structures, patterns, and blueprints should be predictable and easily understood by both humans and AI agents.
-- **Architecture as Code**: Architecture defined in structured files rather than ephemeral diagrams or docs.
-- **AI-Friendly Structures**: Use strictly valid, machine-safe formats for interoperability with AI agents.
-- **Minimal Scaffolding, Maximal Guidance**: The tool should not implement business logic, only create structure and plans.
-- **Maintain Sync Between Code and Architecture**: Support workflows where changes in one must be reflected in the other.
-- **Rails-Friendly, Not Rails-Dependent**: The design supports Rails engines but keeps the core principles framework-agnostic.
-
-### Where Rampart Is Opinionated
+### Where is Rampart opinionated?
 
 Rampart enforces specific architectural choices where clarity and consistency are essential:
 
-- **The Nine Architecture Patterns** (see below): These are not optional. DDD bounded contexts, Hexagonal Architecture layering, use case modeling, and event-driven patterns represent the canonical way to structure Rampart applications.
-- **Monorepo Structure**: All bounded contexts must reside in a single monorepo for centralized architecture governance and consistent tooling.
-- **Rails Engine Implementation**: Bounded contexts must be implemented as Rails engines for clear module boundaries and namespace isolation.
-- **JSON for Architecture Blueprints**: Blueprints use JSON (not YAML) for AI-safety and deterministic parsing.
-- **Dry-rb Foundation**: Rampart builds on the dry-rb ecosystem (dry-types, dry-struct, dry-monads, dry-container) for type safety, immutability, and functional patterns.
-- **Fitness Function Enforcement**: Architecture boundaries are validated programmatically—this is non-negotiable for maintaining integrity over time.
+- **The Nine Architecture Patterns**: DDD bounded contexts, Hexagonal Architecture layering, use case modeling, and event-driven patterns represent the canonical way to structure Rampart applications
+- **Monorepo Structure**: All bounded contexts must reside in a single monorepo for centralized architecture governance
+- **Rails Engine Implementation**: Bounded contexts must be implemented as Rails engines for clear module boundaries. (In the future, it will support microservices)
+- **JSON for Architecture Blueprints**: Blueprints use JSON (not YAML) for AI-safety and deterministic parsing
+- **Dry-rb Foundation**: Built on the dry-rb ecosystem for type safety, immutability, and functional patterns
+- **Fitness Function Enforcement**: Architecture boundaries are validated programmatically
 
-### Where Rampart Is Deliberately Unopinionated
+### Where is Rampart unopinionated?
 
 Teams bring their own preferences for:
 
-- **Testing frameworks** (RSpec, Minitest, etc.)
-- **Code formatters and linters** (StandardRB, RuboCop, etc.)
-- **ORMs and databases** (ActiveRecord, ROM, Sequel)
-- **Web frameworks** (Rails, Hanami, Sinatra)
-- **Background job processors** (Sidekiq, GoodJob, etc.)
-
-### What Rampart Is Not
-
-- Rampart is not a Rails rewrite.
-- It is not a code generator for business logic; scaffolding stays minimal and structural.
-- It is not a linter or code formatter—it validates architecture, not syntax.
-- It does not prescribe specific ORMs, controllers, or background job frameworks.
+- Testing frameworks (RSpec, Minitest, etc.)
+- Code formatters and linters (StandardRB, RuboCop, etc.)
+- ORMs and databases (ActiveRecord, ROM, Sequel)
+- Web frameworks (Rails, Hanami, Sinatra)
+- Background job processors (Sidekiq, GoodJob, etc.)
 
 ---
 
-## Architecture Patterns
+## Architecture & Design
 
-Rampart provides nine enforceable, AI-friendly architecture patterns. Each is rated against the two core goals.
+### What architecture patterns does Rampart use?
 
-> For detailed explanations, anti-patterns, and implementation guidance, see [Architecture Philosophy](docs/rampart_architecture_philosophy.md).
+Rampart provides nine enforceable, AI-friendly architecture patterns:
 
-| Pattern | Goal 1 (BC Autonomy) | Goal 2 (Clarity) |
-|---------|---------------------|------------------|
-| **Domain-Driven Design** | HIGH | HIGH |
-| **Hexagonal Architecture** | HIGH | HIGH |
-| **Clean Architecture / Onion** | HIGH | HIGH |
-| **Modular Monolith / Vertical Slices** | HIGH | MEDIUM–HIGH |
-| **Lightweight CQRS & Task-Based Interfaces** | MEDIUM–HIGH | HIGH |
-| **Domain Events & Event-Driven Modeling** | HIGH | MEDIUM |
-| **Architecture Fitness Functions** | HIGH | VERY HIGH |
-| **Functional Core / Imperative Shell** | MEDIUM | HIGH |
-| **C4 Model (Inside-the-Box)** | MEDIUM | HIGH |
+1. **Domain-Driven Design** — Align software models with business domains using bounded contexts and tactical patterns
+2. **Hexagonal Architecture** — Isolate domain logic from infrastructure through ports and adapters
+3. **Clean Architecture / Onion** — Enforce strict dependency direction with framework-independent core
+4. **Modular Monolith / Vertical Slices** — Organize code into autonomous vertical slices within a single deployable
+5. **Lightweight CQRS & Task-Based Interfaces** — Separate read/write models with intent-revealing commands
+6. **Domain Events & Event-Driven Modeling** — Decouple bounded contexts through immutable business facts
+7. **Architecture Fitness Functions** — Validate architectural rules programmatically in CI/CD
+8. **Functional Core / Imperative Shell** — Keep domain logic pure and side-effect-free
+9. **C4 Model (Inside-the-Box)** — Visualize system structure at multiple levels of abstraction
 
-### High Impact Summary
+For detailed explanations, anti-patterns, and implementation guidance, see [Architecture Philosophy](docs/rampart_architecture_philosophy.md).
 
-**Bounded context autonomy**: DDD, Hexagonal, Clean Architecture, Modular Monolith, Domain Events, Fitness Functions
+### How does Rampart work with AI tools?
 
-**Human + AI clarity**: Hexagonal, Clean Architecture, CQRS, Functional Core, Fitness Functions, C4 Diagrams
+Current LLMs do not reliably follow architectural instructions. They hallucinate dependencies, flatten layers, and ignore boundaries. Rampart does not assume AI agents will behave perfectly. Instead, it positions itself as a **guardrail and reviewer**:
+
+- **Detect, don't prevent** — AI agents will make structural mistakes. Rampart catches them via drift detection and fitness validation
+- **Post-hoc verification** — After any AI-assisted code change, `rampart verify` confirms the architecture remains intact
+- **Blame-free feedback loops** — When violations are detected, Rampart provides actionable guidance for correction
+- **Future-proofed** — As LLMs improve, Rampart's JSON blueprints become more effective
+
+### How is Rampart like Terraform?
+
+Rampart can be viewed as a "Terraform for application architecture":
+
+| Terraform Concept    | Rampart Equivalent                                 |
+| -------------------- | -------------------------------------------------- |
+| Resource definitions | Use cases, events, domain objects, adapters        |
+| Dependency graph     | Event flows, inter-BC relationships, C4 components |
+| Validate             | Fitness functions (`rampart verify`)               |
+| Plan                 | Architectural plan (`rampart plan`)                |
+| Apply                | Scaffolding + agent-guided implementation          |
+| State file           | Rampart architecture JSON blueprints               |
+| Import               | Legacy extraction (`rampart extract`)              |
+
+For the complete Terraform analogy, see [Architecture Philosophy](docs/rampart_architecture_philosophy.md#311-the-terraform-analogy).
 
 ---
 
-## Framework Features
+## Getting Started
 
-Rampart provides building blocks for implementing DDD patterns in Ruby applications:
-
-- **DDD Tactical Patterns** - Aggregates, Entities, Value Objects, Domain Events, Domain Services
-- **Hexagonal Architecture** - Clear port/adapter separation with dependency inversion
-- **Clean Architecture** - Framework-independent domain layer with testable business rules
-- **Type Safety** - Built on dry-types for runtime type checking
-- **Monadic Results** - Error handling without exceptions using dry-monads
-
-## Installation
+### How do I install the Rampart gem?
 
 ```ruby
 gem 'rampart', path: '../rampart'  # For local development
@@ -121,7 +119,90 @@ Or from a gem server (when published):
 gem 'rampart'
 ```
 
-## Quick Example
+### What functionality does the gem provide?
+
+The Rampart gem provides base classes for implementing DDD and Hexagonal Architecture patterns:
+
+- **Domain layer primitives** — Aggregates, entities, value objects, domain events, and domain services with built-in immutability and type safety
+- **Application layer patterns** — Commands, queries, and application services for use case orchestration
+- **Port abstractions** — Base classes for defining and implementing hexagonal ports and adapters
+- **Type system** — Built on dry-types for runtime validation with monadic error handling via dry-monads
+
+### How do I use the Rampart CLI?
+
+Install the CLI (requires [Bun](https://bun.sh)):
+
+```bash
+cd rampart/cli && bun install
+```
+
+Then run with:
+
+```bash
+bun run rampart --help
+```
+
+### What features does the Rampart CLI provide?
+
+The Rampart CLI manages the full architecture lifecycle:
+
+- **Design & scaffold** — Initialize projects, create bounded contexts, and generate DDD directory structures
+- **Plan & implement** — Generate implementation plans from architecture blueprints for human or AI execution
+- **Validate & sync** — Run fitness checks and detect drift between code and architecture definitions
+- **Migrate legacy** — Extract domain models and create phased migration plans for existing codebases
+
+For complete CLI documentation, see [Features](docs/rampart_features.md#cli-tools-).
+
+
+### What does a typical Rampart project look like?
+
+```
+project-root/
+├── architecture/
+│   ├── system.json           # System-level manifest
+│   ├── catalog.json          # Per-bounded-context blueprint
+│   └── payments.json
+├── engines/
+│   ├── catalog/              # Bounded context as Rails engine
+│   └── payments/
+└── apps/
+    └── web/                  # Rails app
+```
+
+Each engine follows the DDD/Hexagonal structure while respecting Rails conventions:
+
+```
+engines/catalog/                 # "Catalog" bounded context
+├── app/
+│   ├── controllers/catalog      # Controller infrastructure 
+│   ├── models/catalog           # ActiveRecord infrastructure
+│   │
+│   ├── domain/catalog/          # Domain layer
+│   │   ├── aggregates/
+│   │   ├── entities/
+│   │   ├── value_objects/
+│   │   ├── events/
+│   │   ├── services/
+│   │   └── ports/
+│   │
+│   ├── application/catalog/     # Application layer
+│   │   ├── services/
+│   │   ├── commands/
+│   │   └── queries/
+│   │
+│   └── infrastructure/catalog/  # Infrastructure layer (except Rails infrastructure as noted above)
+│       ├── persistence/
+│       │   ├── mappers/
+│       │   └── repositories/
+│       ├── http/
+│       │   └── serializers/
+│       ├── adapters/
+│       └── wiring/
+```
+
+For complete project structure details, see [System Overview](docs/rampart_system.md).
+
+### Can I see some example code snippets?
 
 ```ruby
 # Domain Layer - Pure Ruby
@@ -155,59 +236,22 @@ class SqlOrderRepository < Rampart::Ports::SecondaryPort
 end
 ```
 
-## Documentation
+---
+
+## Learning More
+
+### Where can I find documentation?
 
 - **[Architecture Philosophy](docs/rampart_architecture_philosophy.md)** - Core principles, patterns, and anti-patterns
 - **[User Guide](docs/rampart_user_guide.md)** - Day-to-day usage and best practices
 - **[Features](docs/rampart_features.md)** - Complete feature list, CLI tools, and implementation details
 - **[System Overview](docs/rampart_system.md)** - System architecture and component relationships
 
-## Demo Application
+### Is there a demo application?
 
 **[Cats-as-a-Service](https://github.com/pcaplan/cats-as-a-service)** - A complete Rails + Next.js e-commerce application demonstrating Rampart patterns in practice with bounded context engines, clean architecture, and DDD tactical patterns.
 
-## Core Classes
-
-### Domain Layer
-- `AggregateRoot` - Consistency boundaries with event tracking
-- `Entity` - Objects with identity
-- `ValueObject` - Immutable value objects
-- `DomainEvent` - Business events with versioning
-- `DomainService` - Domain logic services
-- `DomainException` - Domain-specific errors
-
-### Application Layer
-- `Command` - Write operation DTOs
-- `Query` - Read operation DTOs
-- `Service` - Application services / use cases
-- `Transaction` - Transaction boundaries
-
-### Ports
-- `SecondaryPort` - Outbound interface abstractions
-- `EventBusPort` - Event publishing interface
-
-## Project Structure
-
-```
-rampart/
-├── lib/rampart/          # Framework source code
-│   ├── domain/           # Domain layer base classes
-│   ├── application/      # Application layer base classes
-│   ├── ports/            # Port abstractions
-│   └── support/          # Utilities (Container, Result, Types)
-├── cli/                  # CLI tools for architecture management
-├── docs/                 # Documentation
-└── rampart.gemspec       # Gem specification
-```
-
-## Dependencies
-
-- `dry-types ~> 1.7` - Type system
-- `dry-struct ~> 1.6` - Immutable structs
-- `dry-container ~> 0.11` - Dependency injection
-- `dry-auto_inject ~> 1.0` - Auto-injection
-- `dry-monads ~> 1.6` - Monadic error handling
-- `dry-initializer ~> 3.1` - Object initialization
+---
 
 ## License
 
