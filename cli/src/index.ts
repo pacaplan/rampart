@@ -30,10 +30,12 @@ Commands:
 
 Options:
   --output, -o <path>       Output file (default: docs/plans/{bc_id}_plan.md)
+  --backend <name>          Cilantro backend override (cursor | claude | codex). Also supports CILANTRO_BACKEND env var.
 
 Examples:
   rampart plan architecture/cat_content.json
   rampart plan architecture/commerce.json -o my_plan.md
+  rampart plan architecture/cat_content.json --backend cursor
 
 Modes:
   Greenfield  - Engine doesn't exist; plan includes Rails generator, Gemfile,

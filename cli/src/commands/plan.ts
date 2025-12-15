@@ -5,6 +5,30 @@ import { resolve, dirname, join, basename } from "path";
 
 interface PlanOptions {
   output?: string;
+  backend?: string;
+}
+
+function sanitizePlanOutput(raw: string): string {
+  // Some backends occasionally prepend narration despite prompt instructions.
+  // We want the file to start at the first Markdown heading, if present.
+  const firstH1 = raw.match(/^\s*#\s.+$/m);
+  if (firstH1?.index !== undefined) {
+    return raw.slice(firstH1.index).trimStart();
+  }
+
+  const firstH2 = raw.match(/^\s*##\s.+$/m);
+  if (firstH2?.index !== undefined) {
+    return raw.slice(firstH2.index).trimStart();
+  }
+
+  // If there are no headings at all, best-effort: remove common preface lines.
+  // Keep the content from the first bullet list / numbered list if present.
+  const firstList = raw.match(/^\s*(?:[-*]|\d+\.)\s+/m);
+  if (firstList?.index !== undefined) {
+    return raw.slice(firstList.index).trimStart();
+  }
+
+  return raw.trimStart();
 }
 
 export async function plan(args: string[]) {
@@ -15,6 +39,7 @@ export async function plan(args: string[]) {
   }
 
   const outputIndex = args.findIndex((a) => a === "--output" || a === "-o");
+  const backendIndex = args.findIndex((a) => a === "--backend");
   
   // Validate Cilantro is ready
   if (!(await isInitialized())) {
@@ -32,6 +57,9 @@ export async function plan(args: string[]) {
       ? args[outputIndex + 1]
       : join(ctx.projectRoot, "docs", "plans", `${ctx.bcId}_plan.md`);
 
+  const backend =
+    backendIndex !== -1 ? args[backendIndex + 1] : undefined;
+
   // Determine working directory based on mode
   const workingDir = ctx.engineExists ? ctx.enginePath : ctx.projectRoot;
 
@@ -48,6 +76,7 @@ export async function plan(args: string[]) {
   const result = await executePrompt({
     prompt,
     workingDirectory: workingDir,
+    backend,
     timeout: 300000, // 5 minutes
   });
 
@@ -61,7 +90,7 @@ export async function plan(args: string[]) {
 
   // Write output
   const resolvedOutput = resolve(outputPath);
-  await Bun.write(resolvedOutput, result.output);
+  await Bun.write(resolvedOutput, sanitizePlanOutput(result.output));
 
   console.log(`Plan written to: ${resolvedOutput}`);
 }

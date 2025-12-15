@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "cilantro": "file:../../../../cilantro"
+    "cilantro": "file:../../cilantro"
   },
   "devDependencies": {
     "@types/bun": "latest",
