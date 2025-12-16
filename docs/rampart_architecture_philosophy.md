@@ -189,8 +189,8 @@ Fitness functions are executable constraints that continuously verify architectu
 ### Rampart's Approach
 
 - **Start with RSpec**: Reusable matchers plus per-engine specs deliver immediate value without new tooling.
-- **Blueprints Then CLI**: A JSON blueprint captures layers, dependencies, and key components as machine-readable metadata. A future `rampart verify` CLI can consume it.
-- **Use Packwerk**: Packwerk or similar tools will be levearged.
+- **Blueprints for Documentation**: A JSON blueprint captures layers, dependencies, and key components as machine-readable metadata.
+- **Use Packwerk**: Packwerk enforces layer boundaries and dependency rules via static analysis.
 
 ### Integration with DDD + Hexagonal
 
@@ -254,8 +254,8 @@ Rampart uses **JSON as the authoritative format** for all architecture blueprint
 
 Current LLMs do not reliably follow architectural instructions. They hallucinate dependencies, flatten layers, and ignore boundaries—especially as context windows fill up. Rampart does not assume AI agents will behave perfectly. Instead, it positions itself as a **guardrail and reviewer**:
 
-- **Detect, don't prevent** — AI agents will make structural mistakes. Rampart catches them via drift detection and fitness validation, enabling fast correction rather than relying on prevention.
-- **Post-hoc verification** — After any AI-assisted code change, `rampart verify` confirms the architecture remains intact. This fits naturally into CI pipelines or pre-commit hooks.
+- **Detect, don't prevent** — AI agents will make structural mistakes. Rampart catches them via drift detection and fitness validation (Packwerk + RSpec), enabling fast correction rather than relying on prevention.
+- **Post-hoc verification** — After any AI-assisted code change, Packwerk and RSpec architecture specs confirm the architecture remains intact. This fits naturally into CI pipelines or pre-commit hooks.
 - **Blame-free feedback loops** — When violations are detected, Rampart provides actionable guidance that both humans and AI agents can use to self-correct.
 - **Improving over time** — As LLMs improve at following structured constraints, Rampart's JSON blueprints become more effective. The architecture is future-proofed for better AI tooling.
 
@@ -286,7 +286,7 @@ As Terraform builds a dependency graph of resources, Rampart captures: which BC 
 
 #### 3. Architecture Fitness Validation (Fitness Functions)
 
-Terraform has `terraform validate`. Rampart introduces `rampart verify`, which executes architecture fitness functions that enforce layering constraints, BC boundaries, allowed dependencies, and required use cases/events in the model.
+Terraform has `terraform validate`. Rampart uses Packwerk and RSpec architecture specs to execute fitness functions that enforce layering constraints, BC boundaries, allowed dependencies, and required use cases/events in the model.
 
 #### 4. Component-Level Modeling (C4 Model)
 
@@ -306,7 +306,7 @@ Terraform includes `terraform import` to bring unmanaged infra into its control.
 | -------------------- | -------------------------------------------------- |
 | Resource definitions | Use cases, events, domain objects, adapters        |
 | Dependency graph     | Event flows, inter-BC relationships, C4 components |
-| Validate             | Fitness functions (`rampart verify`)               |
+| Validate             | Fitness functions (Packwerk + RSpec)               |
 | Plan                 | Architectural plan (`rampart plan`)                |
 | Apply                | Scaffolding + agent-guided implementation          |
 | State file           | Rampart architecture JSON blueprints               |

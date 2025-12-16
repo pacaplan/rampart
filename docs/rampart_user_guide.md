@@ -130,7 +130,7 @@ A Terraform-like workflow for evolving architecture. Rampart separates concerns 
 
 3. **Implement** — Write domain logic, use cases, and adapter code per the plan
 
-4. **Verify** — Run `rampart verify` to ensure architecture fitness rules pass
+4. **Verify** — Run `packwerk check` and RSpec architecture specs to ensure architecture fitness rules pass
 
 5. **Commit** — Check in code and architecture JSON together to keep them in sync
 

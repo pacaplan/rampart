@@ -100,8 +100,8 @@ For detailed explanations, anti-patterns, and implementation guidance, see [Arch
 
 Current LLMs do not reliably follow architectural instructions. They hallucinate dependencies, flatten layers, and ignore boundaries. Rampart does not assume AI agents will behave perfectly. Instead, it positions itself as a **guardrail and reviewer**:
 
-- **Detect, don't prevent** — AI agents will make structural mistakes. Rampart catches them via drift detection and fitness validation
-- **Post-hoc verification** — After any AI-assisted code change, `rampart verify` confirms the architecture remains intact
+- **Detect, don't prevent** — AI agents will make structural mistakes. Rampart catches them via drift detection and fitness validation (Packwerk + RSpec)
+- **Post-hoc verification** — After any AI-assisted code change, Packwerk and RSpec architecture specs confirm the architecture remains intact
 - **Blame-free feedback loops** — When violations are detected, Rampart provides actionable guidance for correction
 - **Future-proofed** — As LLMs improve, Rampart's JSON blueprints become more effective
 
@@ -113,7 +113,7 @@ Rampart can be viewed as a "Terraform for application architecture":
 | -------------------- | -------------------------------------------------- |
 | Resource definitions | Use cases, events, domain objects, adapters        |
 | Dependency graph     | Event flows, inter-BC relationships, C4 components |
-| Validate             | Fitness functions (`rampart verify`)               |
+| Validate             | Fitness functions (Packwerk + RSpec)               |
 | Plan                 | Architectural plan (`rampart plan`)                |
 | Apply                | Scaffolding + agent-guided implementation          |
 | State file           | Rampart architecture JSON blueprints               |

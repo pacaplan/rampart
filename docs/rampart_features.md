@@ -158,12 +158,6 @@ These JSON files act as the architectural source of truth.
   - Generate TODO list for implementation
 
 ### Validation & Synchronization
-- [ ] **rampart verify** - Run architecture fitness checks
-  - Validate layer boundaries and dependency rules
-  - Check inheritance constraints (aggregates, value objects, ports inherit from Rampart bases)
-  - Check immutability constraints (no setters on value objects)
-  - Verify ports have adapter implementations
-  - Report violations with actionable guidance
 
 - [ ] **rampart sync** - Detect drift between code and architecture JSON
   - Scan codebase for:
