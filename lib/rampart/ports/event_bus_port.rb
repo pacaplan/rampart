@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rampart
   module Ports
     class EventBusPort < SecondaryPort

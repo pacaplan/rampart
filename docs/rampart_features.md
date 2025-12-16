@@ -200,15 +200,22 @@ These JSON files act as the architectural source of truth.
   - **Cross-BC boundary enforcement** (when multiple engines exist)
   - CI integration via `packwerk check`
 
-- [x] **RSpec Pattern Verification** - Rules Packwerk can't enforce
-  - Class inheritance validation (aggregates, value objects, ports, CQRS DTOs)
-  - Immutability checks (no setter methods on value objects)
-  - Port implementation coverage and repository return-type assertions
+- [ ] **RuboCop** - For v0, High-signal, low-effort architectural rules
+  - **Ban domain namespace usage in controllers:**
+    - In `app/controllers/**`, forbid constants matching `::Domain::`, `::ValueObjects::`, `::Aggregates::`
+    - Provides immediate feedback where Packwerk packaging might be imperfect
+  - **Domain purity:**
+    - In `app/domain/**`, forbid `Rails`, `ActiveRecord` constants
+    - Enforces strict Hexagonal separation
+  - **Infrastructure isolation:**
+    - Optional: Forbid `Infrastructure` namespace usage in controllers
 
-- [x] **Rampart::Testing::ArchitectureMatchers** - Reusable matchers
-  - `have_no_rails_dependencies`, `inherit_from_rampart_base`, `implement_all_abstract_methods`
-  - Designed for reuse across bounded contexts and engines
-  - `be_immutable` and `have_no_mutable_instance_variables` enforce Functional Core immutability
+- [x] **RSpec Architecture Verification** - Enforced by `Rampart Engine Architecture` shared spec
+  - **1. DI and Wiring Policies**: Services depend on Ports/Adapters; Controllers resolve only Services.
+  - **2. Base Class Contracts**: Aggregates, Entities, ValueObjects, Ports, Commands inherit from Rampart bases.
+  - **3. Immutability**: Value Objects and Aggregates are immutable (no setters, no instance var mutation).
+  - **4. Public API Safety**: Public modules load correctly and do not leak infrastructure types (ActiveRecord).
+  - **5. Architecture JSON Sync**: Bidirectional verification that code matches the JSON blueprint (Aggregates, Ports, Events, Services, Adapters, Controllers).
 
 - [x] **Architecture Blueprint JSON** - Documentation artifact
   - Machine-readable representation of layers, boundaries, and components

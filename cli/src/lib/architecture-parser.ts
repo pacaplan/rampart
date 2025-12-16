@@ -25,7 +25,7 @@ export interface Architecture {
       constraint?: string;
       adapters: {
         persistence: Array<{ name: string; implements: string; technology?: string }>;
-        external: Array<{ name: string; implements: string; technology?: string; optional?: boolean }>;
+        external: Array<{ name: string; implements: string; technology?: string; pending?: boolean }>;
       };
       entrypoints: {
         http: Array<{ name: string; routes: string; invokes: string }>;

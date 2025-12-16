@@ -37,6 +37,24 @@ No. Rampart is not a Rails rewrite or alternative. It works *with* Rails, not ag
 
 Rampart provides architectural discipline on top of Rails. It enforces structure for bounded contexts, domain models, and application layers while remaining deliberately agnostic about testing frameworks, linters, ORMs, and other peripheral concerns.
 
+### Is there another tool that already does this?
+
+No. While several tools address pieces of this problem, none provide the full Architecture-as-Code lifecycle that Rampart offers.
+
+Below are important capability gaps that current tools do not fill, along with examples of tools that come closest but still fall short:
+
+| Missing Capability                                                            | Most Similar Tools                                       | Why They Fall Short                                                                                                                                                         |
+| ----------------------------------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **A single authoritative, version-controlled architecture blueprint**         | Structurizr, PlantUML, C4 model tools                    | These generate diagrams or model visualizations, but do not serve as living, enforced architectural specifications or a system of record.                                   |
+| **Planning + structural change workflow (similar to Terraform plan)**         | OpenAPI/AsyncAPI (for API planning), Backstage templates | OpenAPI only covers API layers; Backstage handles service metadata, not domain structure or architectural decisions. No tool plans architectural scaffolding or migrations. |
+| **Sync between architecture and code, including drift detection**             | ArchUnit, dependency-analysis tools, SonarQube           | These can detect certain code smells or dependency violations but cannot compare code to a declarative architecture model or enforce layered/domain boundaries.             |
+| **DDD-native domain modeling (bounded contexts, aggregates, ports/adapters)** | ContextMapper (academic), Structurizr DSL                | These express relationships conceptually but lack Rails integration, scaffolding, JSON blueprints, or synchronization with real codebases.                                  |
+| **Architecture-guided scaffolding without generating business logic**         | Rails generators, JHipster                               | Generators scaffold code quickly but do not encode or enforce architectural boundaries; they cannot evolve designs over time or keep architecture synchronized.             |
+| **Migration planning from legacy codebases into modern architecture**         | vFunction (for Java), monolith decomposition tools       | Focused on technical decomposition or microservices extraction, not DDD-based restructuring, JSON blueprints, or Rails codebases.                                           |
+| **AI-native architecture understanding and enforcement**                      | None                                                     | No current tool provides machine-parseable architecture blueprints designed specifically for LLM agents to use while writing or modifying code.                             |
+
+**The gap**: While certain tools overlap partially with Rampart's goals, none provide a full Architecture-as-Code lifecycle with DDD semantics, scaffolding, drift detection, and AI-native integration.
+
 ### Where is Rampart opinionated?
 
 Rampart enforces specific architectural choices where clarity and consistency are essential:
