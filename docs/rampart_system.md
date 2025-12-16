@@ -219,8 +219,7 @@ These apply **across bounded contexts** only.
 
 ```jsonc
 "diagram_defaults": {
-  "levels": ["L1_context", "L2_layers", "L3_components"],
-  "include_pending": false
+  "levels": ["L1_context", "L2_layers", "L3_components"]
 }
 ```
 

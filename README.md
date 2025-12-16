@@ -64,14 +64,13 @@ Rampart enforces specific architectural choices where clarity and consistency ar
 - **Rails Engine Implementation**: Bounded contexts must be implemented as Rails engines for clear module boundaries. (In the future, it will support microservices)
 - **JSON for Architecture Blueprints**: Blueprints use JSON (not YAML) for AI-safety and deterministic parsing
 - **Dry-rb Foundation**: Built on the dry-rb ecosystem for type safety, immutability, and functional patterns
-- **Fitness Function Enforcement**: Architecture boundaries are validated programmatically
-- **Packwerk Static Analysis**: Enforces strict dependency boundaries
+- **Packwerk Static Analysis**: Enforces layer boundaries (domain/application/infrastructure) and cross-context dependencies
+- **Rspec Fitness Function Enforcement**: RSpec shared specs verify runtime dependency boundaries, base class contracts, immutability, and JSON blueprint synchronization
 
 ### Where is Rampart unopinionated?
 
 Teams bring their own preferences for:
 
-- Testing frameworks (RSpec, Minitest, etc.)
 - Code formatters and linters (StandardRB, RuboCop, etc.)
 - ORMs and databases (ActiveRecord, ROM, Sequel)
 - Web frameworks (Rails, Hanami, Sinatra)

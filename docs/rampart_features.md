@@ -188,7 +188,7 @@ These JSON files act as the architectural source of truth.
 
 ## Architecture Fitness Functions / Enforcement Tools ⚠️
 
-- [ ] **Packwerk** - Static analysis for layer boundaries
+- [x] **Packwerk** - Static analysis for layer boundaries
   - **Layer dependency rules:**
     - `domain/` package: No dependencies on application or infrastructure
     - `application/` package: Can depend on domain, not infrastructure
@@ -199,16 +199,6 @@ These JSON files act as the architectural source of truth.
     - **Rationale:** Prevents controllers from bypassing application services and calling repositories/aggregates directly, which breaks transaction boundaries and event publishing
   - **Cross-BC boundary enforcement** (when multiple engines exist)
   - CI integration via `packwerk check`
-
-- [ ] **RuboCop** - For v0, High-signal, low-effort architectural rules
-  - **Ban domain namespace usage in controllers:**
-    - In `app/controllers/**`, forbid constants matching `::Domain::`, `::ValueObjects::`, `::Aggregates::`
-    - Provides immediate feedback where Packwerk packaging might be imperfect
-  - **Domain purity:**
-    - In `app/domain/**`, forbid `Rails`, `ActiveRecord` constants
-    - Enforces strict Hexagonal separation
-  - **Infrastructure isolation:**
-    - Optional: Forbid `Infrastructure` namespace usage in controllers
 
 - [x] **RSpec Architecture Verification** - Enforced by `Rampart Engine Architecture` shared spec
   - **1. DI and Wiring Policies**: Services depend on Ports/Adapters; Controllers resolve only Services.
