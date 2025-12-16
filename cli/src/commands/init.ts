@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { execSync } from "node:child_process";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -24,6 +25,40 @@ function loadTemplate(filename: string): string {
   return readFileSync(templatePath, "utf-8");
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Gemfile Management
+// ─────────────────────────────────────────────────────────────────────────────
+
+function addGemToGemfile(gemName: string, group?: string): void {
+  const projectRoot = process.cwd();
+  const gemfilePath = join(projectRoot, "Gemfile");
+
+  if (!existsSync(gemfilePath)) {
+    console.log(`Warning: Gemfile not found. Skipping gem '${gemName}'.`);
+    return;
+  }
+
+  const gemfileContent = readFileSync(gemfilePath, "utf-8");
+
+  // Check if gem already exists
+  const gemPattern = new RegExp(`gem\\s+['"]${gemName}['"]`, "m");
+  if (gemPattern.test(gemfileContent)) {
+    return; // Gem already present
+  }
+
+  try {
+    // Build bundle add command
+    const groupFlag = group ? `--group ${group}` : "";
+    const command = `bundle add ${gemName} ${groupFlag}`.trim();
+
+    console.log(`Adding gem '${gemName}' to Gemfile${group ? ` (${group} group)` : ''}...`);
+    execSync(command, { cwd: projectRoot, stdio: 'inherit' });
+  } catch (error: any) {
+    console.log(`Warning: Failed to add gem '${gemName}'. You may need to add it manually.`);
+    console.log(`Error: ${error.message}`);
+  }
+}
+
 async function initProject() {
   const projectRoot = process.cwd();
   const architectureDir = join(projectRoot, "architecture");
@@ -31,6 +66,7 @@ async function initProject() {
   const agentsMdPath = join(projectRoot, "AGENTS.md");
   const enginesDir = join(projectRoot, "engines");
   const enginesAgentsMdPath = join(enginesDir, "AGENTS.md");
+  const packwerkYmlPath = join(projectRoot, "packwerk.yml");
 
   let createdAny = false;
 
@@ -95,6 +131,12 @@ Rampart provides the building blocks for DDD:
   if (!existsSync(enginesAgentsMdPath)) {
     console.log("Creating engines/AGENTS.md...");
     writeFileSync(enginesAgentsMdPath, loadTemplate("engines_agents.md"));
+    createdAny = true;
+  }
+
+  if (!existsSync(packwerkYmlPath)) {
+    console.log("Creating packwerk.yml...");
+    writeFileSync(packwerkYmlPath, loadTemplate("packwerk.yml"));
     createdAny = true;
   }
 
@@ -210,11 +252,55 @@ async function initEngine(contextName: string) {
         writeFileSync(specAgentsPath, loadTemplate("spec_agents.md"));
         createdAny = true;
     }
-    
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Packwerk Configuration
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Create app/public directory for cross-engine API
+    const publicDir = join(appDir, "public");
+    if (!existsSync(publicDir)) {
+        console.log("Creating app/public/ for cross-engine API...");
+        mkdirSync(publicDir, { recursive: true });
+        createdAny = true;
+    }
+
+    // Generate package.yml files
+    const packageFiles = [
+        { path: join(enginePath, "package.yml"), template: "package_engine.yml", name: "Engine boundary" },
+        { path: join(publicDir, "package.yml"), template: "package_public.yml", name: "Public API" },
+        { path: join(appDir, "domain", contextName, "package.yml"), template: "package_domain.yml", name: "Domain layer" },
+        { path: join(appDir, "application", contextName, "package.yml"), template: "package_application.yml", name: "Application layer" },
+        { path: join(appDir, "infrastructure", contextName, "package.yml"), template: "package_infrastructure.yml", name: "Infrastructure layer" },
+        { path: join(appDir, "controllers", "package.yml"), template: "package_controllers.yml", name: "Controllers layer" },
+    ];
+
+    for (const { path, template, name } of packageFiles) {
+        const parentDir = dirname(path);
+        // Only create package.yml if parent directory exists and file doesn't exist
+        if (existsSync(parentDir) && !existsSync(path)) {
+            console.log(`Creating ${name} package.yml...`);
+            let content = loadTemplate(template);
+            // Replace {{CONTEXT_NAME}} placeholder with actual context name
+            content = content.replace(/\{\{CONTEXT_NAME\}\}/g, contextName);
+            writeFileSync(path, content);
+            createdAny = true;
+        }
+    }
+
+    // Add gems to Gemfile
+    console.log("Checking Gemfile for required gems...");
+    addGemToGemfile("packwerk", "development");
+    addGemToGemfile("rampart");
+
     if (!createdAny) {
         console.log(`Engine '${contextName}' already initialized with Rampart structure.`);
     } else {
         console.log(`Rampart initialization complete for '${contextName}'.`);
+        console.log("\nNext steps:");
+        console.log("  1. Run 'bundle install' to install packwerk");
+        console.log("  2. Run 'bundle exec packwerk validate' to check configuration");
+        console.log("  3. Run 'bundle exec packwerk check' to verify layer boundaries");
     }
 }
 

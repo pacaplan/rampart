@@ -1,0 +1,5 @@
+enforce_dependencies: true
+enforce_privacy: true
+dependencies:
+  - "engines/{{CONTEXT_NAME}}/app/domain/{{CONTEXT_NAME}}"
+  - "engines/{{CONTEXT_NAME}}/app/application/{{CONTEXT_NAME}}"
