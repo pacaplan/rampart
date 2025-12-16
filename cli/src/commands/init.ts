@@ -1,5 +1,9 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export async function init(args: string[]) {
   const contextName = args[0];
@@ -11,11 +15,22 @@ export async function init(args: string[]) {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Template Loading
+// ─────────────────────────────────────────────────────────────────────────────
+
+function loadTemplate(filename: string): string {
+  const templatePath = join(__dirname, "..", "..", "templates", filename);
+  return readFileSync(templatePath, "utf-8");
+}
+
 async function initProject() {
   const projectRoot = process.cwd();
   const architectureDir = join(projectRoot, "architecture");
   const systemJsonPath = join(architectureDir, "system.json");
   const agentsMdPath = join(projectRoot, "AGENTS.md");
+  const enginesDir = join(projectRoot, "engines");
+  const enginesAgentsMdPath = join(enginesDir, "AGENTS.md");
 
   let createdAny = false;
 
@@ -45,8 +60,8 @@ async function initProject() {
   }
   
   if (!existsSync(agentsMdPath)) {
-      console.log("Creating AGENTS.md...");
-      const agentsContent = `# Agent Guidelines
+    console.log("Creating AGENTS.md...");
+    const agentsContent = `# Agent Guidelines
 
 ## Project Overview
 
@@ -66,14 +81,27 @@ Rampart provides the building blocks for DDD:
 - Application: Commands, Queries, Services
 - Ports: Secondary Ports for infrastructure abstraction
 `;
-      writeFileSync(agentsMdPath, agentsContent);
-      createdAny = true;
+    writeFileSync(agentsMdPath, agentsContent);
+    createdAny = true;
+  }
+
+  // Create engines directory and AGENTS.md if engines dir exists or we create it
+  if (!existsSync(enginesDir)) {
+    console.log("Creating engines directory...");
+    mkdirSync(enginesDir);
+    createdAny = true;
+  }
+
+  if (!existsSync(enginesAgentsMdPath)) {
+    console.log("Creating engines/AGENTS.md...");
+    writeFileSync(enginesAgentsMdPath, loadTemplate("engines_agents.md"));
+    createdAny = true;
   }
 
   if (!createdAny) {
     console.log("Rampart already initialized in this project.");
   } else {
-      console.log("Rampart initialized successfully.");
+    console.log("Rampart initialized successfully.");
   }
 }
 
@@ -108,39 +136,85 @@ async function initEngine(contextName: string) {
     }
 
     const appDir = join(enginePath, "app");
+    const specDir = join(enginePath, "spec");
     const domainDir = join(appDir, "domain", contextName);
     
-    // Check if already initialized
-    if (existsSync(domainDir)) {
-        console.log(`Engine '${contextName}' already initialized with Rampart structure.`);
-        return;
+    let createdAny = false;
+    const structureExists = existsSync(domainDir);
+
+    if (!structureExists) {
+        console.log(`Initializing Rampart structure for engine '${contextName}'...`);
+
+        const dirsToCreate = [
+            `domain/${contextName}/aggregates`,
+            `domain/${contextName}/entities`,
+            `domain/${contextName}/value_objects`,
+            `domain/${contextName}/events`,
+            `domain/${contextName}/services`,
+            `domain/${contextName}/ports`,
+            `application/${contextName}/services`,
+            `application/${contextName}/commands`,
+            `application/${contextName}/queries`,
+            `infrastructure/${contextName}/persistence/mappers`,
+            `infrastructure/${contextName}/persistence/repositories`,
+            `infrastructure/${contextName}/adapters`,
+            `infrastructure/${contextName}/wiring`,
+        ];
+
+        for (const dir of dirsToCreate) {
+            const fullPath = join(appDir, dir);
+            if (!existsSync(fullPath)) {
+                mkdirSync(fullPath, { recursive: true });
+            }
+        }
+        createdAny = true;
     }
 
-    console.log(`Initializing Rampart structure for engine '${contextName}'...`);
+    // Create AGENTS.md files for each layer (even if structure already exists)
+    const domainAgentsPath = join(appDir, "domain", "AGENTS.md");
+    if (existsSync(join(appDir, "domain")) && !existsSync(domainAgentsPath)) {
+        console.log("Creating app/domain/AGENTS.md...");
+        writeFileSync(domainAgentsPath, loadTemplate("domain_agents.md"));
+        createdAny = true;
+    }
 
-    const dirsToCreate = [
-        `domain/${contextName}/aggregates`,
-        `domain/${contextName}/entities`,
-        `domain/${contextName}/value_objects`,
-        `domain/${contextName}/events`,
-        `domain/${contextName}/services`,
-        `domain/${contextName}/ports`,
-        `application/${contextName}/services`,
-        `application/${contextName}/commands`,
-        `application/${contextName}/queries`,
-        `infrastructure/${contextName}/persistence/mappers`,
-        `infrastructure/${contextName}/persistence/repositories`,
-        `infrastructure/${contextName}/adapters`,
-        `infrastructure/${contextName}/wiring`,
-    ];
+    const applicationAgentsPath = join(appDir, "application", "AGENTS.md");
+    if (existsSync(join(appDir, "application")) && !existsSync(applicationAgentsPath)) {
+        console.log("Creating app/application/AGENTS.md...");
+        writeFileSync(applicationAgentsPath, loadTemplate("application_agents.md"));
+        createdAny = true;
+    }
 
-    for (const dir of dirsToCreate) {
-        const fullPath = join(appDir, dir);
-        if (!existsSync(fullPath)) {
-            mkdirSync(fullPath, { recursive: true });
-        }
+    const infrastructureAgentsPath = join(appDir, "infrastructure", "AGENTS.md");
+    if (existsSync(join(appDir, "infrastructure")) && !existsSync(infrastructureAgentsPath)) {
+        console.log("Creating app/infrastructure/AGENTS.md...");
+        writeFileSync(infrastructureAgentsPath, loadTemplate("infrastructure_agents.md"));
+        createdAny = true;
+    }
+
+    const controllersAgentsPath = join(appDir, "controllers", "AGENTS.md");
+    if (existsSync(join(appDir, "controllers")) && !existsSync(controllersAgentsPath)) {
+        console.log("Creating app/controllers/AGENTS.md...");
+        writeFileSync(controllersAgentsPath, loadTemplate("controllers_agents.md"));
+        createdAny = true;
+    }
+
+    // Create spec directory and AGENTS.md if it doesn't exist
+    if (!existsSync(specDir)) {
+        mkdirSync(specDir, { recursive: true });
+        createdAny = true;
+    }
+    const specAgentsPath = join(specDir, "AGENTS.md");
+    if (!existsSync(specAgentsPath)) {
+        console.log("Creating spec/AGENTS.md...");
+        writeFileSync(specAgentsPath, loadTemplate("spec_agents.md"));
+        createdAny = true;
     }
     
-    console.log(`Rampart structure created for '${contextName}'.`);
+    if (!createdAny) {
+        console.log(`Engine '${contextName}' already initialized with Rampart structure.`);
+    } else {
+        console.log(`Rampart initialization complete for '${contextName}'.`);
+    }
 }
 

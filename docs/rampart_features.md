@@ -188,14 +188,17 @@ These JSON files act as the architectural source of truth.
 
 ## Architecture Fitness Functions / Enforcement Tools ⚠️
 
-- [ ] **Packwerk** - Static analysis for layer boundaries (deferred)
-  - Layer rules:
+- [ ] **Packwerk** - Static analysis for layer boundaries
+  - **Layer dependency rules:**
     - `domain/` package: No dependencies on application or infrastructure
     - `application/` package: Can depend on domain, not infrastructure
     - `infrastructure/` package: Can depend on domain and application
-  - Cross-BC boundary enforcement (when multiple engines exist)
+  - **Primary adapter rules (controllers):**
+    - Controllers CANNOT import from `domain/` (aggregates, entities, ports)
+    - Controllers CANNOT import from `infrastructure/persistence/` (repositories)
+    - **Rationale:** Prevents controllers from bypassing application services and calling repositories/aggregates directly, which breaks transaction boundaries and event publishing
+  - **Cross-BC boundary enforcement** (when multiple engines exist)
   - CI integration via `packwerk check`
-  - *Status: Deferred until multiple bounded contexts exist*
 
 - [x] **RSpec Pattern Verification** - Rules Packwerk can't enforce
   - Class inheritance validation (aggregates, value objects, ports, CQRS DTOs)

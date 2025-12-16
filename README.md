@@ -47,6 +47,7 @@ Rampart enforces specific architectural choices where clarity and consistency ar
 - **JSON for Architecture Blueprints**: Blueprints use JSON (not YAML) for AI-safety and deterministic parsing
 - **Dry-rb Foundation**: Built on the dry-rb ecosystem for type safety, immutability, and functional patterns
 - **Fitness Function Enforcement**: Architecture boundaries are validated programmatically
+- **Packwerk Static Analysis**: Enforces strict dependency boundaries
 
 ### Where is Rampart unopinionated?
 
