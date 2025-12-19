@@ -98,26 +98,34 @@ For detailed explanations, anti-patterns, and implementation guidance, see [Arch
 
 ### How does Rampart work with AI tools?
 
-Current LLMs do not reliably follow architectural instructions. They hallucinate dependencies, flatten layers, and ignore boundaries. Rampart does not assume AI agents will behave perfectly. Instead, it positions itself as a **guardrail and reviewer**:
+Rampart takes a two-pronged approach to AI-assisted development:
 
-- **Detect, don't prevent** — AI agents will make structural mistakes. Rampart catches them via drift detection and fitness validation (Packwerk + RSpec)
-- **Post-hoc verification** — After any AI-assisted code change, Packwerk and RSpec architecture specs confirm the architecture remains intact
-- **Blame-free feedback loops** — When violations are detected, Rampart provides actionable guidance for correction
-- **Future-proofed** — As LLMs improve, Rampart's JSON blueprints become more effective
+**1. Prompt-Driven Guidance** — Rampart ships **prompt files** that encode architectural knowledge:
+- `architecture.prompt` — Guides the design of `architecture.json` through collaborative dialogue
+- `planning.prompt` — Guides spec completion for capabilities, gathering functional and technical requirements
+
+These prompts are loaded into AI coding assistants (Claude Code, Cursor, etc.) and guide the human+AI collaboration within architectural boundaries.
+
+**2. Validation & Enforcement** — Rampart validates that code adheres to architecture:
+- **Post-hoc verification** — After code changes, Packwerk and RSpec architecture specs confirm the architecture remains intact
+- **Drift detection** — `rampart sync` identifies divergence between code and `architecture.json`
+- **Blame-free feedback** — When violations are detected, Rampart provides actionable guidance for correction
+
+This dual approach means AI agents are guided proactively through prompts, then verified through enforcement tools.
 
 ### How is Rampart like Terraform?
 
 Rampart can be viewed as a "Terraform for application architecture":
 
-| Terraform Concept    | Rampart Equivalent                                 |
-| -------------------- | -------------------------------------------------- |
-| Resource definitions | Use cases, events, domain objects, adapters        |
-| Dependency graph     | Event flows, inter-BC relationships, C4 components |
-| Validate             | Fitness functions (Packwerk + RSpec)               |
-| Plan                 | Architectural plan (`rampart plan`)                |
-| Apply                | Scaffolding + agent-guided implementation          |
-| State file           | Rampart architecture JSON blueprints               |
-| Import               | Legacy extraction (`rampart extract`)              |
+| Terraform Concept    | Rampart Equivalent                                        |
+| -------------------- | --------------------------------------------------------- |
+| Resource definitions | Use cases, events, domain objects, adapters               |
+| Dependency graph     | Event flows, inter-BC relationships, C4 components        |
+| Validate             | Fitness functions (Packwerk + RSpec)                      |
+| Plan                 | Spec generation (`rampart spec`) + prompt-guided planning |
+| Apply                | Prompt-guided spec completion + implementation            |
+| State file           | Rampart architecture JSON blueprints                      |
+| Import               | Legacy extraction (`rampart extract`)                     |
 
 For the complete Terraform analogy, see [Architecture Philosophy](docs/rampart_architecture_philosophy.md#311-the-terraform-analogy).
 
@@ -164,9 +172,9 @@ bun run rampart --help
 
 The Rampart CLI manages the full architecture lifecycle:
 
-- **Design & scaffold** — Initialize projects, create bounded contexts, and generate DDD directory structures
-- **Plan & implement** — Generate implementation plans from architecture blueprints for human or AI execution
-- **Validate & sync** — Run fitness checks and detect drift between code and architecture definitions
+- **Initialize & scaffold** — Bootstrap projects with `rampart init`, create bounded contexts, and generate DDD directory structures
+- **Generate specs** — `rampart spec` reads `architecture.json` and generates spec templates for each capability
+- **Validate & sync** — Detect drift between code and architecture definitions with `rampart sync`
 - **Migrate legacy** — Extract domain models and create phased migration plans for existing codebases
 
 For complete CLI documentation, see [Features](docs/rampart_features.md#cli-tools-).
@@ -180,6 +188,17 @@ project-root/
 │   ├── system.json           # System-level manifest
 │   ├── catalog.json          # Per-bounded-context blueprint
 │   └── payments.json
+├── prompts/
+│   ├── architecture.prompt   # Guides architecture.json design
+│   └── planning.prompt       # Guides spec completion
+├── docs/
+│   ├── diagrams/             # Architecture diagrams
+│   │   ├── catalog_architecture.md
+│   │   └── images/
+│   └── specs/                # Capability specs
+│       └── cat_content/
+│           ├── browse_catalog.spec.md
+│           └── manage_catalog.spec.md
 ├── engines/
 │   ├── catalog/              # Bounded context as Rails engine
 │   └── payments/
@@ -192,7 +211,7 @@ Each engine follows the DDD/Hexagonal structure while respecting Rails conventio
 ```
 engines/catalog/                 # "Catalog" bounded context
 ├── app/
-│   ├── controllers/catalog      # Controller infrastructure 
+│   ├── controllers/catalog      # Controller infrastructure
 │   ├── models/catalog           # ActiveRecord infrastructure
 │   │
 │   ├── domain/catalog/          # Domain layer

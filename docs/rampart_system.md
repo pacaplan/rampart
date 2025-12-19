@@ -265,9 +265,20 @@ project-root/
 │   ├── system.json           # System-level manifest
 │   ├── cat_content.json      # Cat & Content BC architecture
 │   └── billing.json          # Billing BC architecture (example)
+├── prompts/
+│   ├── architecture.prompt   # Guides architecture.json design
+│   └── planning.prompt       # Guides spec completion
 ├── engines/
 │   ├── cat_content/          # Engine implementation
+│   │   ├── specs/            # Capability specs
+│   │   │   ├── browse_catalog.spec.md
+│   │   │   ├── generate_custom_cat.spec.md
+│   │   │   ├── manage_catalog.spec.md
+│   │   │   └── moderate_custom_cats.spec.md
+│   │   └── app/              # Domain/Application/Infrastructure
 │   └── billing/              # Engine implementation
+│       ├── specs/            # Capability specs
+│       └── app/              # Domain/Application/Infrastructure
 └── apps/
     └── web/                  # Rails app
 ```

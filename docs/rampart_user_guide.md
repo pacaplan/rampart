@@ -9,6 +9,8 @@ Day-to-day usage rules and guidance for keeping Rampart implementations intentio
 ## Glossary
 
 - **Bounded Context** — A logical boundary within which a domain model is defined and consistent; typically maps to a Rails engine.
+- **Capability** — A cohesive unit of functionality exposed to an actor; groups related entrypoints and becomes the unit of planning and implementation.
+- **Spec** — A version-controlled document capturing functional requirements, technical requirements, and implementation details for a capability.
 - **Aggregate** — A cluster of domain objects with a root entity that enforces invariants and acts as the consistency boundary.
 - **Entity** — An object with a unique identity that persists over time.
 - **Value Object** — An immutable object defined by its attributes, with no identity.
@@ -120,25 +122,42 @@ Whenever a command wades into generic territory, revisit the workflow and ask, "
 
 ## Rampart Change Lifecycle
 
-A Terraform-like workflow for evolving architecture. Rampart separates concerns between architecture design (what you want), engine creation (Rails infrastructure), and Rampart initialization (DDD/Hexagonal structure).
+A Terraform-like workflow for evolving architecture through prompt-driven collaboration.
 
 ### Adding a New Bounded Context
 
-1. **Design the bounded context** — Run `rampart design` to interactively define the new BC
+1. **Design the bounded context** — Load `architecture.prompt` into your AI assistant and collaboratively define the BC, producing `architecture/{bc_id}.json`
 
-2. **Generate implementation plan** — Run `rampart plan` to create the engine and generate the implementation plan
+2. **Create Rails engine** (if new) — Run `rails plugin new engines/{bc_name} --mountable` and `rampart init {bc_name}` to scaffold DDD structure
 
-3. **Implement** — Write domain logic, use cases, and adapter code per the plan
+3. **Generate spec templates** — Run `rampart spec` to generate one spec file per capability in `engines/{bc_name}/specs/`
 
-4. **Verify** — Run `packwerk check` and RSpec architecture specs to ensure architecture fitness rules pass
+4. **Complete specs** — For each capability, load `planning.prompt` and the spec file into your AI assistant; collaboratively fill in:
+   - Functional requirements (inputs, outputs, scenarios, validation)
+   - Technical requirements (performance, security, observability)
+   - Data model (schema, relationships, indexes)
+   - Request/response contracts
+   - Domain logic and integration details
 
-5. **Commit** — Check in code and architecture JSON together to keep them in sync
+5. **Implement** — Write domain logic, use cases, and adapter code per the completed specs
 
-### Modifying an Existing Bounded Context
+6. **Verify** — Run `packwerk check` and RSpec architecture specs to ensure fitness
 
-1. **Update the architecture blueprint** — Run `rampart design`
+7. **Commit** — Check in code, specs, and architecture JSON together
 
-2. **Follow steps 2-5 from "Adding a New Bounded Context" above**
+### Adding a Capability to Existing Bounded Context
+
+1. **Update architecture blueprint** — Edit `architecture/{bc_id}.json` to add the capability (manually or via `architecture.prompt`)
+
+2. **Generate spec template** — Run `rampart spec` to generate the new capability's spec file
+
+3. **Complete spec** — Load `planning.prompt` and fill in the spec
+
+4. **Implement** — Write code per the spec
+
+5. **Verify** — Run fitness checks
+
+6. **Commit** — Check in code, spec, and updated architecture JSON
 
 ### Detecting Drift
 

@@ -68,6 +68,27 @@ These JSON files act as the architectural source of truth.
 
 ---
 
+## Prompt Files ✅
+
+Rampart ships prompt files that guide AI-assisted architecture and planning workflows:
+
+- **architecture.prompt** - Guides collaborative architecture design
+  - Helps user define bounded contexts
+  - Elicits domain model (aggregates, entities, value objects)
+  - Produces/refines `architecture.json`
+  - Uses architectural patterns and ubiquitous language
+
+- **planning.prompt** - Guides spec completion for capabilities
+  - Gathers functional requirements (inputs, outputs, validation)
+  - Gathers technical requirements (performance, security, observability)
+  - Fills in data model details (schema, relationships, indexes)
+  - Defines request/response contracts
+  - Clarifies domain logic and integration details
+
+These prompts are loaded into AI coding assistants (Claude Code, Cursor, etc.) as custom commands or modes.
+
+---
+
 ## CLI Tools ❌
 
 > See [User Guide: Rampart Change Lifecycle](rampart_user_guide.md#rampart-change-lifecycle) for the recommended workflow.
@@ -76,24 +97,14 @@ These JSON files act as the architectural source of truth.
 - [ ] **rampart init** - Bootstrap Rampart in a new project
   - Create `architecture/` directory
   - Generate `architecture/system.json` with empty engines list
+  - Create `prompts/` directory
+  - Install `architecture.prompt` and `planning.prompt`
   - Set up initializer/configuration files for Rampart
-  - Generate agent instruction files for AI-assisted development
 
-### Architecture Design
-- [ ] **rampart design** - Interactive architecture design (adds to system.json)
-  - **New bounded context flow:**
-    - Prompt for BC identifier, name, and description
-    - Add entry to `architecture/system.json` under `engines.items`
-    - Create `architecture/{bc_id}.json` with initial structure
-  - **Existing bounded context flow:**
-    - Select BC to modify from `system.json` engines list
-    - Guide through adding/modifying domain elements
-    - Update `architecture/{bc_id}.json`
-  - **Domain modeling prompts:**
-    - Define aggregates, entities, value objects, domain services
-    - Specify commands, queries, domain events
-    - Define ports (repositories, external services) and adapters
-  - Future: AI chatbot assistance for domain modeling decisions
+- [x] **rampart diagram** - Generate architecture diagrams from blueprints
+  - **L1 System Context** - Actors, BC, Downstream BCs, External Systems
+  - **L3 Capability Flows** - Actor -> Controller -> Service -> Ports -> Adapters -> External/DB
+  - **Outputs** - Markdown documentation with embedded SVG/PNG images
 
 - [ ] **rampart visualize** - Generate architecture diagrams from blueprints
   - Context maps (inter-BC relationships from `system.json`)
@@ -141,21 +152,20 @@ These JSON files act as the architectural source of truth.
   - **Generates agent instruction files** for AI-assisted development
   - **Note:** Adding gem to Gemfile and mounting routes are manual steps (project-specific)
 
-### Implementation Planning
-- [ ] **rampart plan** - Generate implementation plan from architecture JSON
-  - **If engine does not exist,** Include the following steps inthe plan:
-    - Run standard Rails generator: `rails plugin new engines/{bc_name} --mountable --skip-test`
-    - Add gem to main app Gemfile: `gem "{bc_name}", path: "engines/{bc_name}"`
-    - Mount in routes: `mount {BcName}::Engine => "/path"`
-    - Run `rampart init` (see above)
+### Spec Generation
+- [ ] **rampart spec** - Generate spec templates for capabilities from architecture JSON
+  - **If engine does not exist,** generates minimal spec indicating Rails engine setup needed
   - **If engine exists:**
-    - Compare `architecture/{bc_id}.json` against current engine structure
-  - **Output markdown document showing:**
-    - Files to create (new aggregates, services, ports, etc.)
-    - Files to modify (adding methods, events, etc.)
-    - Missing implementations (ports without adapters, etc.)
-  - Support greenfield (new BC) and incremental (sync new elements) modes
-  - Generate TODO list for implementation
+    - Reads `architecture/{bc_id}.json`
+    - Identifies all capabilities defined in the BC
+    - Generates one spec template file per capability in `engines/{bc_name}/specs/`
+  - **Spec template structure:**
+    - Functional requirements (placeholder)
+    - Technical requirements (placeholder)
+    - Application layer section (pre-filled from architecture.json)
+    - Domain layer section (pre-filled from architecture.json)
+    - Infrastructure layer section (pre-filled from architecture.json)
+  - Spec templates are ready for completion via `planning.prompt`
 
 ### Validation & Synchronization
 
@@ -217,13 +227,25 @@ The goal is to make the first fitness function free—teams get value immediatel
 
 ---
 
-## Architecture-Aware Agent Integration
+## Architecture-Aware AI Integration
 
-Rampart generates instruction files used by AI agents to:
+Rampart provides prompt files that guide AI coding assistants through architectural workflows:
 
-- Follow layering constraints
-- Respect BC boundaries
-- Maintain fitness rules
-- Update architecture JSON (use cases, events, domain model) whenever code changes
+**Architecture Design** (`architecture.prompt`):
+- Collaborative elicitation of bounded contexts
+- Domain modeling (aggregates, entities, value objects, events)
+- Port and adapter identification
+- Produces version-controlled `architecture.json`
 
-This enables AI coding assistants to work within architectural boundaries rather than accidentally violating them.
+**Planning** (`planning.prompt`):
+- Guides spec completion for capabilities
+- Gathers functional and technical requirements
+- Fills in data model, contracts, and integration details
+- Produces version-controlled spec files
+
+**Validation** (Packwerk + RSpec):
+- After implementation, fitness functions verify architectural compliance
+- Drift detection catches violations
+- Provides actionable feedback for correction
+
+This three-phase approach (design → plan → validate) enables AI assistants to work within architectural boundaries while maintaining human control over key decisions.

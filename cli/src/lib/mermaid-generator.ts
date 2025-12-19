@@ -10,8 +10,10 @@ function sanitize(str: string): string {
   return str.replace(/"/g, "'").replace(/\n/g, "<br/>");
 }
 
-function slugify(str: string): string {
+export function slugify(str: string): string {
   return str
+    // Insert underscore before uppercase letters (handles PascalCase)
+    .replace(/([a-z])([A-Z])/g, "$1_$2")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "_")
     .replace(/^_|_$/g, "");

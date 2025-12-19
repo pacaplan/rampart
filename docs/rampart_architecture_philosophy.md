@@ -250,16 +250,44 @@ Rampart uses **JSON as the authoritative format** for all architecture blueprint
 
 ---
 
-## 3.10 AI as Guardrail, Not Controller
+## 3.10 AI Collaboration Through Prompts and Validation
 
-Current LLMs do not reliably follow architectural instructions. They hallucinate dependencies, flatten layers, and ignore boundaries—especially as context windows fill up. Rampart does not assume AI agents will behave perfectly. Instead, it positions itself as a **guardrail and reviewer**:
+Rampart enables productive AI-assisted development through a combination of proactive guidance and verification.
 
-- **Detect, don't prevent** — AI agents will make structural mistakes. Rampart catches them via drift detection and fitness validation (Packwerk + RSpec), enabling fast correction rather than relying on prevention.
+### Prompt-Driven Guidance
+
+Rampart ships **prompt files** that guide AI coding assistants through architectural workflows:
+
+**Architecture Design** (`architecture.prompt`):
+- Guides collaborative elicitation of bounded contexts and domain models
+- Encodes architectural patterns and ubiquitous language principles
+- Produces version-controlled JSON as the source of truth
+
+**Planning** (`planning.prompt`):
+- Guides spec completion for capabilities
+- Gathers both functional and technical requirements systematically
+- Fills in data model, contracts, and integration details through targeted questions
+- Produces version-controlled spec files ready for implementation
+
+These prompts are loaded into AI assistants (Claude Code, Cursor, etc.) as custom commands or modes, enabling the AI to act as a knowledgeable collaborator within architectural boundaries.
+
+### Validation as Safety Net
+
+Current LLMs do not reliably follow architectural instructions in all cases. They may hallucinate dependencies, flatten layers, or ignore boundaries—especially as context windows fill up. Rampart provides a validation layer:
+
+- **Detect, don't prevent** — AI agents may make structural mistakes. Rampart catches them via drift detection and fitness validation (Packwerk + RSpec), enabling fast correction.
 - **Post-hoc verification** — After any AI-assisted code change, Packwerk and RSpec architecture specs confirm the architecture remains intact. This fits naturally into CI pipelines or pre-commit hooks.
 - **Blame-free feedback loops** — When violations are detected, Rampart provides actionable guidance that both humans and AI agents can use to self-correct.
-- **Improving over time** — As LLMs improve at following structured constraints, Rampart's JSON blueprints become more effective. The architecture is future-proofed for better AI tooling.
+- **Improving over time** — As LLMs improve at following structured constraints, Rampart's prompts and JSON blueprints become more effective.
 
-The honest pitch: AI will make mistakes; Rampart catches them.
+### The Rampart AI Strategy
+
+1. **Guide proactively** — Prompts encode architectural knowledge and guide AI through proper workflows
+2. **Validate post-hoc** — Fitness functions catch mistakes and provide feedback
+3. **Iterate collaboratively** — Human + AI work together within clear boundaries
+4. **Version control decisions** — Architecture JSON and specs serve as reviewable artifacts
+
+This approach maintains human control over architectural decisions while leveraging AI's speed and pattern recognition.
 
 ---
 
@@ -307,7 +335,7 @@ Terraform includes `terraform import` to bring unmanaged infra into its control.
 | Resource definitions | Use cases, events, domain objects, adapters        |
 | Dependency graph     | Event flows, inter-BC relationships, C4 components |
 | Validate             | Fitness functions (Packwerk + RSpec)               |
-| Plan                 | Architectural plan (`rampart plan`)                |
-| Apply                | Scaffolding + agent-guided implementation          |
+| Plan                 | Spec generation (`rampart spec`) + prompt-guided planning |
+| Apply                | Prompt-guided spec completion + implementation     |
 | State file           | Rampart architecture JSON blueprints               |
 | Import               | Legacy extraction (`rampart extract`)              |
