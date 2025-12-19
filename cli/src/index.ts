@@ -2,6 +2,7 @@
 
 import { plan } from "./commands/plan.ts";
 import { init } from "./commands/init.ts";
+import { diagram } from "./commands/diagram.ts";
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -13,6 +14,9 @@ async function main() {
       break;
     case "init":
       await init(args.slice(1));
+      break;
+    case "diagram":
+      await diagram(args.slice(1));
       break;
     case "version":
       console.log("rampart-cli v0.1.0");
@@ -28,19 +32,21 @@ function printHelp() {
 rampart-cli - Architecture tooling for Rampart framework
 
 Commands:
-  plan <architecture.json>  Generate implementation plan from architecture blueprint
-  init [engine_name]        Initialize Rampart in project or engine
-  version                   Print version
-  help                      Show this help
+  plan <architecture.json>    Generate implementation plan from architecture blueprint
+  diagram <architecture.json> Generate architecture diagrams (L1, L3)
+  init [engine_name]          Initialize Rampart in project or engine
+  version                     Print version
+  help                        Show this help
 
 Options:
-  --output, -o <path>       Output file (default: docs/plans/{bc_id}_plan.md)
+  --output, -o <path>       Output file
+  --format, -f <format>     Image format: png | svg (default: svg)
   --backend <name>          Cilantro backend override (cursor | claude | codex). Also supports CILANTRO_BACKEND env var.
 
 Examples:
   rampart plan architecture/cat_content.json
-  rampart plan architecture/commerce.json -o my_plan.md
-  rampart plan architecture/cat_content.json --backend cursor
+  rampart diagram architecture/cat_content.json
+  rampart diagram architecture/cat_content.json -o docs/arch/cat_content.md -f png
   rampart init
   rampart init cat_content
 `);

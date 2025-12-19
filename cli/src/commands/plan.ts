@@ -1,4 +1,4 @@
-import { executePrompt, isInitialized } from "cilantro";
+// import { executePrompt, isInitialized } from "cilantro";
 import { buildArchitectureContext } from "../lib/architecture-parser.ts";
 import { buildPrompt } from "../lib/prompt-builder.ts";
 import { resolve, dirname, join, basename } from "path";
@@ -32,6 +32,8 @@ function sanitizePlanOutput(raw: string): string {
 }
 
 export async function plan(args: string[]) {
+  console.log("Plan command is temporarily disabled due to missing cilantro dependency.");
+  /*
   // Parse arguments
   const archPath = args.find((a) => !a.startsWith("-"));
   if (!archPath) {
@@ -93,4 +95,5 @@ export async function plan(args: string[]) {
   await Bun.write(resolvedOutput, sanitizePlanOutput(result.output));
 
   console.log(`Plan written to: ${resolvedOutput}`);
+  */
 }

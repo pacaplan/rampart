@@ -3,10 +3,39 @@ export interface Architecture {
   profile: string;
   description?: string;
   scope?: { in: string[]; out: string[] };
+
+  actors?: Array<{
+    name: string;
+    description?: string;
+  }>;
+
+  relationships?: {
+    publishes_to?: Array<{
+      bc: string;
+      via: string;
+      events: string[];
+    }>;
+    consumed_by?: Array<{
+      bc: string;
+      purpose: string;
+    }>;
+  };
+
   layers: {
     domain: {
-      aggregates: Array<{ name: string; description?: string; entity?: string }>;
-      events: Array<{ name: string; description?: string }>;
+      aggregates: Array<{
+        name: string;
+        description?: string;
+        entity?: string;
+        key_attributes?: string[];
+        invariants?: string[];
+        lifecycle?: string[];
+      }>;
+      events: Array<{
+        name: string;
+        description?: string;
+        payload_intent?: string[];
+      }>;
       ports: {
         repositories: string[];
         external: Array<{ name: string; description?: string }>;
@@ -16,9 +45,18 @@ export interface Architecture {
       services: Array<{
         name: string;
         orchestrates: string;
-        uses_ports: string[];
-        publishes: string[];
+        uses_ports?: string[];
+        publishes?: string[];
         operations?: { consumer?: string[]; admin?: string[] };
+      }>;
+      capabilities?: Array<{
+        name: string;
+        actors: string[];
+        entrypoints: string[];
+        orchestrates: string[];
+        uses_ports: string[];
+        emits: string[];
+        outputs: string[];
       }>;
     };
     infrastructure: {
@@ -28,12 +66,18 @@ export interface Architecture {
         external: Array<{ name: string; implements: string; technology?: string; pending?: boolean }>;
       };
       entrypoints: {
-        http: Array<{ name: string; routes: string; invokes: string }>;
+        http: Array<{ name: string; routes: string; invokes?: string }>;
       };
       wiring: string;
     };
   };
-  external_systems?: Array<{ name: string; type: string; purpose: string }>;
+  external_systems?: Array<{
+    name: string;
+    description?: string;
+    type?: string;
+    purpose?: string;
+    providers?: string[];
+  }>;
 }
 
 export interface ArchitectureContext {
