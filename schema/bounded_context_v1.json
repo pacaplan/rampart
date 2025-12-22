@@ -1,0 +1,490 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "rampart/schema/bounded_context_v1.json",
+  "title": "Rampart Bounded Context Blueprint",
+  "description": "Schema for defining a bounded context architecture in a Rampart-powered Rails application",
+  "type": "object",
+  "required": ["$schema", "name", "profile", "description", "actors", "layers"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "rampart/schema/bounded_context_v1.json",
+      "description": "Schema identifier for validation"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the bounded context",
+      "minLength": 1
+    },
+    "profile": {
+      "type": "string",
+      "enum": ["rampart_hexddd_v1"],
+      "description": "Rampart architecture profile version"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of the bounded context's purpose and scope"
+    },
+    "actors": {
+      "type": "array",
+      "description": "Roles that interact with this bounded context",
+      "items": {
+        "$ref": "#/$defs/actor"
+      },
+      "minItems": 1
+    },
+    "relationships": {
+      "type": "object",
+      "description": "How this context relates to other bounded contexts",
+      "properties": {
+        "publishes_to": {
+          "type": "array",
+          "description": "Contexts that consume events from this context",
+          "items": {
+            "$ref": "#/$defs/publishes_relationship"
+          }
+        },
+        "consumed_by": {
+          "type": "array",
+          "description": "Contexts that read data from this context",
+          "items": {
+            "$ref": "#/$defs/consumed_by_relationship"
+          }
+        },
+        "consumes_from": {
+          "type": "array",
+          "description": "Contexts this context consumes events from",
+          "items": {
+            "$ref": "#/$defs/consumes_from_relationship"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "layers": {
+      "type": "object",
+      "description": "The three architectural layers: domain, application, infrastructure",
+      "required": ["domain", "application", "infrastructure"],
+      "properties": {
+        "domain": {
+          "$ref": "#/$defs/domain_layer"
+        },
+        "application": {
+          "$ref": "#/$defs/application_layer"
+        },
+        "infrastructure": {
+          "$ref": "#/$defs/infrastructure_layer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "external_systems": {
+      "type": "array",
+      "description": "External systems this context integrates with",
+      "items": {
+        "$ref": "#/$defs/external_system"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "actor": {
+      "type": "object",
+      "required": ["name", "description"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Role name (e.g., Shopper, Admin, Guest)"
+        },
+        "description": {
+          "type": "string",
+          "description": "What this actor does in the context"
+        }
+      },
+      "additionalProperties": false
+    },
+    "publishes_relationship": {
+      "type": "object",
+      "required": ["bc", "via", "events"],
+      "properties": {
+        "bc": {
+          "type": "string",
+          "description": "Target bounded context identifier"
+        },
+        "via": {
+          "type": "string",
+          "enum": ["events", "api", "shared_kernel"],
+          "description": "Communication mechanism"
+        },
+        "events": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Event names published to this context"
+        }
+      },
+      "additionalProperties": false
+    },
+    "consumed_by_relationship": {
+      "type": "object",
+      "required": ["bc", "purpose"],
+      "properties": {
+        "bc": {
+          "type": "string",
+          "description": "Consuming bounded context identifier"
+        },
+        "purpose": {
+          "type": "string",
+          "description": "Why this context consumes data"
+        }
+      },
+      "additionalProperties": false
+    },
+    "consumes_from_relationship": {
+      "type": "object",
+      "required": ["bc", "via"],
+      "properties": {
+        "bc": {
+          "type": "string",
+          "description": "Source bounded context identifier"
+        },
+        "via": {
+          "type": "string",
+          "enum": ["events", "api", "shared_kernel"],
+          "description": "Communication mechanism"
+        },
+        "events": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Event names consumed from this context"
+        }
+      },
+      "additionalProperties": false
+    },
+    "domain_layer": {
+      "type": "object",
+      "description": "Pure domain logic: aggregates, events, and ports",
+      "required": ["aggregates", "events", "ports"],
+      "properties": {
+        "aggregates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/aggregate"
+          },
+          "minItems": 1
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/domain_event"
+          }
+        },
+        "ports": {
+          "type": "object",
+          "required": ["repositories"],
+          "properties": {
+            "repositories": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Repository port names for aggregate persistence"
+            },
+            "external": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/external_port"
+              },
+              "description": "Ports for external system integration"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "aggregate": {
+      "type": "object",
+      "required": ["name", "description", "key_attributes", "invariants", "lifecycle"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Aggregate root name in PascalCase"
+        },
+        "description": {
+          "type": "string",
+          "description": "What this aggregate represents"
+        },
+        "entity": {
+          "type": "string",
+          "description": "Optional child entity name if aggregate contains entities"
+        },
+        "key_attributes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Primary attributes of the aggregate"
+        },
+        "invariants": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Business rules that must always be true"
+        },
+        "lifecycle": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Valid states the aggregate can be in"
+        }
+      },
+      "additionalProperties": false
+    },
+    "domain_event": {
+      "type": "object",
+      "required": ["name", "description", "payload_intent"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Event name in PascalCase, past tense (e.g., OrderPlaced)"
+        },
+        "description": {
+          "type": "string",
+          "description": "What business fact this event represents"
+        },
+        "payload_intent": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Key data fields the event carries"
+        }
+      },
+      "additionalProperties": false
+    },
+    "external_port": {
+      "type": "object",
+      "required": ["name", "description"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Port interface name (e.g., LanguageModelPort)"
+        },
+        "description": {
+          "type": "string",
+          "description": "What capability this port provides"
+        }
+      },
+      "additionalProperties": false
+    },
+    "application_layer": {
+      "type": "object",
+      "description": "Use cases and orchestration",
+      "required": ["services", "capabilities"],
+      "properties": {
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/application_service"
+          }
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/capability"
+          },
+          "minItems": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "application_service": {
+      "type": "object",
+      "required": ["name", "orchestrates"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Service class name"
+        },
+        "orchestrates": {
+          "type": "string",
+          "description": "Primary aggregate this service manages"
+        }
+      },
+      "additionalProperties": false
+    },
+    "capability": {
+      "type": "object",
+      "required": ["name", "actors", "entrypoints", "orchestrates", "uses_ports", "emits", "outputs"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Capability name in PascalCase, task-based (e.g., GenerateCustomCat)"
+        },
+        "actors": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Roles that can perform this capability"
+        },
+        "entrypoints": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Controller#action or job names that trigger this capability"
+        },
+        "orchestrates": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Application services involved"
+        },
+        "uses_ports": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Ports (repositories and external) used"
+        },
+        "emits": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Domain events emitted on success"
+        },
+        "outputs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Domain objects returned to the caller"
+        }
+      },
+      "additionalProperties": false
+    },
+    "infrastructure_layer": {
+      "type": "object",
+      "description": "Adapters and entrypoints",
+      "required": ["adapters", "entrypoints"],
+      "properties": {
+        "adapters": {
+          "type": "object",
+          "properties": {
+            "persistence": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/adapter"
+              },
+              "description": "Repository implementations"
+            },
+            "external": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/adapter"
+              },
+              "description": "External port implementations"
+            }
+          },
+          "additionalProperties": false
+        },
+        "entrypoints": {
+          "type": "object",
+          "properties": {
+            "http": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/http_entrypoint"
+              },
+              "description": "HTTP controllers"
+            },
+            "jobs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/job_entrypoint"
+              },
+              "description": "Background job handlers"
+            },
+            "events": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/event_entrypoint"
+              },
+              "description": "Domain event handlers"
+            }
+          },
+          "additionalProperties": false
+        },
+        "wiring": {
+          "type": "string",
+          "description": "Dependency injection mechanism (e.g., Dry::Container)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "adapter": {
+      "type": "object",
+      "required": ["name", "implements"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Adapter class name"
+        },
+        "implements": {
+          "type": "string",
+          "description": "Port interface this adapter implements"
+        }
+      },
+      "additionalProperties": false
+    },
+    "http_entrypoint": {
+      "type": "object",
+      "required": ["name", "routes"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Controller class name"
+        },
+        "routes": {
+          "type": "string",
+          "description": "Base route path"
+        }
+      },
+      "additionalProperties": false
+    },
+    "job_entrypoint": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Job class name"
+        },
+        "schedule": {
+          "type": "string",
+          "description": "Cron schedule if recurring"
+        }
+      },
+      "additionalProperties": false
+    },
+    "event_entrypoint": {
+      "type": "object",
+      "required": ["name", "handles"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Event handler class name"
+        },
+        "handles": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Events this handler processes"
+        }
+      },
+      "additionalProperties": false
+    },
+    "external_system": {
+      "type": "object",
+      "required": ["name", "description"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "External system name"
+        },
+        "providers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Specific providers/vendors"
+        },
+        "description": {
+          "type": "string",
+          "description": "What this system provides"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

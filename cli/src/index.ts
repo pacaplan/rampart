@@ -40,6 +40,8 @@ Commands:
   diagram <architecture.json> Generate architecture diagrams (L1, L3)
   spec <bc_id>                Generate capability spec templates
   init [engine_name]          Initialize Rampart in project or engine
+                              Also installs /rampart.architect and /rampart.plan
+                              slash commands for Cursor and Claude Code
   version                     Print version
   help                        Show this help
 

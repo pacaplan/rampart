@@ -101,10 +101,10 @@ For detailed explanations, anti-patterns, and implementation guidance, see [Arch
 Rampart takes a two-pronged approach to AI-assisted development:
 
 **1. Prompt-Driven Guidance** — Rampart ships **prompt files** that encode architectural knowledge:
-- `architecture.prompt` — Guides the design of `architecture.json` through collaborative dialogue
-- `planning.prompt` — Guides spec completion for capabilities, gathering functional and technical requirements
+- `architecture.prompt.md` — Guides the design of `architecture.json` through collaborative dialogue
+- `planning.prompt.md` — Guides spec completion for capabilities, gathering functional and technical requirements
 
-These prompts are loaded into AI coding assistants (Claude Code, Cursor, etc.) and guide the human+AI collaboration within architectural boundaries.
+Running `rampart init` installs these as slash commands (`/rampart.architect` and `/rampart.plan`) for both Cursor and Claude Code.
 
 **2. Validation & Enforcement** — Rampart validates that code adheres to architecture:
 - **Post-hoc verification** — After code changes, Packwerk and RSpec architecture specs confirm the architecture remains intact
@@ -189,8 +189,8 @@ project-root/
 │   ├── catalog.json          # Per-bounded-context blueprint
 │   └── payments.json
 ├── prompts/
-│   ├── architecture.prompt   # Guides architecture.json design
-│   └── planning.prompt       # Guides spec completion
+│   ├── architecture.prompt.md   # Guides architecture.json design
+│   └── planning.prompt.md       # Guides spec completion
 ├── docs/
 │   ├── diagrams/             # Architecture diagrams
 │   │   ├── catalog_architecture.md

@@ -126,6 +126,107 @@ function generateSpecMarkdown(
   lines.push("---");
   lines.push("");
 
+  // Domain State & Data (New Section)
+  lines.push("## Domain State & Data");
+  lines.push("");
+  lines.push("### Aggregates involved");
+  lines.push("");
+
+  const involvedAggregates = capability.orchestrates || [];
+  const aggregateDefs = arch.layers.domain.aggregates.filter(a => 
+    involvedAggregates.includes(a.name) || 
+    // Fallback: if 'orchestrates' refers to a Service, check if that service orchestrates the Aggregate
+    arch.layers.application.services.some(s => s.name === a.name && involvedAggregates.includes(s.name)) ||
+    // Simple name matching just in case
+    involvedAggregates.some(inv => inv.includes(a.name))
+  );
+
+  if (aggregateDefs.length > 0) {
+    aggregateDefs.forEach(agg => {
+      lines.push(`#### ${agg.name}`);
+      lines.push(`> ${agg.description || "No description"}`);
+      lines.push("");
+      
+      if (agg.key_attributes && agg.key_attributes.length > 0) {
+        lines.push("**Key Attributes:**");
+        agg.key_attributes.forEach(attr => lines.push(`- \`${attr}\``));
+        lines.push("");
+      }
+
+      if (agg.invariants && agg.invariants.length > 0) {
+        lines.push("**Invariants:**");
+        agg.invariants.forEach(inv => lines.push(`- ${inv}`));
+        lines.push("");
+      }
+
+      if (agg.lifecycle && agg.lifecycle.length > 0) {
+        lines.push(`**Lifecycle:** ${agg.lifecycle.join(" -> ")}`);
+        lines.push("");
+      }
+    });
+  } else {
+    lines.push("_No specific aggregates identified in architecture._");
+  }
+
+  lines.push("");
+  
+  // Domain Events (New Section)
+  if (capability.emits && capability.emits.length > 0) {
+    lines.push("### Domain Events Emitted");
+    lines.push("");
+    
+    const eventDefs = arch.layers.domain.events.filter(e => capability.emits.includes(e.name));
+    
+    if (eventDefs.length > 0) {
+      eventDefs.forEach(evt => {
+        lines.push(`#### ${evt.name}`);
+        lines.push(`> ${evt.description || "No description"}`);
+        lines.push("");
+        
+        if (evt.payload_intent && evt.payload_intent.length > 0) {
+          lines.push("**Payload Intent:**");
+          evt.payload_intent.forEach(field => lines.push(`- \`${field}\``));
+          lines.push("");
+        }
+      });
+    } else {
+      capability.emits.forEach(evtName => lines.push(`- ${evtName} (Definition not found in domain layer)`));
+    }
+    lines.push("");
+  }
+  
+  lines.push("---");
+  lines.push("");
+
+  // Data Model (to be completed)
+  lines.push("## Data Model");
+  lines.push("");
+  lines.push("<!-- Map the Aggregate attributes above to a persistence schema -->");
+  lines.push("<!-- Note: Only model tables owned by this Bounded Context -->");
+  lines.push("");
+  lines.push("| Table | Column | Type | Constraints |");
+  lines.push("|-------|--------|------|-------------|");
+  lines.push("| ...   | ...    | ...  | ...         |");
+  lines.push("");
+  lines.push("---");
+  lines.push("");
+
+  // Request/Response Contracts
+  lines.push("## Request/Response Contracts");
+  lines.push("");
+  lines.push("<!-- Define API payloads and Event DTOs -->");
+  lines.push("<!-- Tip: Use Task-Based naming (e.g. GenerateCustomCatRequest) -->");
+  lines.push("");
+  lines.push("```json");
+  lines.push("// Request");
+  lines.push("{");
+  lines.push("  ...");
+  lines.push("}");
+  lines.push("```");
+  lines.push("");
+  lines.push("---");
+  lines.push("");
+
   // Architecture section
   lines.push("## Architecture");
   lines.push("");

@@ -72,13 +72,13 @@ These JSON files act as the architectural source of truth.
 
 Rampart ships prompt files that guide AI-assisted architecture and planning workflows:
 
-- **architecture.prompt** - Guides collaborative architecture design
+- **architecture.prompt.md** - Guides collaborative architecture design
   - Helps user define bounded contexts
   - Elicits domain model (aggregates, entities, value objects)
   - Produces/refines `architecture.json`
   - Uses architectural patterns and ubiquitous language
 
-- **planning.prompt** - Guides spec completion for capabilities
+- **planning.prompt.md** - Guides spec completion for capabilities
   - Gathers functional requirements (inputs, outputs, validation)
   - Gathers technical requirements (performance, security, observability)
   - Fills in data model details (schema, relationships, indexes)
@@ -98,7 +98,7 @@ These prompts are loaded into AI coding assistants (Claude Code, Cursor, etc.) a
   - Create `architecture/` directory
   - Generate `architecture/system.json` with empty engines list
   - Create `prompts/` directory
-  - Install `architecture.prompt` and `planning.prompt`
+  - Install `architecture.prompt.md` and `planning.prompt.md`
   - Set up initializer/configuration files for Rampart
 
 - [x] **rampart diagram** - Generate architecture diagrams from blueprints
@@ -165,7 +165,7 @@ These prompts are loaded into AI coding assistants (Claude Code, Cursor, etc.) a
     - Application layer section (pre-filled from architecture.json)
     - Domain layer section (pre-filled from architecture.json)
     - Infrastructure layer section (pre-filled from architecture.json)
-  - Spec templates are ready for completion via `planning.prompt`
+  - Spec templates are ready for completion via `planning.prompt.md`
 
 ### Validation & Synchronization
 
@@ -231,13 +231,13 @@ The goal is to make the first fitness function free—teams get value immediatel
 
 Rampart provides prompt files that guide AI coding assistants through architectural workflows:
 
-**Architecture Design** (`architecture.prompt`):
+**Architecture Design** (`architecture.prompt.md`):
 - Collaborative elicitation of bounded contexts
 - Domain modeling (aggregates, entities, value objects, events)
 - Port and adapter identification
 - Produces version-controlled `architecture.json`
 
-**Planning** (`planning.prompt`):
+**Planning** (`planning.prompt.md`):
 - Guides spec completion for capabilities
 - Gathers functional and technical requirements
 - Fills in data model, contracts, and integration details

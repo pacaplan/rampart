@@ -120,19 +120,40 @@ Whenever a command wades into generic territory, revisit the workflow and ask, "
 - **Application layer**: Contains commands, queries, and application services. Orchestrates domain logic through ports. Transactions wrap use case execution at this layer's edge.
 - **Infrastructure layer**: Contains adapters (repositories, external service clients, event bus implementations). All I/O lives here. Adapters depend inward only.
 
+## Slash Commands
+
+Running `rampart init` installs two slash commands for use in Cursor and Claude Code:
+
+| Command | Purpose |
+|---------|---------|
+| `/rampart.architect` | Design or modify bounded context architecture, producing `architecture/{bc_id}.json` |
+| `/rampart.plan` | Complete capability specs with functional requirements, data models, and contracts |
+
+The commands are installed as symlinks pointing to canonical files in `prompts/`:
+
+```
+prompts/
+├── architecture.prompt.md    # Source for /rampart.architect
+└── planning.prompt.md        # Source for /rampart.plan
+```
+
+To use a command, type `/rampart.architect` or `/rampart.plan` in your AI assistant's chat, then follow the guided workflow.
+
+---
+
 ## Rampart Change Lifecycle
 
 A Terraform-like workflow for evolving architecture through prompt-driven collaboration.
 
 ### Adding a New Bounded Context
 
-1. **Design the bounded context** — Load `architecture.prompt` into your AI assistant and collaboratively define the BC, producing `architecture/{bc_id}.json`
+1. **Design the bounded context** — Use `/rampart.architect` to collaboratively define the BC, producing `architecture/{bc_id}.json`
 
 2. **Create Rails engine** (if new) — Run `rails plugin new engines/{bc_name} --mountable` and `rampart init {bc_name}` to scaffold DDD structure
 
 3. **Generate spec templates** — Run `rampart spec` to generate one spec file per capability in `engines/{bc_name}/specs/`
 
-4. **Complete specs** — For each capability, load `planning.prompt` and the spec file into your AI assistant; collaboratively fill in:
+4. **Complete specs** — For each capability, use `/rampart.plan` with the spec file to collaboratively fill in:
    - Functional requirements (inputs, outputs, scenarios, validation)
    - Technical requirements (performance, security, observability)
    - Data model (schema, relationships, indexes)
@@ -147,11 +168,11 @@ A Terraform-like workflow for evolving architecture through prompt-driven collab
 
 ### Adding a Capability to Existing Bounded Context
 
-1. **Update architecture blueprint** — Edit `architecture/{bc_id}.json` to add the capability (manually or via `architecture.prompt`)
+1. **Update architecture blueprint** — Use `/rampart.architect` to add the capability to `architecture/{bc_id}.json`
 
 2. **Generate spec template** — Run `rampart spec` to generate the new capability's spec file
 
-3. **Complete spec** — Load `planning.prompt` and fill in the spec
+3. **Complete spec** — Use `/rampart.plan` to fill in the spec
 
 4. **Implement** — Write code per the spec
 

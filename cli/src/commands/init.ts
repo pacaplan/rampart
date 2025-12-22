@@ -1,5 +1,5 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, symlinkSync, lstatSync } from "node:fs";
+import { join, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execSync } from "node:child_process";
 
@@ -57,6 +57,64 @@ function addGemToGemfile(gemName: string, group?: string): void {
     console.log(`Warning: Failed to add gem '${gemName}'. You may need to add it manually.`);
     console.log(`Error: ${error.message}`);
   }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Prompt Installation (Slash Commands for Cursor and Claude Code)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function installPrompts(): boolean {
+  const projectRoot = process.cwd();
+  const promptsDir = join(projectRoot, "prompts");
+  let createdAny = false;
+
+  // 1. Create prompts/ directory and copy canonical files
+  if (!existsSync(promptsDir)) {
+    mkdirSync(promptsDir, { recursive: true });
+  }
+
+  // Map: source template filename -> { canonical name, command name }
+  const prompts = [
+    { template: "architecture.prompt.md", canonical: "architecture.prompt.md", command: "rampart.architect.md" },
+    { template: "planning.prompt.md", canonical: "planning.prompt.md", command: "rampart.plan.md" },
+  ];
+
+  for (const { template, canonical } of prompts) {
+    const destPath = join(promptsDir, canonical);
+    if (!existsSync(destPath)) {
+      console.log(`Installing prompts/${canonical}...`);
+      writeFileSync(destPath, loadTemplate(`prompts/${template}`));
+      createdAny = true;
+    }
+  }
+
+  // 2. Create symlinks for Cursor and Claude Code
+  const symlinkConfigs = [
+    { dir: ".cursor/prompts", label: "Cursor" },
+    { dir: ".claude/commands", label: "Claude Code" },
+  ];
+
+  for (const { dir, label } of symlinkConfigs) {
+    const fullDir = join(projectRoot, dir);
+    if (!existsSync(fullDir)) {
+      mkdirSync(fullDir, { recursive: true });
+    }
+
+    for (const { canonical, command } of prompts) {
+      const linkPath = join(fullDir, command);
+      const targetPath = join(promptsDir, canonical);
+      const relativeTarget = relative(fullDir, targetPath);
+
+      // Check if symlink already exists
+      if (!existsSync(linkPath)) {
+        console.log(`Creating /${command.replace(".md", "")} symlink for ${label}...`);
+        symlinkSync(relativeTarget, linkPath);
+        createdAny = true;
+      }
+    }
+  }
+
+  return createdAny;
 }
 
 async function initProject() {
@@ -137,6 +195,10 @@ Rampart provides the building blocks for DDD:
   if (!existsSync(packwerkYmlPath)) {
     console.log("Creating packwerk.yml...");
     writeFileSync(packwerkYmlPath, loadTemplate("packwerk.yml"));
+    createdAny = true;
+  }
+
+  if (installPrompts()) {
     createdAny = true;
   }
 

@@ -258,12 +258,12 @@ Rampart enables productive AI-assisted development through a combination of proa
 
 Rampart ships **prompt files** that guide AI coding assistants through architectural workflows:
 
-**Architecture Design** (`architecture.prompt`):
+**Architecture Design** (`architecture.prompt.md`):
 - Guides collaborative elicitation of bounded contexts and domain models
 - Encodes architectural patterns and ubiquitous language principles
 - Produces version-controlled JSON as the source of truth
 
-**Planning** (`planning.prompt`):
+**Planning** (`planning.prompt.md`):
 - Guides spec completion for capabilities
 - Gathers both functional and technical requirements systematically
 - Fills in data model, contracts, and integration details through targeted questions

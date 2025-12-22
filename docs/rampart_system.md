@@ -266,8 +266,8 @@ project-root/
 │   ├── cat_content.json      # Cat & Content BC architecture
 │   └── billing.json          # Billing BC architecture (example)
 ├── prompts/
-│   ├── architecture.prompt   # Guides architecture.json design
-│   └── planning.prompt       # Guides spec completion
+│   ├── architecture.prompt.md   # Guides architecture.json design
+│   └── planning.prompt.md       # Guides spec completion
 ├── engines/
 │   ├── cat_content/          # Engine implementation
 │   │   ├── specs/            # Capability specs
