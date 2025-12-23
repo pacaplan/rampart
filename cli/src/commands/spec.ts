@@ -403,10 +403,20 @@ export async function spec(args: string[]): Promise<void> {
 
   console.log(`Output directory: ${specsDir}`);
 
-  // Generate spec for each capability
+  // Generate spec for each capability (skip existing files)
+  let generated = 0;
+  let skipped = 0;
+  
   for (const capability of arch.layers.application.capabilities) {
     const capSlug = slugify(capability.name);
     const specPath = join(specsDir, `${capSlug}.spec.md`);
+
+    // Skip existing specs to avoid overwriting user edits
+    if (existsSync(specPath)) {
+      console.log(`Skipped (exists): ${specPath}`);
+      skipped++;
+      continue;
+    }
 
     // Generate L3 Mermaid code (just the source, no rendering)
     const diagram = generateL3(arch, capability, bcId);
@@ -416,8 +426,9 @@ export async function spec(args: string[]): Promise<void> {
     
     await Bun.write(specPath, specContent);
     console.log(`Generated: ${specPath}`);
+    generated++;
   }
 
-  console.log(`\nGenerated ${arch.layers.application.capabilities.length} spec template(s).`);
+  console.log(`\nGenerated ${generated} spec template(s), skipped ${skipped} existing.`);
 }
 
