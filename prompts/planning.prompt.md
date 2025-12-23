@@ -206,6 +206,14 @@ Capture any additional context:
 
 **Important:** Implementation notes must not change architecture. If a note implies a new port, adapter, aggregate, or event is needed, escalate to `architecture.prompt.md` first. This section captures constraints for implementing the existing architecture—not redesigning it.
 
+### 8. Update Spec Status
+
+Once you have completed all sections of the spec (Acceptance Criteria, Error Handling, Data Model, Request/Response Contracts), confirm with the user that planning is complete:
+
+> "I believe we've covered all the spec sections. Are you satisfied with the Acceptance Criteria, Error Handling, Data Model, and Request/Response Contracts? If so, I'll update the **Status** field at the top of the spec file from `template` to `planned`."
+
+When the user confirms, update the Status field in the spec file.
+
 ---
 
 ## Example Conversations
@@ -333,6 +341,8 @@ Now let's cover **Error Handling**. What should happen if:
 6. **Stay within scope** — Focus on this capability only. Cross-cutting concerns belong elsewhere.
 
 7. **Preserve checkboxes** — Keep the `- [ ]` format so requirements can be tracked during implementation.
+
+8. **Confirm before status change** — Confirm with the user that planning is complete before updating the Status field from `template` to `planned`.
 
 ---
 

@@ -84,8 +84,17 @@ function generateSpecMarkdown(
   lines.push(`# ${capability.name} — Capability Spec`);
   lines.push("");
   lines.push(`**Bounded Context:** ${arch.name}`);
+  lines.push(`**Status:** template`);
   lines.push(`**Generated:** ${new Date().toISOString()}`);
   lines.push(`**Source:** \`${archPath}\``);
+  lines.push("");
+  lines.push("<!-- ");
+  lines.push("Status values:");
+  lines.push("  - template: Initial generated template, not yet planned");
+  lines.push("  - planned: Specs completed via /rampart.plan, ready for implementation");
+  lines.push("  - implemented: Code implementation complete");
+  lines.push("Update this status as you progress through the workflow.");
+  lines.push("-->");
   lines.push("");
   lines.push("---");
   lines.push("");
@@ -198,27 +207,46 @@ function generateSpecMarkdown(
   lines.push("---");
   lines.push("");
 
-  // Data Model (to be completed)
+  // Data Model (to be completed during planning)
   lines.push("## Data Model");
   lines.push("");
   lines.push("<!-- Map the Aggregate attributes above to a persistence schema -->");
   lines.push("<!-- Note: Only model tables owned by this Bounded Context -->");
   lines.push("");
+  lines.push("### Schema");
+  lines.push("");
   lines.push("| Table | Column | Type | Constraints |");
   lines.push("|-------|--------|------|-------------|");
   lines.push("| ...   | ...    | ...  | ...         |");
   lines.push("");
+  lines.push("### Relationships");
+  lines.push("");
+  lines.push("<!-- Define foreign keys, join tables, and cross-aggregate references -->");
+  lines.push("");
+  lines.push("### Indexes");
+  lines.push("");
+  lines.push("<!-- Define indexes for query optimization -->");
+  lines.push("");
   lines.push("---");
   lines.push("");
 
-  // Request/Response Contracts
+  // Request/Response Contracts (to be completed during planning)
   lines.push("## Request/Response Contracts");
   lines.push("");
   lines.push("<!-- Define API payloads and Event DTOs -->");
   lines.push("<!-- Tip: Use Task-Based naming (e.g. GenerateCustomCatRequest) -->");
   lines.push("");
+  lines.push("### Request");
+  lines.push("");
   lines.push("```json");
-  lines.push("// Request");
+  lines.push("{");
+  lines.push("  ...");
+  lines.push("}");
+  lines.push("```");
+  lines.push("");
+  lines.push("### Response");
+  lines.push("");
+  lines.push("```json");
   lines.push("{");
   lines.push("  ...");
   lines.push("}");
@@ -310,30 +338,19 @@ function generateSpecMarkdown(
   lines.push("---");
   lines.push("");
 
-  // Planning sections (to be filled in)
-  lines.push("## Data Model");
-  lines.push("");
-  lines.push("<!-- Fill in during planning -->");
-  lines.push("");
-  lines.push("### Schema");
-  lines.push("");
-  lines.push("### Relationships");
-  lines.push("");
-  lines.push("### Indexes");
-  lines.push("");
-  lines.push("---");
-  lines.push("");
-
-  lines.push("## Request/Response Contracts");
-  lines.push("");
-  lines.push("<!-- Fill in during planning -->");
-  lines.push("");
-  lines.push("---");
-  lines.push("");
-
   lines.push("## Implementation Notes (Optional)");
   lines.push("");
   lines.push("<!-- Add any implementation-specific notes, constraints, or considerations -->");
+  lines.push("");
+  lines.push("---");
+  lines.push("");
+  lines.push("## ✅ Post-Implementation Checklist");
+  lines.push("");
+  lines.push("Once implementation is complete:");
+  lines.push("");
+  lines.push("- [ ] All acceptance criteria pass");
+  lines.push("- [ ] Error handling scenarios covered by tests");
+  lines.push("- [ ] Update **Status** field at top of this file from `planned` to `implemented`");
   lines.push("");
 
   return lines.join("\n");
