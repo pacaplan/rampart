@@ -313,6 +313,10 @@
           "type": "string",
           "description": "Capability name in PascalCase, task-based (e.g., GenerateCustomCat)"
         },
+        "description": {
+          "type": "string",
+          "description": "Brief description of what this capability accomplishes"
+        },
         "actors": {
           "type": "array",
           "items": { "type": "string" },

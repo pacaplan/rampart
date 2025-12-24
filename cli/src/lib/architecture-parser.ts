@@ -51,6 +51,7 @@ export interface Architecture {
       }>;
       capabilities?: Array<{
         name: string;
+        description?: string;
         actors: string[];
         entrypoints: string[];
         orchestrates: string[];

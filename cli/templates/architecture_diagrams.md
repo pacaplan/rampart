@@ -15,6 +15,10 @@ Generated from `{{JSON_PATH}}` on {{TIMESTAMP}}
 {{#each capabilities}}
 ### {{name}}
 
+{{#if description}}
+{{description}}
+
+{{/if}}
 ![{{name}}](images/{{BC_ID}}_l3_{{slug}}.{{FORMAT}})
 
 {{/each}}

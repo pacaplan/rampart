@@ -144,23 +144,23 @@ export function generateL3(
   const entrypoint = capability.entrypoints[0];
   if (entrypoint) {
       const controllerId = "Controller";
-      // Assuming format Controller#action
-      const [controllerName, action] = entrypoint.split("#");
-      
+      // Check if this is a Controller#action format or CLI/other format
+      const isControllerAction = entrypoint.includes("#");
+      const [controllerName, action] = isControllerAction ? entrypoint.split("#") : [entrypoint, null];
+
       // Edge from actor
       const actorId = capability.actors[0]?.replace(/\s+/g, "");
       if (actorId) {
-          // Find route if possible
-          const routeInfo = arch.layers.infrastructure.entrypoints.http.find(e => e.name === controllerName);
-          let routeLabel = action;
-          if (routeInfo) {
-              // This is a simplification, ideally we'd map action to route method/path
-              routeLabel = `${routeInfo.routes}`; 
+          // Find route if possible (only for HTTP entrypoints)
+          const routeInfo = arch.layers.infrastructure.entrypoints.http?.find(e => e.name === controllerName);
+          let routeLabel = action || entrypoint; // Fallback to full entrypoint if no action
+          if (routeInfo?.routes) {
+              routeLabel = routeInfo.routes;
           }
           lines.push(`    ${actorId} -->|"${sanitize(routeLabel)}"| ${controllerId}`);
       }
 
-      lines.push(`    ${controllerId}["${entrypoint}"]`);
+      lines.push(`    ${controllerId}["${sanitize(entrypoint)}"]`);
 
       // Service
       if (capability.orchestrates && capability.orchestrates.length > 0) {

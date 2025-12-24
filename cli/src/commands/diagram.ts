@@ -1,7 +1,7 @@
 import { join, dirname, basename, resolve } from "path";
 import { existsSync, mkdirSync } from "fs";
 import { parseArchitecture, deriveBcId } from "../lib/architecture-parser.js";
-import { generateAllDiagrams } from "../lib/mermaid-generator.js";
+import { generateAllDiagrams, slugify } from "../lib/mermaid-generator.js";
 import { renderMermaid } from "../lib/mermaid-renderer.js";
 
 // Minimal args parsing
@@ -150,23 +150,35 @@ export async function diagram(args: string[]): Promise<void> {
   // Handle #each capabilities
   const capRegex = /{{#each capabilities}}([\s\S]*?){{\/each}}/g;
   const match = capRegex.exec(template);
-  
+
   if (match) {
     const block = match[1];
     let replacement = "";
-    
+
     if (arch.layers.application.capabilities) {
       for (const cap of arch.layers.application.capabilities) {
         let content = block;
+
+        // Handle {{#if description}}...{{/if}} block
+        const descIfRegex = /{{#if description}}([\s\S]*?){{\/if}}/g;
+        const descMatch = descIfRegex.exec(content);
+        if (descMatch) {
+          if (cap.description) {
+            content = content.replace(descMatch[0], descMatch[1].replace(/{{description}}/g, cap.description));
+          } else {
+            content = content.replace(descMatch[0], "");
+          }
+        }
+
         content = content
           .replace(/{{name}}/g, cap.name)
-          .replace(/{{slug}}/g, cap.name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""))
+          .replace(/{{slug}}/g, slugify(cap.name))
           .replace(/{{BC_ID}}/g, bcId)
           .replace(/{{FORMAT}}/g, formatArg);
         replacement += content;
       }
     }
-    
+
     template = template.replace(match[0], replacement);
   } else {
     // Clean up block if regex failed or not found (though it should be there)

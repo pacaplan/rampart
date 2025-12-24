@@ -102,6 +102,10 @@ function generateSpecMarkdown(
   // Overview
   lines.push("## Overview");
   lines.push("");
+  if (capability.description) {
+    lines.push(capability.description);
+    lines.push("");
+  }
   lines.push(`**Actors:** ${capability.actors.join(", ")}`);
   lines.push(`**Entrypoints:** ${capability.entrypoints.join(", ")}`);
   lines.push(`**Outputs:** ${capability.outputs.length > 0 ? capability.outputs.join(", ") : "N/A"}`);
