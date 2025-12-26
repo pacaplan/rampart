@@ -37,6 +37,7 @@ export interface WorkflowSuggestion {
   action: SuggestionAction;
   message: string;
   command?: string;
+  specPath?: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -190,16 +191,16 @@ function determineBCSuggestions(state: BCWorkflowState): WorkflowSuggestion[] {
     return suggestions;
   }
 
-  // Priority 2: Check for capabilities missing specs -> generate_specs
-  const missingSpecs = state.capabilities.filter((c) => !c.hasSpec);
-  if (missingSpecs.length > 0) {
-    const capText = missingSpecs.length === 1 ? 'capability' : 'capabilities';
+  // Priority 2: Planned specs -> implement_capability (depth-first: finish what's closest to done)
+  const plannedSpecs = state.capabilities.filter((c) => c.status === "planned");
+  for (const cap of plannedSpecs) {
     suggestions.push({
       bcId: state.bcId,
       priority: 2,
-      action: "generate_specs",
-      message: `Generate spec templates for ${state.bcId} (${missingSpecs.length} ${capText})`,
-      command: `rampart spec ${state.bcId}`,
+      action: "implement_capability",
+      message: `Implement ${cap.name}`,
+      command: undefined, // Manual implementation
+      specPath: cap.specPath || undefined,
     });
   }
 
@@ -215,15 +216,16 @@ function determineBCSuggestions(state: BCWorkflowState): WorkflowSuggestion[] {
     });
   }
 
-  // Priority 4: Planned specs -> implement_capability
-  const plannedSpecs = state.capabilities.filter((c) => c.status === "planned");
-  for (const cap of plannedSpecs) {
+  // Priority 4: Check for capabilities missing specs -> generate_specs
+  const missingSpecs = state.capabilities.filter((c) => !c.hasSpec);
+  if (missingSpecs.length > 0) {
+    const capText = missingSpecs.length === 1 ? 'capability' : 'capabilities';
     suggestions.push({
       bcId: state.bcId,
       priority: 4,
-      action: "implement_capability",
-      message: `Implement ${cap.name}`,
-      command: undefined, // Manual implementation
+      action: "generate_specs",
+      message: `Generate spec templates for ${state.bcId} (${missingSpecs.length} ${capText})`,
+      command: `rampart spec ${state.bcId}`,
     });
   }
 

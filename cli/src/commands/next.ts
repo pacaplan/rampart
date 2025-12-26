@@ -63,8 +63,11 @@ function formatSuggestion(suggestion: WorkflowSuggestion, index: number): string
   } else {
     // For manual implementation
     if (suggestion.action === "implement_capability") {
-      const bcState = suggestion.bcId;
-      lines.push(`   (Manual implementation - refer to spec file)`);
+      if (suggestion.specPath) {
+        lines.push(`   Spec: ${suggestion.specPath}`);
+      } else {
+        lines.push(`   (Manual implementation - refer to spec file)`);
+      }
     }
   }
   return lines.join("\n");
@@ -112,8 +115,8 @@ export async function next(args: string[]): Promise<void> {
     bcsToAnalyze.map((bc) => analyzeBCWorkflowState(bc.id, bc.architectureFile, projectRoot))
   );
 
-  // Generate suggestions (max 3)
-  const suggestions = await generateSuggestions(bcStates, 3);
+  // Generate suggestions (no limit)
+  const suggestions = await generateSuggestions(bcStates, Infinity);
 
   // Output
   if (suggestions.length === 0) {
