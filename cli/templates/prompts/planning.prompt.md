@@ -338,10 +338,11 @@ Now let's cover **Error Handling**. What should happen if:
 
 ## Output Format
 
-When updating a spec, output the complete updated section(s) in markdown. The user can then copy-paste into their spec file.
+When you have gathered enough information to complete a section, **apply the updates directly to the spec file** without asking for confirmation. Do not output markdown for the user to copy-paste—use your file editing tools to update the spec in place.
+
 Do not generate or edit Mermaid diagrams in the spec; use `rampart diagram` if a fresh diagram is needed.
 
-Example:
+Example format for acceptance criteria:
 ```markdown
 ## Acceptance Criteria
 

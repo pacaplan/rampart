@@ -356,10 +356,10 @@ async function initEngine(contextName: string) {
     addGemToGemfile("packwerk", "development");
 
     // Try to find local rampart gem (relative to project root)
-    const rampartLocalPath = join(projectRoot, "..", "..", "rampart");
+    const rampartLocalPath = join(projectRoot, "..", "rampart");
     if (existsSync(rampartLocalPath)) {
-        // Use local path relative to engine directory
-        addGemToGemfile("rampart", undefined, { path: "../../../rampart" });
+        // Use local path relative to project root
+        addGemToGemfile("rampart", undefined, { path: "../rampart" });
     } else {
         // Fall back to rubygems
         addGemToGemfile("rampart");

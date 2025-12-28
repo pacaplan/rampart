@@ -219,10 +219,7 @@ export function generateL3(
               
               if (aggregateDef) {
                   const aggId = "Aggregate";
-                  let aggLabel = `${aggregateName} Aggregate`;
-                  if (aggregateDef.invariants && aggregateDef.invariants.length > 0) {
-                      aggLabel += `<br/>─────<br/>Invariants:<br/>• ${aggregateDef.invariants.map(i => wrapText(i, 30)).join("<br/>• ")}`;
-                  }
+                  const aggLabel = `${aggregateName} Aggregate`;
                   lines.push(`    ${serviceId} -->|orchestrates| ${aggId}["${sanitize(aggLabel)}"]`);
 
                   // Events
