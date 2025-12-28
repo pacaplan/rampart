@@ -185,7 +185,7 @@ function determineBCSuggestions(state: BCWorkflowState): WorkflowSuggestion[] {
       priority: 1,
       action: "create_engine",
       message: `Create Rails engine for ${state.bcId}`,
-      command: `rails plugin new engines/${state.bcId} --mountable && rampart init ${state.bcId}`,
+      command: `rails plugin new engines/${state.bcId} --mountable --skip-git && rampart init ${state.bcId}`,
     });
     // Block on this step - don't suggest further work until engine exists
     return suggestions;

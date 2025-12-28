@@ -29,7 +29,7 @@ function loadTemplate(filename: string): string {
 // Gemfile Management
 // ─────────────────────────────────────────────────────────────────────────────
 
-function addGemToGemfile(gemName: string, group?: string): void {
+function addGemToGemfile(gemName: string, group?: string, options?: { path?: string }): void {
   const projectRoot = process.cwd();
   const gemfilePath = join(projectRoot, "Gemfile");
 
@@ -49,7 +49,8 @@ function addGemToGemfile(gemName: string, group?: string): void {
   try {
     // Build bundle add command
     const groupFlag = group ? `--group ${group}` : "";
-    const command = `bundle add ${gemName} ${groupFlag}`.trim();
+    const pathFlag = options?.path ? `--path "${options.path}"` : "";
+    const command = `bundle add ${gemName} ${groupFlag} ${pathFlag}`.trim();
 
     console.log(`Adding gem '${gemName}' to Gemfile${group ? ` (${group} group)` : ''}...`);
     execSync(command, { cwd: projectRoot, stdio: 'inherit' });
@@ -353,7 +354,16 @@ async function initEngine(contextName: string) {
     // Add gems to Gemfile
     console.log("Checking Gemfile for required gems...");
     addGemToGemfile("packwerk", "development");
-    addGemToGemfile("rampart");
+
+    // Try to find local rampart gem (relative to project root)
+    const rampartLocalPath = join(projectRoot, "..", "..", "rampart");
+    if (existsSync(rampartLocalPath)) {
+        // Use local path relative to engine directory
+        addGemToGemfile("rampart", undefined, { path: "../../../rampart" });
+    } else {
+        // Fall back to rubygems
+        addGemToGemfile("rampart");
+    }
 
     if (!createdAny) {
         console.log(`Engine '${contextName}' already initialized with Rampart structure.`);
