@@ -26,6 +26,17 @@ function loadTemplate(filename: string): string {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// String Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+function toPascalCase(str: string): string {
+  return str
+    .split(/[_-]/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join("");
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Gemfile Management
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -313,6 +324,17 @@ async function initEngine(contextName: string) {
     if (!existsSync(specAgentsPath)) {
         console.log("Creating spec/AGENTS.md...");
         writeFileSync(specAgentsPath, loadTemplate("spec_agents.md"));
+        createdAny = true;
+    }
+
+    // Create architecture spec
+    const architectureSpecPath = join(specDir, "architecture_spec.rb");
+    if (!existsSync(architectureSpecPath)) {
+        console.log("Creating spec/architecture_spec.rb...");
+        let content = loadTemplate("architecture_spec.rb");
+        const pascalCaseName = toPascalCase(contextName);
+        content = content.replace(/\{\{CONTEXT_NAME_PASCAL\}\}/g, pascalCaseName);
+        writeFileSync(architectureSpecPath, content);
         createdAny = true;
     }
 
