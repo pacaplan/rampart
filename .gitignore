@@ -4,3 +4,9 @@ worktrees/
 # Dependencies
 node_modules/
 
+# Test output
+**/spec/examples.txt
+
+# Playwright MCP
+.playwright-mcp
+

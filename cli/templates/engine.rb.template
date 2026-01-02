@@ -1,0 +1,36 @@
+# frozen_string_literal: true
+
+require "rampart"
+
+module {{CONTEXT_NAME_PASCAL}}
+  class Engine < ::Rails::Engine
+    isolate_namespace {{CONTEXT_NAME_PASCAL}}
+
+    config.generators do |g|
+      g.test_framework :rspec
+      g.fixture_replacement :factory_bot
+    end
+
+    # Add hexagonal layer directories to autoload paths
+    initializer "{{CONTEXT_NAME}}.autoload_paths", before: :set_autoload_paths do |app|
+      app.config.autoload_paths << root.join("app/domain")
+      app.config.autoload_paths << root.join("app/application")
+      app.config.autoload_paths << root.join("app/infrastructure")
+
+      app.config.eager_load_paths << root.join("app/domain")
+      app.config.eager_load_paths << root.join("app/application")
+      app.config.eager_load_paths << root.join("app/infrastructure")
+    end
+
+    # Load all hexagonal architecture components using Rampart's generic loader
+    # The directory structure (app/{layer}/{{CONTEXT_NAME}}/) doesn't match
+    # Ruby namespace conventions, so we use Rampart::EngineLoader which auto-discovers files
+    config.to_prepare do
+      Rampart::EngineLoader.load_all(
+        engine_root: {{CONTEXT_NAME_PASCAL}}::Engine.root,
+        context_name: "{{CONTEXT_NAME}}"
+      )
+    end
+  end
+end
+

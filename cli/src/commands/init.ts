@@ -338,6 +338,36 @@ async function initEngine(contextName: string) {
         createdAny = true;
     }
 
+    // Create lib directory
+    const libDir = join(enginePath, "lib", contextName);
+    if (!existsSync(libDir)) {
+        mkdirSync(libDir, { recursive: true });
+    }
+
+    // Create engine.rb (uses Rampart::EngineLoader from the gem)
+    const engineRbPath = join(libDir, "engine.rb");
+    let shouldWriteEngine = false;
+    
+    if (!existsSync(engineRbPath)) {
+        shouldWriteEngine = true;
+    } else {
+        // Check if existing file already has Rampart::EngineLoader
+        const existingContent = readFileSync(engineRbPath, "utf-8");
+        if (!existingContent.includes("Rampart::EngineLoader")) {
+            console.log("Updating lib/{{contextName}}/engine.rb with Rampart loader...".replace("{{contextName}}", contextName));
+            shouldWriteEngine = true;
+        }
+    }
+    
+    if (shouldWriteEngine) {
+        let content = loadTemplate("engine.rb.template");
+        const pascalCaseName = toPascalCase(contextName);
+        content = content.replace(/\{\{CONTEXT_NAME_PASCAL\}\}/g, pascalCaseName);
+        content = content.replace(/\{\{CONTEXT_NAME\}\}/g, contextName);
+        writeFileSync(engineRbPath, content);
+        createdAny = true;
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // Packwerk Configuration
     // ─────────────────────────────────────────────────────────────────────────

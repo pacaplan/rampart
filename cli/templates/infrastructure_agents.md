@@ -2,6 +2,20 @@
 
 The infrastructure layer contains all framework-specific code, I/O, and external integrations.
 
+## Namespace Rules for ActiveRecord Models
+
+**Important:** ActiveRecord models should be nested under `Infrastructure::Persistence` to keep them out of the public API.
+
+**File locations:**
+- Base class: `app/infrastructure/{context}/persistence/base_record.rb`
+- Models: `app/infrastructure/{context}/persistence/models/*.rb`
+
+This ensures the architecture spec passes: "public API does not expose ActiveRecord models"
+
+### Adding New Files
+
+Simply create the file in the appropriate directory. `Rampart::EngineLoader` auto-discovers all `.rb` files.
+
 ## Controllers (Primary Adapters)
 
 See `app/controllers/AGENTS.md` for detailed controller guidelines.
