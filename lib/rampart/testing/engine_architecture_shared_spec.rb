@@ -12,6 +12,16 @@ require "rampart/testing/architecture_matchers"
 #       container_class: MyEngine::Infrastructure::Wiring::Container
 #   end
 #
+# Options:
+#   - engine_root: (required) Path to the engine root directory
+#   - container_class: (required) The DI container class for the engine
+#   - architecture_json_path: (optional) Path to the architecture JSON file
+#   - warn_unimplemented: (optional, default: false) When true, items defined in JSON
+#     but missing from code will emit warnings instead of failures. This is useful
+#     during development when the JSON blueprint represents planned architecture
+#     that hasn't been implemented yet. Code that exists but isn't documented in
+#     JSON will still fail (to catch architecture drift).
+#
 # This shared group verifies:
 # 1. DI and Wiring Policies (Services depend on Ports, Controllers depend on Services)
 # 2. Base Class Contracts (Inheritance from Rampart primitives)
@@ -31,6 +41,49 @@ RSpec.shared_examples "Rampart Engine Architecture" do |options = {}|
 
   let(:architecture_json_path) do
     options[:architecture_json_path] || File.join(engine_root, "../../architecture/#{File.basename(engine_root)}.json")
+  end
+
+  let(:warn_unimplemented) do
+    options[:warn_unimplemented] || false
+  end
+
+  # Helper to check architecture sync with support for warning-only mode on unimplemented items
+  def check_architecture_sync(component_type:, json_items:, code_items:, json_path:, add_to_code_hint:, add_to_json_hint:)
+    missing_from_code = json_items - code_items
+    missing_from_json = code_items - json_items
+
+    # Always fail if code exists that isn't documented in JSON (architecture drift)
+    if missing_from_json.any?
+      error_parts = []
+      error_parts << "#{component_type} mismatch - undocumented code found:"
+      error_parts << ""
+      error_parts << "  JSON defines: #{json_items.inspect}"
+      error_parts << "  Code defines: #{code_items.inspect}"
+      error_parts << ""
+      error_parts << "  ❌ Defined in code but missing from JSON: #{missing_from_json.inspect}"
+      error_parts << "     → #{add_to_json_hint}"
+      fail error_parts.join("\n")
+    end
+
+    # For items in JSON but missing from code: warn or fail based on option
+    if missing_from_code.any?
+      message_parts = []
+      message_parts << "#{component_type} not yet implemented:"
+      message_parts << ""
+      message_parts << "  JSON defines: #{json_items.inspect}"
+      message_parts << "  Code defines: #{code_items.inspect}"
+      message_parts << ""
+      message_parts << "  ⚠️  Defined in JSON but missing from code: #{missing_from_code.inspect}"
+      message_parts << "     → #{add_to_code_hint}"
+      message = message_parts.join("\n")
+
+      if warn_unimplemented
+        # Emit as RSpec warning (will appear in output but not fail)
+        warn "\n#{message}\n"
+      else
+        fail message
+      end
+    end
   end
 
   def classes_in_engine(base_class)
@@ -65,10 +118,12 @@ RSpec.shared_examples "Rampart Engine Architecture" do |options = {}|
       location&.include?("/infrastructure/")
     end
   end
-  # Controllers
+  # Controllers (excluding base ApplicationController classes)
   let(:controllers) do
     ObjectSpace.each_object(Class).select do |klass|
       next unless defined?(ActionController::API) && klass < ActionController::API
+      # Skip base ApplicationController classes - these are Rails infrastructure, not entrypoints
+      next if klass.name&.end_with?("::ApplicationController")
       location = Object.const_source_location(klass.name)&.first
       location && location.start_with?(engine_root) && location.include?("/controllers/")
     end
@@ -191,7 +246,14 @@ RSpec.shared_examples "Rampart Engine Architecture" do |options = {}|
       let(:code_aggregates) { get_names(aggregates) }
 
       it "match between JSON and Code" do
-        expect(code_aggregates).to match_array(json_aggregates)
+        check_architecture_sync(
+          component_type: "Aggregates",
+          json_items: json_aggregates,
+          code_items: code_aggregates,
+          json_path: architecture_json_path,
+          add_to_code_hint: "Add these aggregate classes to the codebase",
+          add_to_json_hint: "Add these aggregates to #{architecture_json_path}"
+        )
       end
     end
 
@@ -200,7 +262,14 @@ RSpec.shared_examples "Rampart Engine Architecture" do |options = {}|
       let(:code_events) { get_names(events) }
 
       it "match between JSON and Code" do
-        expect(code_events).to match_array(json_events)
+        check_architecture_sync(
+          component_type: "Events",
+          json_items: json_events,
+          code_items: code_events,
+          json_path: architecture_json_path,
+          add_to_code_hint: "Add these event classes to the codebase",
+          add_to_json_hint: "Add these events to #{architecture_json_path}"
+        )
       end
     end
 
@@ -213,7 +282,14 @@ RSpec.shared_examples "Rampart Engine Architecture" do |options = {}|
       let(:code_ports) { get_names(ports) }
 
       it "match between JSON and Code" do
-        expect(code_ports).to match_array(json_ports)
+        check_architecture_sync(
+          component_type: "Ports",
+          json_items: json_ports,
+          code_items: code_ports,
+          json_path: architecture_json_path,
+          add_to_code_hint: "Add these port interfaces to the domain layer",
+          add_to_json_hint: "Add these ports to #{architecture_json_path}"
+        )
       end
     end
 
@@ -222,7 +298,14 @@ RSpec.shared_examples "Rampart Engine Architecture" do |options = {}|
       let(:code_services) { get_names(services) }
 
       it "match between JSON and Code" do
-        expect(code_services).to match_array(json_services)
+        check_architecture_sync(
+          component_type: "Services",
+          json_items: json_services,
+          code_items: code_services,
+          json_path: architecture_json_path,
+          add_to_code_hint: "Add these service classes to the application layer",
+          add_to_json_hint: "Add these services to #{architecture_json_path}"
+        )
       end
     end
 
@@ -235,7 +318,14 @@ RSpec.shared_examples "Rampart Engine Architecture" do |options = {}|
       let(:code_adapters) { get_names(adapters) }
 
       it "match between JSON and Code" do
-        expect(code_adapters).to match_array(json_adapters)
+        check_architecture_sync(
+          component_type: "Adapters",
+          json_items: json_adapters,
+          code_items: code_adapters,
+          json_path: architecture_json_path,
+          add_to_code_hint: "Add these adapter implementations to the infrastructure layer",
+          add_to_json_hint: "Add these adapters to #{architecture_json_path}"
+        )
       end
     end
 
@@ -244,19 +334,18 @@ RSpec.shared_examples "Rampart Engine Architecture" do |options = {}|
         (architecture_json.dig("layers", "infrastructure", "entrypoints", "http") || []).map { |c| c["name"] }.sort
       end
       let(:code_controllers) do 
-        # Filter out internal/admin/health controllers that might not be in JSON
-        # Or expect JSON to be comprehensive.
-        # CatContent JSON lists: CatListingsController, CustomCatsController.
-        # Real code has: Admin::CatsController, HealthController, CatbotController.
-        # This will fail unless JSON is updated or we filter.
-        # Assuming JSON should be source of truth for MAJOR entrypoints.
-        # But for exact match, it will be strict.
         get_names(controllers)
       end
 
       it "match between JSON and Code" do
-        # Validate bidirectionally
-        expect(code_controllers).to match_array(json_controllers)
+        check_architecture_sync(
+          component_type: "Controllers",
+          json_items: json_controllers,
+          code_items: code_controllers,
+          json_path: architecture_json_path,
+          add_to_code_hint: "Add these controller classes to app/controllers",
+          add_to_json_hint: "Add these controllers to #{architecture_json_path}"
+        )
       end
     end
   end
