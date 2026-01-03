@@ -248,6 +248,7 @@ async function initEngine(contextName: string) {
     const appDir = join(enginePath, "app");
     const specDir = join(enginePath, "spec");
     const domainDir = join(appDir, "domain", contextName);
+    const agentsMdPath = join(enginePath, "AGENTS.md");
     
     let createdAny = false;
     const structureExists = existsSync(domainDir);
@@ -277,6 +278,13 @@ async function initEngine(contextName: string) {
                 mkdirSync(fullPath, { recursive: true });
             }
         }
+        createdAny = true;
+    }
+
+    if (!existsSync(agentsMdPath)) {
+        console.log("Creating AGENTS.md...");
+        const agentsContent = "It is **mandatory** to use the rampart skill, which for now lives in [SKILL.md](/Users/pcaplan/paul/cats-as-a-service/.claude/skills/rampart/SKILL.md).\n";
+        writeFileSync(agentsMdPath, agentsContent);
         createdAny = true;
     }
 
@@ -386,4 +394,3 @@ async function initEngine(contextName: string) {
         console.log("  3. Run 'bundle exec packwerk check' to verify layer boundaries");
     }
 }
-
