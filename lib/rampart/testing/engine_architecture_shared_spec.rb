@@ -216,19 +216,9 @@ RSpec.shared_examples "Rampart Engine Architecture" do |options = {}|
       expect(const).to be_truthy
     end
 
-    it "public API does not expose ActiveRecord models" do
-      module_name = container_class.name.split("::").first
-      root_module = Object.const_get(module_name)
-      
-      root_module.constants.each do |const_name|
-        const = root_module.const_get(const_name)
-        if const.is_a?(Class) && defined?(ActiveRecord::Base) && const < ActiveRecord::Base
-          location = Object.const_source_location(const.name)
-          loc_str = location ? "#{location[0]}:#{location[1]}" : "unknown location"
-          fail "Public API exposes ActiveRecord model: #{const_name} defined at #{loc_str}"
-        end
-      end
-    end
+    # Note: We rely on Packwerk's enforce_privacy to prevent external access to
+    # infrastructure internals. No namespace-based hiding is required—all classes
+    # use the flat {Context}::{ClassName} convention.
   end
 
   describe "Architecture JSON Sync" do

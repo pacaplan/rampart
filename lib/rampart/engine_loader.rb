@@ -87,10 +87,15 @@ module Rampart
 
         Dir.glob(dir.join(pattern)).sort.each do |file|
           next if File.directory?(file)
-          require_dependency file
+          if Rails.env.development? || Rails.env.test?
+            load file.to_s
+          else
+            require_dependency file
+          end
         end
       end
     end
   end
 end
+
 

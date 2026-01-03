@@ -78,5 +78,10 @@ Each engine uses `Rampart::EngineLoader` to auto-discover and load all hexagonal
 4. **Events**: Use domain events for cross-context communication
 5. **Controllers**: See `app/controllers/AGENTS.md` for controller-specific guidelines
 6. **No Manual Requires**: `Rampart::EngineLoader` handles class loading automatically
+7. **Flat Namespace**: All classes use `{Context}::{ClassName}` (e.g., `CatContent::CatListing`, `CatContent::Container`)
 
+## Namespace Convention
 
+All classes within an engine use a flat namespace under the context module:
+- ✅ CORRECT - CatContent::CatListingRecord
+- ❌ WRONG - CatContent::Infrastructure::Persistence::CatListingRecord

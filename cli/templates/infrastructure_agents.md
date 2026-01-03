@@ -2,15 +2,12 @@
 
 The infrastructure layer contains all framework-specific code, I/O, and external integrations.
 
-## Namespace Rules for ActiveRecord Models
-
-**Important:** ActiveRecord models should be nested under `Infrastructure::Persistence` to keep them out of the public API.
+## File locations
 
 **File locations:**
 - Base class: `app/infrastructure/{context}/persistence/base_record.rb`
 - Models: `app/infrastructure/{context}/persistence/models/*.rb`
-
-This ensures the architecture spec passes: "public API does not expose ActiveRecord models"
+- Container: `app/infrastructure/{context}/wiring/container.rb`
 
 ### Adding New Files
 
