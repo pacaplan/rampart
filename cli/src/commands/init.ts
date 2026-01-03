@@ -135,7 +135,6 @@ async function initProject() {
   const systemJsonPath = join(architectureDir, "system.json");
   const agentsMdPath = join(projectRoot, "AGENTS.md");
   const enginesDir = join(projectRoot, "engines");
-  const enginesAgentsMdPath = join(enginesDir, "AGENTS.md");
   const packwerkYmlPath = join(projectRoot, "packwerk.yml");
 
   let createdAny = false;
@@ -191,18 +190,13 @@ Rampart provides the building blocks for DDD:
     createdAny = true;
   }
 
-  // Create engines directory and AGENTS.md if engines dir exists or we create it
+  // Create engines directory if it doesn't exist
   if (!existsSync(enginesDir)) {
     console.log("Creating engines directory...");
     mkdirSync(enginesDir);
     createdAny = true;
   }
 
-  if (!existsSync(enginesAgentsMdPath)) {
-    console.log("Creating engines/AGENTS.md...");
-    writeFileSync(enginesAgentsMdPath, loadTemplate("engines_agents.md"));
-    createdAny = true;
-  }
 
   if (!existsSync(packwerkYmlPath)) {
     console.log("Creating packwerk.yml...");
@@ -286,44 +280,9 @@ async function initEngine(contextName: string) {
         createdAny = true;
     }
 
-    // Create AGENTS.md files for each layer (even if structure already exists)
-    const domainAgentsPath = join(appDir, "domain", "AGENTS.md");
-    if (existsSync(join(appDir, "domain")) && !existsSync(domainAgentsPath)) {
-        console.log("Creating app/domain/AGENTS.md...");
-        writeFileSync(domainAgentsPath, loadTemplate("domain_agents.md"));
-        createdAny = true;
-    }
-
-    const applicationAgentsPath = join(appDir, "application", "AGENTS.md");
-    if (existsSync(join(appDir, "application")) && !existsSync(applicationAgentsPath)) {
-        console.log("Creating app/application/AGENTS.md...");
-        writeFileSync(applicationAgentsPath, loadTemplate("application_agents.md"));
-        createdAny = true;
-    }
-
-    const infrastructureAgentsPath = join(appDir, "infrastructure", "AGENTS.md");
-    if (existsSync(join(appDir, "infrastructure")) && !existsSync(infrastructureAgentsPath)) {
-        console.log("Creating app/infrastructure/AGENTS.md...");
-        writeFileSync(infrastructureAgentsPath, loadTemplate("infrastructure_agents.md"));
-        createdAny = true;
-    }
-
-    const controllersAgentsPath = join(appDir, "controllers", "AGENTS.md");
-    if (existsSync(join(appDir, "controllers")) && !existsSync(controllersAgentsPath)) {
-        console.log("Creating app/controllers/AGENTS.md...");
-        writeFileSync(controllersAgentsPath, loadTemplate("controllers_agents.md"));
-        createdAny = true;
-    }
-
-    // Create spec directory and AGENTS.md if it doesn't exist
+    // Create spec directory if it doesn't exist
     if (!existsSync(specDir)) {
         mkdirSync(specDir, { recursive: true });
-        createdAny = true;
-    }
-    const specAgentsPath = join(specDir, "AGENTS.md");
-    if (!existsSync(specAgentsPath)) {
-        console.log("Creating spec/AGENTS.md...");
-        writeFileSync(specAgentsPath, loadTemplate("spec_agents.md"));
         createdAny = true;
     }
 

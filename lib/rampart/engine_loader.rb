@@ -98,4 +98,3 @@ module Rampart
   end
 end
 
-
