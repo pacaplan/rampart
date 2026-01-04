@@ -69,6 +69,29 @@ async function resolveArchitecturePath(arg: string): Promise<string> {
   return join(projectRoot, engine.architecture_file);
 }
 
+async function resolveArchitecturePathNew(arg: string): Promise<string> {
+  // If it looks like a file path, return it resolved
+  if (arg.endsWith(".json")) {
+    return resolve(arg);
+  }
+
+  // Otherwise, treat as BC ID and construct the new path
+  const systemPath = await findSystemJson(process.cwd());
+  if (!systemPath) {
+    throw new Error(`Could not find architecture/system.json to resolve BC ID '${arg}'. Please run from project root or provide full path.`);
+  }
+
+  const projectRoot = dirname(dirname(systemPath));
+  const newPath = join(projectRoot, "architecture", arg, "architecture.json");
+  
+  // Check if the new path exists
+  if (existsSync(newPath)) {
+    return newPath;
+  }
+
+  throw new Error(`Could not find architecture file at ${newPath}. Please ensure the bounded context uses architecture/{bc_id}/architecture.json.`);
+}
+
 type Capability = NonNullable<Architecture["layers"]["application"]["capabilities"]>[0];
 
 function generateSpecMarkdown(
@@ -373,7 +396,7 @@ export async function spec(args: string[]): Promise<void> {
   
   let archPath: string;
   try {
-    archPath = await resolveArchitecturePath(bcIdOrPath);
+    archPath = await resolveArchitecturePathNew(bcIdOrPath);
   } catch (e) {
     console.error((e as Error).message);
     process.exit(1);
@@ -391,14 +414,21 @@ export async function spec(args: string[]): Promise<void> {
   console.log(`Generating spec templates for ${bcId}...`);
 
   // Determine output directory
-  // Default: docs/specs/{bcId}/
+  // Default: architecture/{bcId}/
   let specsDir: string;
   if (outputArg) {
     specsDir = resolve(outputArg);
   } else {
     const archDir = dirname(resolve(archPath));
     const projectRoot = basename(archDir) === "architecture" ? dirname(archDir) : archDir;
-    specsDir = join(projectRoot, "docs", "specs", bcId);
+    
+    // If the architecture file is "architecture.json", output to its parent directory
+    if (basename(resolve(archPath)) === "architecture.json") {
+      specsDir = dirname(resolve(archPath));
+    } else {
+      // Fallback for old format
+      specsDir = join(projectRoot, "architecture", bcId);
+    }
   }
 
   if (!existsSync(specsDir)) {
@@ -435,4 +465,3 @@ export async function spec(args: string[]): Promise<void> {
 
   console.log(`\nGenerated ${generated} spec template(s), skipped ${skipped} existing.`);
 }
-

@@ -186,8 +186,13 @@ For complete CLI documentation, see [Features](docs/rampart_features.md#cli-tool
 project-root/
 ├── architecture/
 │   ├── system.json           # System-level manifest
-│   ├── catalog.json          # Per-bounded-context blueprint
-│   └── payments.json
+│   ├── catalog/              # Per-bounded-context directory
+│   │   ├── architecture.json
+│   │   ├── browse_catalog.spec.md
+│   │   └── manage_catalog.spec.md
+│   └── payments/
+│       ├── architecture.json
+│       └── ...
 ├── prompts/
 │   ├── architecture.prompt.md   # Guides architecture.json design
 │   └── planning.prompt.md       # Guides spec completion
@@ -195,10 +200,6 @@ project-root/
 │   ├── diagrams/             # Architecture diagrams
 │   │   ├── catalog_architecture.md
 │   │   └── images/
-│   └── specs/                # Capability specs
-│       └── cat_content/
-│           ├── browse_catalog.spec.md
-│           └── manage_catalog.spec.md
 ├── engines/
 │   ├── catalog/              # Bounded context as Rails engine
 │   └── payments/

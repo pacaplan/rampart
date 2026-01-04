@@ -47,27 +47,19 @@ async function resolveArchitecturePath(arg: string): Promise<string> {
     return resolve(arg);
   }
 
-  // Otherwise, treat as BC ID and look up in system.json
+  // Otherwise, treat as BC ID and use the new default path
   const systemPath = await findSystemJson(process.cwd());
   if (!systemPath) {
     throw new Error(`Could not find architecture/system.json to resolve BC ID '${arg}'. Please run from project root or provide full path.`);
   }
 
-  const systemFile = Bun.file(systemPath);
-  const system = await systemFile.json();
-  
-  const engine = system.engines?.items?.find((e: any) => e.id === arg);
-  if (!engine) {
-    throw new Error(`Bounded Context '${arg}' not found in system.json`);
-  }
-
-  if (!engine.architecture_file) {
-    throw new Error(`Engine '${arg}' in system.json is missing 'architecture_file' property`);
-  }
-
-  // Resolve architecture file relative to system.json's project root (parent of architecture dir)
   const projectRoot = dirname(dirname(systemPath));
-  return join(projectRoot, engine.architecture_file);
+  const newPath = join(projectRoot, "architecture", arg, "architecture.json");
+  if (existsSync(newPath)) {
+    return newPath;
+  }
+
+  throw new Error(`Could not find architecture file at ${newPath}. Please ensure the bounded context uses architecture/{bc_id}/architecture.json.`);
 }
 
 export async function diagram(args: string[]): Promise<void> {
@@ -111,9 +103,15 @@ export async function diagram(args: string[]): Promise<void> {
     mdOutputPath = resolve(outputArg);
   } else {
     // Try to find docs dir relative to project root
-    // Assume arch path is project/architecture/file.json -> project/docs/diagrams/...
+    // New format: project/architecture/{bc_id}/architecture.json
+    // Old format: project/architecture/{bc_id}.json
     const archDir = dirname(resolve(archPath));
-    const projectRoot = basename(archDir) === "architecture" ? dirname(archDir) : archDir;
+    let projectRoot = archDir;
+    if (basename(archDir) === "architecture") {
+      projectRoot = dirname(archDir);
+    } else if (basename(dirname(archDir)) === "architecture") {
+      projectRoot = dirname(dirname(archDir));
+    }
     mdOutputPath = join(projectRoot, "docs", "diagrams", `${bcId}_architecture.md`);
   }
 

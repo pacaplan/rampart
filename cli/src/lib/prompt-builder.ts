@@ -178,7 +178,7 @@ ${JSON.stringify(ctx.architecture, null, 2)}
 # Implementation Plan: {Bounded Context Name}
 
 Generated: {date}
-Architecture: architecture/${ctx.bcId}.json
+Architecture: architecture/${ctx.bcId}/architecture.json
 Mode: ${ctx.engineExists ? "Incremental" : "Greenfield"}
 
 ## Summary

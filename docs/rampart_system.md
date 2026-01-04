@@ -110,7 +110,7 @@ Version of the `system.json` schema. Used for backward compatibility and migrati
   "id": "cat_content",
   "engine_name": "cat_content",
   "path": "engines/cat_content",
-  "architecture_file": "architecture/cat_content.json",
+  "architecture_file": "architecture/cat_content/architecture.json",
   "enabled": true
 }
 ```
@@ -120,7 +120,7 @@ Version of the `system.json` schema. Used for backward compatibility and migrati
 - `id` (required): stable bounded‑context identifier (should not change)
 - `engine_name`: folder / Rails engine name (often same as id)
 - `path` (required): explicit path to the engine root
-- `architecture_file`: path to BC architecture file in `architecture/` directory (named by BC id: `architecture/{id}.json`)
+- `architecture_file`: path to BC architecture file in `architecture/` directory (named by BC id: `architecture/{id}/architecture.json`)
 - `enabled`: whether Rampart should include this engine
 
 **Why explicit paths?**
@@ -152,7 +152,7 @@ Profiles live outside BC `architecture.json` files to avoid duplication.
 
 ```jsonc
 "discovery": {
-  "architecture_filename": "cat_content.json",
+  "architecture_filename": "architecture.json",
   "strict_engine_list": true,
   "ignore": [
     "vendor/**",
@@ -164,7 +164,7 @@ Profiles live outside BC `architecture.json` files to avoid duplication.
 }
 ```
 
-- `architecture_filename`: expected BC architecture file naming pattern (BC id-based: `{id}.json`)
+- `architecture_filename`: expected BC architecture file naming pattern (stored as `architecture/{id}/architecture.json`)
 - `strict_engine_list`: if true, only engines listed in `system.json` are validated
 - `ignore`: glob patterns to skip during scanning
 
@@ -237,12 +237,12 @@ Provides sensible defaults for diagram generation.
   "engines": {
     "base_dir": "engines",
     "items": [
-      { "id": "cat_content", "engine_name": "cat_content", "path": "engines/cat_content", "architecture_file": "architecture/cat_content.json", "enabled": true },
-      { "id": "billing", "engine_name": "billing", "path": "engines/billing", "architecture_file": "architecture/billing.json", "enabled": true }
+      { "id": "cat_content", "engine_name": "cat_content", "path": "engines/cat_content", "architecture_file": "architecture/cat_content/architecture.json", "enabled": true },
+      { "id": "billing", "engine_name": "billing", "path": "engines/billing", "architecture_file": "architecture/billing/architecture.json", "enabled": true }
     ]
   },
   "profiles": { "default": "rampart_hexddd_v1" },
-  "discovery": { "architecture_filename": "cat_content.json", "strict_engine_list": true },
+  "discovery": { "architecture_filename": "architecture.json", "strict_engine_list": true },
   "system_constraints": { "integration": [], "shared_kernel": [], "global_rules": [] }
 }
 ```
@@ -251,7 +251,7 @@ Provides sensible defaults for diagram generation.
 
 ## 10. Design Principles Recap
 
-- One architecture file per bounded context (in `architecture/` directory, named `{id}.json`)
+- One architecture file per bounded context (in `architecture/{id}/architecture.json`)
 - `system.json` is thin, declarative, and deterministic
 - All architecture definitions centralized in `architecture/` directory
 - No duplication of framework or BC‑level rules
@@ -263,25 +263,22 @@ Provides sensible defaults for diagram generation.
 project-root/
 ├── architecture/
 │   ├── system.json           # System-level manifest
-│   ├── cat_content.json      # Cat & Content BC architecture
-│   └── billing.json          # Billing BC architecture (example)
+│   ├── cat_content/          # Cat & Content BC
+│   │   ├── architecture.json
+│   │   └── browse_catalog.spec.md
+│   └── billing/              # Billing BC (example)
+│       ├── architecture.json
+│       └── ...
 ├── prompts/
 │   ├── architecture.prompt.md   # Guides architecture.json design
 │   └── planning.prompt.md       # Guides spec completion
 ├── engines/
 │   ├── cat_content/          # Engine implementation
-│   │   ├── specs/            # Capability specs
-│   │   │   ├── browse_catalog.spec.md
-│   │   │   ├── generate_custom_cat.spec.md
-│   │   │   ├── manage_catalog.spec.md
-│   │   │   └── moderate_custom_cats.spec.md
 │   │   └── app/              # Domain/Application/Infrastructure
 │   └── billing/              # Engine implementation
-│       ├── specs/            # Capability specs
 │       └── app/              # Domain/Application/Infrastructure
 └── apps/
     └── web/                  # Rails app
 ```
 
 This document is the canonical reference for `system.json` in Rampart.
-

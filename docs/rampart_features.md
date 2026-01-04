@@ -12,10 +12,17 @@ Rampart-powered projects store architecture definitions in JSON files:
 
 ```
 architecture/
-  system.json      # System-wide config and engine list
-  catalog.json     # Per-bounded-context blueprint
-  payments.json
-  shipping.json
+  system.json           # System-wide config and engine list
+  catalog/              # Per-bounded-context directory
+  │   ├── architecture.json
+  │   ├── browse_catalog.spec.md
+  │   └── manage_catalog.spec.md
+  payments/
+  │   ├── architecture.json
+  │   └── ...
+  shipping/
+  │   ├── architecture.json
+  │   └── ...
 ```
 
 These JSON files act as the architectural source of truth.
@@ -156,9 +163,9 @@ These prompts are loaded into AI coding assistants (Claude Code, Cursor, etc.) a
 - [ ] **rampart spec** - Generate spec templates for capabilities from architecture JSON
   - **If engine does not exist,** generates minimal spec indicating Rails engine setup needed
   - **If engine exists:**
-    - Reads `architecture/{bc_id}.json`
+    - Reads `architecture/{bc_id}/architecture.json`
     - Identifies all capabilities defined in the BC
-    - Generates one spec template file per capability in `engines/{bc_name}/specs/`
+    - Generates one spec template file per capability in `architecture/{bc_name}/`
   - **Spec template structure:**
     - Functional requirements (placeholder)
     - Technical requirements (placeholder)

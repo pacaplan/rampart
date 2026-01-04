@@ -40,7 +40,10 @@ RSpec.shared_examples "Rampart Engine Architecture" do |options = {}|
   end
 
   let(:architecture_json_path) do
-    options[:architecture_json_path] || File.join(engine_root, "../../architecture/#{File.basename(engine_root)}.json")
+    options[:architecture_json_path] || begin
+      bc_id = File.basename(engine_root)
+      File.join(engine_root, "../../architecture/#{bc_id}/architecture.json")
+    end
   end
 
   let(:warn_unimplemented) do

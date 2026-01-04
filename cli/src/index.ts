@@ -57,9 +57,9 @@ Options:
   --backend <name>          Cilantro backend override (cursor | claude | codex). Also supports CILANTRO_BACKEND env var.
 
 Examples:
-  rampart plan architecture/cat_content.json
-  rampart diagram architecture/cat_content.json
-  rampart diagram architecture/cat_content.json -o docs/arch/cat_content.md -f png
+  rampart plan architecture/cat_content/architecture.json
+  rampart diagram architecture/cat_content/architecture.json
+  rampart diagram architecture/cat_content/architecture.json -o docs/arch/cat_content.md -f png
   rampart spec cat_content
   rampart next
   rampart next --bc cat_content

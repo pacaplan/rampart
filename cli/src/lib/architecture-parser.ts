@@ -116,12 +116,19 @@ export async function parseArchitecture(path: string): Promise<Architecture> {
 }
 
 /**
- * Derives the bounded context ID from the architecture file name.
- * e.g., "cat_content.json" -> "cat_content"
+ * Derives the bounded context ID from the architecture file path.
+ * Handles the format "cat_content/architecture.json"
  */
 export function deriveBcId(archPath: string): string {
-  const fileName = basename(archPath, ".json");
-  return fileName;
+  const fileName = basename(archPath);
+
+  // If the file is named "architecture.json", extract BC ID from parent directory
+  if (fileName === "architecture.json") {
+    return basename(dirname(archPath));
+  }
+  
+  // Otherwise, use the old logic: strip .json extension
+  return basename(archPath, ".json");
 }
 
 /**

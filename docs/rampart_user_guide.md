@@ -126,7 +126,7 @@ Running `rampart init` installs two slash commands for use in Cursor and Claude 
 
 | Command | Purpose |
 |---------|---------|
-| `/rampart.architect` | Design or modify bounded context architecture, producing `architecture/{bc_id}.json` |
+| `/rampart.architect` | Design or modify bounded context architecture, producing `architecture/{bc_id}/architecture.json` |
 | `/rampart.plan` | Complete capability specs with functional requirements, data models, and contracts |
 
 The commands are installed as symlinks pointing to canonical files in `prompts/`:
@@ -147,11 +147,11 @@ A Terraform-like workflow for evolving architecture through prompt-driven collab
 
 ### Adding a New Bounded Context
 
-1. **Design the bounded context** — Use `/rampart.architect` to collaboratively define the BC, producing `architecture/{bc_id}.json`
+1. **Design the bounded context** — Use `/rampart.architect` to collaboratively define the BC, producing `architecture/{bc_id}/architecture.json`
 
 2. **Create Rails engine** (if new) — Run `rails plugin new engines/{bc_name} --mountable` and `rampart init {bc_name}` to scaffold DDD structure
 
-3. **Generate spec templates** — Run `rampart spec` to generate one spec file per capability in `engines/{bc_name}/specs/`
+3. **Generate spec templates** — Run `rampart spec` to generate one spec file per capability in `architecture/{bc_name}/`
 
 4. **Complete specs** — For each capability, use `/rampart.plan` with the spec file to collaboratively fill in:
    - Functional requirements (inputs, outputs, scenarios, validation)
@@ -168,7 +168,7 @@ A Terraform-like workflow for evolving architecture through prompt-driven collab
 
 ### Adding a Capability to Existing Bounded Context
 
-1. **Update architecture blueprint** — Use `/rampart.architect` to add the capability to `architecture/{bc_id}.json`
+1. **Update architecture blueprint** — Use `/rampart.architect` to add the capability to `architecture/{bc_id}/architecture.json`
 
 2. **Generate spec template** — Run `rampart spec` to generate the new capability's spec file
 
