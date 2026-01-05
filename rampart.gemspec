@@ -1,7 +1,7 @@
 require_relative "lib/rampart/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "rampart"
+  spec.name = "rampart-core"
   spec.version = Rampart::VERSION
   spec.authors = ["Rampart Team"]
   spec.email = ["team@rampart.dev"]

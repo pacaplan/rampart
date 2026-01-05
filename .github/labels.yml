@@ -1,0 +1,15 @@
+# Version labels for semantic versioning
+# Use with github-label-sync or create manually in GitHub
+
+- name: "version:major"
+  color: "d73a4a"
+  description: "Breaking changes - bumps major version (X.0.0)"
+
+- name: "version:minor"
+  color: "0075ca"
+  description: "New features - bumps minor version (0.X.0)"
+
+- name: "version:patch"
+  color: "0e8a16"
+  description: "Bug fixes - bumps patch version (0.0.X)"
+
