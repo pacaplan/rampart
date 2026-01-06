@@ -19,6 +19,8 @@ module Rampart
   #     end
   #   end
   class EngineLoader
+    # Hexagonal architecture layers in load order
+    LAYERS = %w[domain application infrastructure].freeze
     class << self
       # Set up hexagonal architecture loading for an engine
       #
@@ -35,7 +37,7 @@ module Rampart
         root = engine_class.root
 
         # Add hexagonal layer directories to autoload and eager_load paths
-        layer_paths = %w[domain application infrastructure].map { |layer| root.join("app/#{layer}") }
+        layer_paths = LAYERS.map { |layer| root.join("app/#{layer}") }
         engine_class.config.autoload_paths += layer_paths
         engine_class.config.eager_load_paths += layer_paths
 
@@ -66,7 +68,7 @@ module Rampart
         loader = Rails.autoloaders.main
 
         # Configure collapse for each hexagonal layer
-        %w[domain application infrastructure].each do |layer|
+        LAYERS.each do |layer|
           layer_path = engine_root.join("app/#{layer}/#{context_name}")
           next unless layer_path.exist?
 
@@ -80,9 +82,9 @@ module Rampart
       # @param engine_root [Pathname] Root path of the Rails engine
       # @param context_name [String] Snake-case name of the bounded context
       def load_all(engine_root:, context_name:)
-        load_domain_layer(engine_root, context_name)
-        load_application_layer(engine_root, context_name)
-        load_infrastructure_layer(engine_root, context_name)
+        LAYERS.each do |layer|
+          send("load_#{layer}_layer", engine_root, context_name)
+        end
       end
 
       private
@@ -103,15 +105,12 @@ module Rampart
         domain = root.join("app/domain/#{context_name}")
         return unless domain.exist?
 
-        # Load files in specific order: errors, value objects, entities, events, aggregates, services, ports
+        # Load errors/exceptions first (they have no dependencies)
         load_directory(domain, pattern: "*_error.rb")
         load_directory(domain, pattern: "*_exception.rb")
-        load_directory(domain.join("value_objects"))
-        load_directory(domain.join("entities"))
-        load_directory(domain.join("events"))
-        load_directory(domain.join("aggregates"))
-        load_directory(domain.join("services"))
-        load_directory(domain.join("ports"))
+
+        # Load all subdirectories
+        load_all_subdirectories(domain)
 
         # Load any remaining files at domain root
         load_directory(domain, pattern: "*.rb")
@@ -121,10 +120,8 @@ module Rampart
         app = root.join("app/application/#{context_name}")
         return unless app.exist?
 
-        # Load all application layer files
-        load_directory(app.join("commands"))
-        load_directory(app.join("queries"))
-        load_directory(app.join("services"))
+        # Load all subdirectories and root files
+        load_all_subdirectories(app)
         load_directory(app, pattern: "*.rb")
       end
 
@@ -132,20 +129,23 @@ module Rampart
         infra = root.join("app/infrastructure/#{context_name}")
         return unless infra.exist?
 
-        # Load persistence layer first (base_record before models)
+        # Load base_record.rb first (models depend on it)
         persistence = infra.join("persistence")
-        if persistence.exist?
-          load_directory(persistence, pattern: "base_record.rb")
-          load_directory(persistence.join("models"))
-          load_directory(persistence.join("mappers"))
-          load_directory(persistence.join("repositories"))
-        end
+        load_directory(persistence, pattern: "base_record.rb") if persistence.exist?
 
-        # Load other infrastructure components
-        load_directory(infra.join("adapters"))
-        load_directory(infra.join("http"))
-        load_directory(infra.join("wiring"))
+        # Load all subdirectories
+        load_all_subdirectories(infra)
+
+        # Load any remaining files at infrastructure root
         load_directory(infra, pattern: "*.rb")
+      end
+
+      def load_all_subdirectories(dir)
+        return unless dir.exist?
+
+        Dir.glob(dir.join("*/")).sort.each do |subdir|
+          load_directory(Pathname.new(subdir))
+        end
       end
 
       def load_directory(dir, pattern: "**/*.rb")
