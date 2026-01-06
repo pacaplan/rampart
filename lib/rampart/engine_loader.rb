@@ -87,13 +87,13 @@ module Rampart
 
         Dir.glob(dir.join(pattern)).sort.each do |file|
           next if File.directory?(file)
-          if Rails.env.development? || Rails.env.test?
-            # support auto-reloading in development and test environments
-            load file.to_s
-          else
+          if Rails.application.config.eager_load
             # In eager load environments (CI/production), Zeitwerk has already loaded these files.
             # Using require instead of load prevents re-execution and duplicate definitions.
             require file.to_s
+          else
+            # Support auto-reloading in development and local test environments
+            load file.to_s
           end
         end
       end
