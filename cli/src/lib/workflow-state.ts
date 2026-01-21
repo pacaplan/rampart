@@ -134,7 +134,8 @@ export async function analyzeBCWorkflowState(
   const hasEngine = await engineExists(enginePath);
 
   // Default spec directory (matches spec.ts default)
-  const specsDir = join(projectRoot, "docs", "specs", bcId);
+  // Specs are co-located with architecture.json
+  const specsDir = dirname(resolvedArchPath);
 
   // Check each capability for spec file and status
   const capabilityStates: CapabilityState[] = await Promise.all(
